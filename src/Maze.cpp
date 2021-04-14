@@ -1,17 +1,20 @@
 #include "Maze.h"
 
-Maze::Maze()
+Maze::Maze(int N, int w, int h, bool discrete_walls)
 {
-    generate(5);
-    N = 5;
-    return;
+    generate(N);
+    int x = min(w, h);
+    Maze::discrete_walls = discrete_walls;
+    block_size = x / M - discrete_walls;
+    left_offset = (w - block_size * M) / 2;
+    top_offset = (h - block_size * M) / 2;
 }
 
 void Maze::generate(int N)
 {
     // Using DFS to generate a line boundary maze and then convert it to block walls
     Maze::N = N;
-    int M = 2 * N + 1;
+    M = 2 * N + 1;
     maze.clear();
     maze = vector<vector<int>>(M, vector<int>(M, 0));
     int a[N][N][5];
@@ -125,12 +128,11 @@ vector<vector<int>> Maze::getMaze()
 
 int Maze::getSize()
 {
-    return (2 * N + 1);
+    return M;
 }
 
 void Maze::print()
 {
-    int M = 2 * N + 1;
     for (int i = 0; i < M; i++)
     {
         for (int j = 0; j < M; j++)
@@ -141,30 +143,24 @@ void Maze::print()
     }
 }
 
-void Maze::render(SDL_Renderer *renderer, bool discrete_walls)
+void Maze::render(SDL_Renderer *renderer)
 {
-    int M = 2 * N + 1;
-    int w, h;
-    SDL_GetRendererOutputSize(renderer, &w, &h);
-
-    int x = min(w, h);
-    int sz = x / M - discrete_walls;
-
     SDL_Rect rect;
-
-    int left_offset = (w - M * (sz + discrete_walls)) / 2;
-    int top_offset = (h - M * (sz + discrete_walls)) / 2;
-
     for (int i = 0; i < M; i++)
     {
         for (int j = 0; j < M; j++)
         {
             if (maze[i][j])
             {
-                rect = {j * (sz + discrete_walls) + left_offset, i * (sz + discrete_walls) + top_offset, sz, sz};
+                rect = {j * (block_size) + left_offset, i * (block_size) + top_offset, block_size - discrete_walls, block_size - discrete_walls};
                 SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
                 SDL_RenderFillRect(renderer, &rect);
             }
         }
     }
+}
+
+int Maze::getBlockSize()
+{
+    return block_size;
 }

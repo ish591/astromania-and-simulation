@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 
 #include "Maze.h"
+#include "Player.h"
 
 using namespace std;
 
@@ -12,9 +13,7 @@ int main()
     cin >> n;
     cout << "Enter 0 for continuous walls, 1 for discrete:";
     cin >> fl;
-    Maze maze;
-    maze.generate(n);
-    // maze.print();
+    Maze maze(n, 1280, 720, fl);
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
     {
@@ -34,23 +33,22 @@ int main()
 
     bool quit = false;
     SDL_Event e;
-
+    Player player(1);
+    player.updateDimensions(maze, 1280, 720);
     while (!quit)
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        maze.render(renderer, fl);
+        maze.render(renderer);
+        player.render(renderer, maze);
         while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_QUIT)
             {
                 quit = true;
             }
-            if (e.type == SDL_KEYDOWN)
-            {
-                cout << "TEST!" << endl;
-            }
+            player.takeAction(e);
         }
         SDL_RenderPresent(renderer);
     }
