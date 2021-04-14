@@ -14,3 +14,4 @@ make clean # cleans the build
 
 - Generates a random maze
 - Allows a player to navigate in the maze
+- Added maze solver bot

@@ -20,7 +20,7 @@ public:
     void render(SDL_Renderer *, Maze);
     void updateDimensions(Maze, int, int);
 
-private:
+protected:
     int player_id;
     int x_offset, y_offset;
     int x, y;
