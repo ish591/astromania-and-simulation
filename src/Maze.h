@@ -1,11 +1,11 @@
 #pragma once
-
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <stdlib.h>
 #include <stack>
 #include <vector>
 
+//this is the interface file basically
 using namespace std;
 
 class Maze

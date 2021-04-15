@@ -23,7 +23,7 @@ int main()
     }
 
     SDL_Window *win = SDL_CreateWindow("TEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, 0);
-    SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, 0);
+    SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, 0); //-1 denotes its the first renderer
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     if (!win)
     {
@@ -34,18 +34,18 @@ int main()
 
     bool quit = false;
     SDL_Event e;
-    // Player player(1);
-    // player.updateDimensions(maze, 1280, 720);
-    Bot bot(2);
-    bot.updateDimensions(maze, 1280, 720);
-    bot.setDestination(maze, 2 * n - 1, 2 * n - 1);
+     Player player(1);
+     player.updateDimensions(maze, 1280, 720);
+    //Bot bot(2);
+   // bot.updateDimensions(maze, 1280, 720);
+    //bot.setDestination(maze, 2 * n - 1, 2 * n - 1);
     while (!quit)
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         // bot.updateLocation(maze);
         maze.render(renderer);
-        bot.render(renderer, maze);
+        player.render(renderer, maze);
 
         while (SDL_PollEvent(&e))
         {
@@ -53,7 +53,7 @@ int main()
             {
                 quit = true;
             }
-            // player.takeAction(e);
+            player.takeAction(e);
         }
         SDL_RenderPresent(renderer);
     }

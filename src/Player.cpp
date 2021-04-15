@@ -87,9 +87,44 @@ void Player::updateLocation(Maze maze)
         }
         else if (a[y][x - 1] == 0)
         {
-            if (x_offset - move_size < 0)
-                x--;
-            x_offset = (x_offset + block_size - move_size) % block_size;
+            //check if blocked by a vertical cell
+            if (a[y - 1][x - 1] == 1)
+            {
+                if (y_offset >= player_size / 2)
+                {
+                    //now, the upper block does not pose a constraint
+                    if (a[y + 1][x - 1] == 1)
+                    {
+                        if (y_offset <= block_size - player_size / 2)
+                        {
+                            //lower block also does not pose a constraint
+                            if (x_offset - move_size < 0)
+                                x--;
+                            x_offset = (x_offset + block_size - move_size) % block_size;
+                        }
+                        else
+                        {
+                            x_offset = player_size / 2 + 1;
+                        }
+                    }
+                    else
+                    {
+                        if (x_offset - move_size < 0)
+                            x--;
+                        x_offset = (x_offset + block_size - move_size) % block_size;
+                    }
+                }
+                else
+                {
+                    x_offset = player_size / 2 + 1;
+                }
+            }
+            else
+            {
+                if (x_offset - move_size < 0)
+                    x--;
+                x_offset = (x_offset + block_size - move_size) % block_size;
+            }
         }
         else
         {
@@ -107,9 +142,43 @@ void Player::updateLocation(Maze maze)
         }
         else if (a[y][x + 1] == 0)
         {
-            if (x_offset + move_size >= block_size)
-                x++;
-            x_offset = (x_offset + move_size) % block_size;
+            if (a[y - 1][x + 1] == 1)
+            {
+                if (y_offset >= player_size / 2)
+                {
+                    //now, the upper block does not pose a constraint
+                    if (a[y + 1][x + 1] == 1)
+                    {
+                        if (y_offset <= block_size - player_size / 2)
+                        {
+                            //lower block also does not pose a constraint
+                            if (x_offset + move_size >= block_size)
+                                x++;
+                            x_offset = (x_offset + move_size) % block_size;
+                        }
+                        else
+                        {
+                            x_offset = block_size - 1 - player_size / 2;
+                        }
+                    }
+                    else
+                    {
+                        if (x_offset + move_size >= block_size)
+                            x++;
+                        x_offset = (x_offset + move_size) % block_size;
+                    }
+                }
+                else
+                {
+                    x_offset = block_size - 1 - player_size / 2;
+                }
+            }
+            else
+            {
+                if (x_offset + move_size >= block_size)
+                    x++;
+                x_offset = (x_offset + move_size) % block_size;
+            }
         }
         else
         {
@@ -131,9 +200,42 @@ void Player::updateLocation(Maze maze)
         }
         else if (a[y - 1][x] == 0)
         {
-            if (y_offset - move_size < 0)
-                y--;
-            y_offset = (y_offset + block_size - move_size) % block_size;
+            //check if blocked by a right block
+            if (a[y - 1][x + 1] == 1)
+            {
+                if (x_offset <= block_size - player_size / 2)
+                {
+                    if (a[y - 1][x - 1] == 1)
+                    {
+                        if (x_offset >= player_size / 2)
+                        {
+                            if (y_offset - move_size < 0)
+                                y--;
+                            y_offset = (y_offset + block_size - move_size) % block_size;
+                        }
+                        else
+                        {
+                            y_offset = player_size / 2 + 1;
+                        }
+                    }
+                    else
+                    {
+                        if (y_offset - move_size < 0)
+                            y--;
+                        y_offset = (y_offset + block_size - move_size) % block_size;
+                    }
+                }
+                else
+                {
+                    y_offset = player_size / 2 + 1;
+                }
+            }
+            else
+            {
+                if (y_offset - move_size < 0)
+                    y--;
+                y_offset = (y_offset + block_size - move_size) % block_size;
+            }
         }
         else
         {
@@ -151,9 +253,41 @@ void Player::updateLocation(Maze maze)
         }
         else if (a[y + 1][x] == 0)
         {
-            if (y_offset + move_size >= block_size)
-                y++;
-            y_offset = (y_offset + move_size) % block_size;
+            if (a[y - 1][x + 1] == 1)
+            {
+                if (x_offset <= block_size - player_size / 2)
+                {
+                    if (a[y - 1][x - 1] == 1)
+                    {
+                        if (x_offset >= player_size / 2)
+                        {
+                            if (y_offset + move_size >= block_size)
+                                y++;
+                            y_offset = (y_offset + move_size) % block_size;
+                        }
+                        else
+                        {
+                            y_offset = block_size - 1 - player_size / 2;
+                        }
+                    }
+                    else
+                    {
+                        if (y_offset + move_size >= block_size)
+                            y++;
+                        y_offset = (y_offset + move_size) % block_size;
+                    }
+                }
+                else
+                {
+                    y_offset = block_size - 1 - player_size / 2;
+                }
+            }
+            else
+            {
+                if (y_offset + move_size >= block_size)
+                    y++;
+                y_offset = (y_offset + move_size) % block_size;
+            }
         }
         else
         {
