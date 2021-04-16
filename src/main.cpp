@@ -1,12 +1,35 @@
 #include <iostream>
 #include <SDL2/SDL.h>
-
+#include <SDL2/SDL_mixer.h>
 #include "Maze.h"
 #include "Player.h"
 #include "Bot.h"
-
 using namespace std;
-
+bool init()
+{
+    bool success = true;
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
+    {
+        cout << "Error: " << SDL_GetError() << endl;
+        success = false;
+    }
+    else
+    {
+        SDL_Window *win = SDL_CreateWindow("TEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, 0);
+        SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, 0); //-1 denotes its the first renderer
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        if (!win)
+        {
+            cout << "Error" << endl;
+            //SDL_Quit();
+            success = false;
+        }
+    }
+    return success;
+}
+bool loadMedia()
+{
+}
 int main()
 {
     int n, fl;
@@ -14,31 +37,23 @@ int main()
     cin >> n;
     cout << "Enter 0 for continuous walls, 1 for discrete:";
     cin >> fl;
+    cout << "Enter game name: ";
+    //PACMAN OR BOMBERMAN. In case of Pacman, we will use the same generated maze, but with some loops
     Maze maze(n, 1280, 720, fl);
-
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
+    bool initialized = init();
+    if (!initialized)
     {
-        cout << "Error: " << SDL_GetError() << endl;
         return 1;
     }
-
-    SDL_Window *win = SDL_CreateWindow("TEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, 0);
-    SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, 0); //-1 denotes its the first renderer
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    if (!win)
-    {
-        cout << "Error" << endl;
-        SDL_Quit();
-        return 1;
-    }
-
     bool quit = false;
     SDL_Event e;
-     Player player(1);
-     player.updateDimensions(maze, 1280, 720);
-    //Bot bot(2);
-   // bot.updateDimensions(maze, 1280, 720);
-    //bot.setDestination(maze, 2 * n - 1, 2 * n - 1);
+    Player player(1);
+    player.updateDimensions(maze, 1280, 720);
+    Bot bot(2);
+    bot.updateDimensions(maze, 1280, 720);
+    bot.setDestination(maze, 2 * n - 1, 2 * n - 1);
+   
+
     while (!quit)
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -46,9 +61,14 @@ int main()
         // bot.updateLocation(maze);
         maze.render(renderer);
         player.render(renderer, maze);
-
+        bot.render(renderer, maze);
         while (SDL_PollEvent(&e))
         {
+            if (Mix_PlayingMusic() == 0)
+            {
+                //Play the music
+                Mix_PlayMusic(game_sound, -1);
+            }
             if (e.type == SDL_QUIT)
             {
                 quit = true;
@@ -57,7 +77,7 @@ int main()
         }
         SDL_RenderPresent(renderer);
     }
-
+   
     SDL_DestroyWindow(win);
     SDL_Quit();
     return 0;

@@ -17,7 +17,7 @@ public:
 
 private:
     int x_dest, y_dest;
-    void calculatePath(vector<vector<int>> maze);
+    void calculatePath(vector<vector<Box>> maze);
     void center();
     stack<int> path;
 };

@@ -76,7 +76,7 @@ void Player::updateLocation(Maze maze)
 {
     int hmove = RIGHT_PRESSED - LEFT_PRESSED;
     int vmove = DOWN_PRESSED - UP_PRESSED;
-    vector<vector<int>> a = maze.getMaze();
+    vector<vector<Box>> a = maze.getMaze();
     // cout << hmove << vmove << endl;
     switch (hmove)
     {
@@ -85,15 +85,15 @@ void Player::updateLocation(Maze maze)
         {
             x_offset -= move_size;
         }
-        else if (a[y][x - 1] == 0)
+        else if (a[y][x - 1].get_block_type() == 0)
         {
             //check if blocked by a vertical cell
-            if (a[y - 1][x - 1] == 1)
+            if (a[y - 1][x - 1].get_block_type() >= 1)
             {
                 if (y_offset >= player_size / 2)
                 {
                     //now, the upper block does not pose a constraint
-                    if (a[y + 1][x - 1] == 1)
+                    if (a[y + 1][x - 1].get_block_type() >= 1)
                     {
                         if (y_offset <= block_size - player_size / 2)
                         {
@@ -140,14 +140,14 @@ void Player::updateLocation(Maze maze)
         {
             x_offset += move_size;
         }
-        else if (a[y][x + 1] == 0)
+        else if (a[y][x + 1].get_block_type() == 0)
         {
-            if (a[y - 1][x + 1] == 1)
+            if (a[y - 1][x + 1].get_block_type() >= 1)
             {
                 if (y_offset >= player_size / 2)
                 {
                     //now, the upper block does not pose a constraint
-                    if (a[y + 1][x + 1] == 1)
+                    if (a[y + 1][x + 1].get_block_type() >= 1)
                     {
                         if (y_offset <= block_size - player_size / 2)
                         {
@@ -198,14 +198,14 @@ void Player::updateLocation(Maze maze)
         {
             y_offset -= move_size;
         }
-        else if (a[y - 1][x] == 0)
+        else if (a[y - 1][x].get_block_type() == 0)
         {
             //check if blocked by a right block
-            if (a[y - 1][x + 1] == 1)
+            if (a[y - 1][x + 1].get_block_type() >= 1)
             {
                 if (x_offset <= block_size - player_size / 2)
                 {
-                    if (a[y - 1][x - 1] == 1)
+                    if (a[y - 1][x - 1].get_block_type() >= 1)
                     {
                         if (x_offset >= player_size / 2)
                         {
@@ -251,13 +251,13 @@ void Player::updateLocation(Maze maze)
         {
             y_offset += move_size;
         }
-        else if (a[y + 1][x] == 0)
+        else if (a[y + 1][x].get_block_type() == 0)
         {
-            if (a[y - 1][x + 1] == 1)
+            if (a[y - 1][x + 1].get_block_type() >= 1)
             {
                 if (x_offset <= block_size - player_size / 2)
                 {
-                    if (a[y - 1][x - 1] == 1)
+                    if (a[y - 1][x - 1].get_block_type() >= 1)
                     {
                         if (x_offset >= player_size / 2)
                         {

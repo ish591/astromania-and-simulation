@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stack>
 #include <vector>
-
+#include "Box.h"
 //this is the interface file basically
 using namespace std;
 
@@ -17,7 +17,7 @@ public:
     void print();
     void render(SDL_Renderer *);
     int getBlockSize();
-    vector<vector<int>> getMaze();
+    vector<vector<Box>> getMaze();
     bool discrete_walls;
     int left_offset, top_offset;
 
@@ -26,5 +26,5 @@ private:
     int N;
     int M;
     int block_size;
-    vector<vector<int>> maze;
+    vector<vector<Box>> maze;
 };

@@ -23,13 +23,12 @@ void Bot::center()
     y_offset = block_size / 2;
 }
 
-void Bot::calculatePath(vector<vector<int>> maze)
+void Bot::calculatePath(vector<vector<Box>> maze)
 {
     if (x == x_dest && y == y_dest)
         return;
     int M = maze.size();
     int parent[M][M];
-
     for (int i = 0; i < M; i++)
     {
         for (int j = 0; j < M; j++)
@@ -48,22 +47,22 @@ void Bot::calculatePath(vector<vector<int>> maze)
         if (i == y_dest && j == x_dest)
             break;
 
-        if (i - 1 >= 0 && parent[i - 1][j] == -1 && maze[i - 1][j] == 0)
+        if (i - 1 >= 0 && parent[i - 1][j] == -1 && maze[i - 1][j].get_block_type() == 0)
         {
             q.push({i - 1, j});
             parent[i - 1][j] = 1;
         }
-        if (i + 1 < M && parent[i + 1][j] == -1 && maze[i + 1][j] == 0)
+        if (i + 1 < M && parent[i + 1][j] == -1 && maze[i + 1][j].get_block_type() == 0)
         {
             q.push({i + 1, j});
             parent[i + 1][j] = 3;
         }
-        if (j - 1 >= 0 && parent[i][j - 1] == -1 && maze[i][j - 1] == 0)
+        if (j - 1 >= 0 && parent[i][j - 1] == -1 && maze[i][j - 1].get_block_type() == 0)
         {
             q.push({i, j - 1});
             parent[i][j - 1] = 2;
         }
-        if (j + 1 < M && parent[i][j + 1] == -1 && maze[i][j + 1] == 0)
+        if (j + 1 < M && parent[i][j + 1] == -1 && maze[i][j + 1].get_block_type() == 0)
         {
             q.push({i, j + 1});
             parent[i][j + 1] = 4;
@@ -102,7 +101,7 @@ void Bot::updateLocation(Maze maze)
         hmove = (x == 4) - (x == 2);
         path.pop();
     }
-    vector<vector<int>> a = maze.getMaze();
+    vector<vector<Box>> a = maze.getMaze();
 
     switch (hmove)
     {
@@ -111,7 +110,7 @@ void Bot::updateLocation(Maze maze)
         {
             x_offset -= move_size;
         }
-        else if (a[y][x - 1] == 0)
+        else if (a[y][x - 1].get_block_type() == 0)
         {
             if (x_offset - move_size < 0)
                 x--;
@@ -131,7 +130,7 @@ void Bot::updateLocation(Maze maze)
         {
             x_offset += move_size;
         }
-        else if (a[y][x + 1] == 0)
+        else if (a[y][x + 1].get_block_type() == 0)
         {
             if (x_offset + move_size >= block_size)
                 x++;
@@ -155,7 +154,7 @@ void Bot::updateLocation(Maze maze)
         {
             y_offset -= move_size;
         }
-        else if (a[y - 1][x] == 0)
+        else if (a[y - 1][x].get_block_type() == 0)
         {
             if (y_offset - move_size < 0)
                 y--;
@@ -175,7 +174,7 @@ void Bot::updateLocation(Maze maze)
         {
             y_offset += move_size;
         }
-        else if (a[y + 1][x] == 0)
+        else if (a[y + 1][x].get_block_type() == 0)
         {
             if (y_offset + move_size >= block_size)
                 y++;

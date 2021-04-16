@@ -16,7 +16,17 @@ void Maze::generate(int N)
     Maze::N = N;
     M = 2 * N + 1;
     maze.clear();
-    maze = vector<vector<int>>(M, vector<int>(M, 0));
+    maze = vector<vector<Box>>();
+    for (int i = 0; i < M; i++)
+    {
+        vector<Box> temp;
+        for (int j = 0; j < M; j++)
+        {
+            Box new_box = Box(0);
+            temp.push_back(new_box);
+        }
+        maze.push_back(temp);
+    }
     int a[N][N][5];
 
     srand(time(0));
@@ -95,15 +105,15 @@ void Maze::generate(int N)
         for (int j = 0; j < N; j++)
         {
             int x = 2 * i + 1, y = 2 * j + 1;
-            maze[x][y] = 0;
-            maze[x - 1][y] = 1 - a[i][j][1];
-            maze[x][y - 1] = 1 - a[i][j][2];
-            maze[x + 1][y] = 1 - a[i][j][3];
-            maze[x][y + 1] = 1 - a[i][j][4];
-            maze[x - 1][y - 1] = 1;
-            maze[x + 1][y - 1] = 1;
-            maze[x - 1][y + 1] = 1;
-            maze[x + 1][y + 1] = 1;
+            maze[x][y].update(0);
+            maze[x - 1][y].update(1 - a[i][j][1]);
+            maze[x][y - 1].update(1 - a[i][j][2]);
+            maze[x + 1][y].update(1 - a[i][j][3]);
+            maze[x][y + 1].update(1 - a[i][j][4]);
+            maze[x - 1][y - 1].update(2);
+            maze[x + 1][y - 1].update(2);
+            maze[x - 1][y + 1].update(2);
+            maze[x + 1][y + 1].update(2);
         }
     }
     // for (int i = 0; i < N; i++)
@@ -121,7 +131,7 @@ void update(vector<pair<int, int>>)
     return;
 }
 
-vector<vector<int>> Maze::getMaze()
+vector<vector<Box>> Maze::getMaze()
 {
     return maze;
 }
@@ -137,7 +147,8 @@ void Maze::print()
     {
         for (int j = 0; j < M; j++)
         {
-            cout << maze[i][j];
+
+            cout << maze[i][j].get_block_type();
         }
         cout << endl;
     }
@@ -145,21 +156,14 @@ void Maze::print()
 
 void Maze::render(SDL_Renderer *renderer)
 {
-    SDL_Rect rect;
     for (int i = 0; i < M; i++)
     {
         for (int j = 0; j < M; j++)
         {
-            if (maze[i][j])
-            {
-                rect = {j * (block_size) + left_offset, i * (block_size) + top_offset, block_size - discrete_walls, block_size - discrete_walls};
-                SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-                SDL_RenderFillRect(renderer, &rect);
-            }
+            maze[i][j].render(renderer, j * (block_size) + left_offset, i * (block_size) + top_offset, block_size - discrete_walls, block_size - discrete_walls);
         }
     }
 }
-
 int Maze::getBlockSize()
 {
     return block_size;
