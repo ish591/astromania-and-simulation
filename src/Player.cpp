@@ -1,6 +1,21 @@
 #include "Player.h"
-
-Player::Player(int id)
+void Player::set_bomb_type(int t)
+{
+    bomb_type = t;
+}
+void Player::reset_bombs(Maze &maze, int x1, int y1)
+{
+    released = false;
+    bombs.clear();
+    collision_status.clear();
+    for (int i = 0; i < 4; i++)
+    {
+        collision_status.push_back(false);
+        Bomb new_bomb = Bomb(maze, bomb_type, i + 1, x1, y1, x_offset, y_offset); //i+1 denotes the direction
+        bombs.push_back(new_bomb);
+    }
+}
+Player::Player(int id, Maze &maze)
 {
     player_id = id;
     x = 1;
@@ -11,12 +26,15 @@ Player::Player(int id)
     LEFT_PRESSED = 0;
     DOWN_PRESSED = 0;
     RIGHT_PRESSED = 0;
+    SPACE_PRESSED = 0;
+    bomb_type = 1;
+    reset_bombs(maze, x, y);
 }
 
-void Player::updateDimensions(Maze maze, int w, int h)
+void Player::updateDimensions(Maze &maze, int w, int h)
 {
     block_size = maze.getBlockSize();
-    player_size = block_size - 5;
+    player_size = block_size - 15;
     if (player_size % 2 == 1)
         player_size--;
 
@@ -46,6 +64,8 @@ void Player::takeAction(SDL_Event event)
         case SDLK_DOWN:
             DOWN_PRESSED = 1;
             break;
+        case SDLK_SPACE:
+            SPACE_PRESSED = 1;
         default:
             break;
         }
@@ -65,6 +85,8 @@ void Player::takeAction(SDL_Event event)
         case SDLK_DOWN:
             DOWN_PRESSED = 0;
             break;
+        case SDLK_SPACE:
+            SPACE_PRESSED = 0;
         default:
             break;
         }
@@ -72,8 +94,9 @@ void Player::takeAction(SDL_Event event)
     }
 }
 
-void Player::updateLocation(Maze maze)
+void Player::updateLocation(Maze &maze)
 {
+    update_bombs(maze);
     int hmove = RIGHT_PRESSED - LEFT_PRESSED;
     int vmove = DOWN_PRESSED - UP_PRESSED;
     vector<vector<Box>> a = maze.getMaze();
@@ -301,11 +324,108 @@ void Player::updateLocation(Maze maze)
         break;
     }
 }
-
-void Player::render(SDL_Renderer *renderer, Maze maze)
+void Player::update_bombs(Maze &maze)
 {
-    updateLocation(maze);
+    if (SPACE_PRESSED == 1)
+    {
+        //will release bomb only if released = false
+        if (released)
+        {
+            //update the bombs
+            int collision_count = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                if (collision_status[i] == true)
+                {
+                    //already collided
+                    collision_count++;
+                    continue;
+                }
+                bool collided = bombs[i].collision(maze);
+                if (collided)
+                {
+                    //if the bomb will collide in the next move
+                    collision_count++;
+                    collision_status[i] = true;
+                }
+                else
+                {
+                    bool res = bombs[i].update_location(maze);
+                    if (res)
+                    {
+                        collision_count++;
+                        collision_status[i] = true;
+                    }
+                }
+            }
+            if (collision_count == 4)
+            {
+                reset_bombs(maze, x, y);
+            }
+            return;
+        }
+        else
+        {
+            //will release bombs in all the four directions.
+            reset_bombs(maze, x, y);
+            released = true;
+        }
+    }
+    else
+    {
+        if (released)
+        {
+            //update locations or check for collisions
+            int collision_count = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                if (collision_status[i] == true)
+                {
+                    //already collided
+                    collision_count++;
+                    continue;
+                }
+                bool collided = bombs[i].collision(maze);
+                if (collided)
+                {
+                    //if the bomb will collide in the next move
+                    collision_count++;
+                    collision_status[i] = true;
+                }
+                else
+                {
+                    bool res = bombs[i].update_location(maze);
+                    if (res)
+                    {
+                        collision_count++;
+                        collision_status[i] = true;
+                    }
+                }
+            }
+            if (collision_count == 4)
+            {
+                reset_bombs(maze, x, y);
+            }
+        }
+        else
+        {
+            return;
+        }
+    }
+}
+void Player::render(SDL_Renderer *renderer, Maze &maze)
+{
     SDL_Rect rect = {x * block_size + x_offset + left_offset - (player_size / 2), y * block_size + y_offset + top_offset - (player_size / 2), player_size, player_size};
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     SDL_RenderFillRect(renderer, &rect);
+    if (released)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            if (!collision_status[i])
+            {
+                bombs[i].render(renderer);
+            }
+        }
+    }
 }

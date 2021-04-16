@@ -1,13 +1,13 @@
 #include "Bot.h"
 
-Bot::Bot(int id) : Player(id)
+Bot::Bot(int id, Maze &maze) : Player(id, maze)
 {
     x_dest = 1;
     y_dest = 1;
     path = stack<int>();
 }
 
-void Bot::setDestination(Maze maze, int x, int y)
+void Bot::setDestination(Maze &maze, int x, int y)
 {
     x_dest = x;
     y_dest = y;
@@ -91,7 +91,7 @@ void Bot::calculatePath(vector<vector<Box>> maze)
     // }
 }
 
-void Bot::updateLocation(Maze maze)
+void Bot::updateLocation(Maze &maze)
 {
     int hmove = 0, vmove = 0;
     if (!path.empty())
@@ -193,9 +193,8 @@ void Bot::updateLocation(Maze maze)
     }
 }
 
-void Bot::render(SDL_Renderer *renderer, Maze maze)
+void Bot::render(SDL_Renderer *renderer, Maze &maze)
 {
-    updateLocation(maze);
     SDL_Rect rect = {x * block_size + x_offset + left_offset - (player_size / 2), y * block_size + y_offset + top_offset - (player_size / 2), player_size, player_size};
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     SDL_RenderFillRect(renderer, &rect);

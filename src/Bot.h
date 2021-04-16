@@ -10,10 +10,10 @@
 class Bot : public Player
 {
 public:
-    Bot(int);
-    void setDestination(Maze, int, int);
-    void render(SDL_Renderer *, Maze);
-    void updateLocation(Maze);
+    Bot(int, Maze &);
+    void setDestination(Maze &, int, int);
+    void render(SDL_Renderer *, Maze &);
+    void updateLocation(Maze &);
 
 private:
     int x_dest, y_dest;

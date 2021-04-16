@@ -12,7 +12,7 @@ class Maze
 {
 public:
     Maze(int, int, int, bool);
-    void update(vector<pair<int, int>>);
+    void update(int, int, int);
     int getSize();
     void print();
     void render(SDL_Renderer *);

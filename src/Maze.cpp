@@ -116,6 +116,16 @@ void Maze::generate(int N)
             maze[x + 1][y + 1].update(2);
         }
     }
+    for (int i = 0; i < M; i++)
+    {
+        for (int j = 0; j < M; j++)
+        {
+            if (i == 0 || j == 0 || i == M - 1 || j == M - 1)
+            {
+                maze[i][j].update(2);
+            }
+        }
+    }
     // for (int i = 0; i < N; i++)
     // {
     //     for (int j = 0; j < N; j++)
@@ -126,9 +136,9 @@ void Maze::generate(int N)
     // }
 }
 
-void update(vector<pair<int, int>>)
+void Maze::update(int i, int j, int new_type)
 {
-    return;
+    maze[i][j].update(new_type);
 }
 
 vector<vector<Box>> Maze::getMaze()
