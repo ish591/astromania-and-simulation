@@ -118,7 +118,7 @@ int main()
 
         Bot bot(2);
         bot.updateDimensions(maze, 1280, 720);
-        bot.setDestination(maze, 2 * n - 1, 2 * n - 1);
+        bot.setDestination(maze, 2 * n - 1, 2 * n - 1, coins);
 
         Uint32 startTicks = SDL_GetTicks();
         int slow_factor = 10;
@@ -155,23 +155,24 @@ int main()
                             slow_factor = 100;
                         startTicks = curTicks;
                         updates = 0;
-                        cout << slow_factor << endl;
+                        // cout << slow_factor << endl;
                     }
                     if (e.key.keysym.sym == SDLK_x)
                     {
                         slow_factor -= slow_factor / 3;
                         startTicks = curTicks;
                         updates = 0;
-                        cout << slow_factor << endl;
+                        // cout << slow_factor << endl;
                         // Mix_PlayChannel(-1, Coin::collect_coin, 0);
                     }
                 }
             }
+
+            maze.render(renderer);
             for (int i = 0; i < coins.size(); i++)
             {
                 coins[i].render(renderer);
             }
-            maze.render(renderer);
             bot.render(renderer);
 
             SDL_RenderPresent(renderer);

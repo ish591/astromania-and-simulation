@@ -7,7 +7,8 @@ Box::Box(int t)
 
 void Box::update(int new_type)
 {
-    type = new_type;
+    if (new_type != 1 || rand() % 100 < 80)
+        type = new_type;
 }
 
 int Box::get_block_type()
