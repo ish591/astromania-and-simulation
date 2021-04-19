@@ -1,13 +1,13 @@
 #include "Maze.h"
 
-Maze::Maze(int N, int w, int h, bool discrete_walls)
+Maze::Maze(int N, bool discrete_walls, int width, int height)
 {
     generate(N);
-    int x = min(w, h);
+    int x = min(width, height);
     Maze::discrete_walls = discrete_walls;
     block_size = x / M - discrete_walls;
-    left_offset = (w - block_size * M) / 2;
-    top_offset = (h - block_size * M) / 2;
+    left_offset = (width - block_size * M) / 2;
+    top_offset = (height - block_size * M) / 2;
 }
 
 void Maze::generate(int N)
@@ -174,6 +174,7 @@ void Maze::render(SDL_Renderer *renderer)
         }
     }
 }
+
 int Maze::getBlockSize()
 {
     return block_size;

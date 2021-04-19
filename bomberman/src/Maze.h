@@ -11,7 +11,7 @@ using namespace std;
 class Maze
 {
 public:
-    Maze(int, int, int, bool);
+    Maze(int, bool, int, int);
     void update(int, int, int);
     int getSize();
     void print();
