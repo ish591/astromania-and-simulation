@@ -25,6 +25,14 @@ Bomb::Bomb(Maze &maze, int t, int x1, int y1, int x_off, int y_off, int start_ti
     id = pl_id;
     count = total_released;
 }
+void Bomb::set_direction(int d)
+{
+    direction = d;
+}
+void Bomb::set_moving()
+{
+    moving_bomb = true;
+}
 int Bomb::get_type()
 {
     return type;
@@ -61,9 +69,11 @@ pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int
     //check if moving or stationary presently
     if (moving_bomb)
     {
+        cout << "l";
         if (current_time >= time_explode + time_beg)
         {
             //bomb will explode now
+
             explode(maze);
             int ok = 0;
             for (int i = 0; i < bombs.size(); i++)

@@ -18,6 +18,7 @@ Player::Player(int id, Maze &maze)
     {
         power_ups.push_back(false);
     }
+    power_ups[0] = true;
 }
 int Player::get_x()
 {
@@ -150,15 +151,20 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         if (y_offset <= block_size - player_size / 2)
                         {
                             //lower block also does not pose a constraint
-                            int next_x = x + hmove;
-                            int next_y = y + vmove;
+                            int next_x = x - 1;
+                            int next_y = y;
                             bool found = false;
-                            for (auto u : bombs)
+                            for (int b = 0; b < bombs.size(); b++)
                             {
-                                if (u.get_x() == next_x & u.get_y() == next_y)
+                                if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
+                                    if (power_ups[0])
+                                    {
+                                        bombs[b].set_direction(1);
+                                        bombs[b].set_moving();
+                                        //cout << "ok";
+                                    }
                                     found = true;
-                                    break;
                                 }
                             }
                             if (found)
@@ -179,15 +185,21 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     }
                     else
                     {
-                        int next_x = x + hmove;
-                        int next_y = y + vmove;
+                        int next_x = x - 1;
+                        int next_y = y;
                         bool found = false;
-                        for (auto u : bombs)
+                        for (int b = 0; b < bombs.size(); b++)
                         {
-                            if (u.get_x() == next_x & u.get_y() == next_y)
+                            if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
+                                if (power_ups[0])
+                                {
+                                    bombs[b].set_direction(1);
+                                    bombs[b].set_moving();
+
+                                    //cout << "ok";
+                                }
                                 found = true;
-                                break;
                             }
                         }
                         if (found)
@@ -209,15 +221,20 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
             }
             else
             {
-                int next_x = x + hmove;
-                int next_y = y + vmove;
+                int next_x = x - 1;
+                int next_y = y;
                 bool found = false;
-                for (auto u : bombs)
+                for (int b = 0; b < bombs.size(); b++)
                 {
-                    if (u.get_x() == next_x & u.get_y() == next_y)
+                    if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
+                        if (power_ups[0])
+                        {
+                            bombs[b].set_direction(1);
+                            bombs[b].set_moving();
+                            // cout << "ok";
+                        }
                         found = true;
-                        break;
                     }
                 }
                 if (found)
@@ -258,15 +275,19 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         if (y_offset <= block_size - player_size / 2)
                         {
                             //lower block also does not pose a constraint
-                            int next_x = x + hmove;
-                            int next_y = y + vmove;
+                            int next_x = x + 1;
+                            int next_y = y;
                             bool found = false;
-                            for (auto u : bombs)
+                            for (int b = 0; b < bombs.size(); b++)
                             {
-                                if (u.get_x() == next_x & u.get_y() == next_y)
+                                if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
+                                    if (power_ups[0])
+                                    {
+                                        bombs[b].set_direction(3);
+                                        bombs[b].set_moving();
+                                    }
                                     found = true;
-                                    break;
                                 }
                             }
                             if (found)
@@ -287,15 +308,19 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     }
                     else
                     {
-                        int next_x = x + hmove;
-                        int next_y = y + vmove;
+                        int next_x = x + 1;
+                        int next_y = y;
                         bool found = false;
-                        for (auto u : bombs)
+                        for (int b = 0; b < bombs.size(); b++)
                         {
-                            if (u.get_x() == next_x & u.get_y() == next_y)
+                            if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
+                                if (power_ups[0])
+                                {
+                                    bombs[b].set_direction(3);
+                                    bombs[b].set_moving();
+                                }
                                 found = true;
-                                break;
                             }
                         }
                         if (found)
@@ -317,15 +342,19 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
             }
             else
             {
-                int next_x = x + hmove;
-                int next_y = y + vmove;
+                int next_x = x + 1;
+                int next_y = y;
                 bool found = false;
-                for (auto u : bombs)
+                for (int b = 0; b < bombs.size(); b++)
                 {
-                    if (u.get_x() == next_x & u.get_y() == next_y)
+                    if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
+                        if (power_ups[0])
+                        {
+                            bombs[b].set_direction(3);
+                            bombs[b].set_moving();
+                        }
                         found = true;
-                        break;
                     }
                 }
                 if (found)
@@ -369,15 +398,19 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     {
                         if (x_offset >= player_size / 2)
                         {
-                            int next_x = x + hmove;
-                            int next_y = y + vmove;
+                            int next_x = x;
+                            int next_y = y - 1;
                             bool found = false;
-                            for (auto u : bombs)
+                            for (int b = 0; b < bombs.size(); b++)
                             {
-                                if (u.get_x() == next_x & u.get_y() == next_y)
+                                if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
+                                    if (power_ups[0])
+                                    {
+                                        bombs[b].set_direction(2);
+                                        bombs[b].set_moving();
+                                    }
                                     found = true;
-                                    break;
                                 }
                             }
                             if (found)
@@ -398,15 +431,19 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     }
                     else
                     {
-                        int next_x = x + hmove;
-                        int next_y = y + vmove;
+                        int next_x = x;
+                        int next_y = y - 1;
                         bool found = false;
-                        for (auto u : bombs)
+                        for (int b = 0; b < bombs.size(); b++)
                         {
-                            if (u.get_x() == next_x & u.get_y() == next_y)
+                            if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
+                                if (power_ups[0])
+                                {
+                                    bombs[b].set_direction(2);
+                                    bombs[b].set_moving();
+                                }
                                 found = true;
-                                break;
                             }
                         }
                         if (found)
@@ -428,15 +465,19 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
             }
             else
             {
-                int next_x = x + hmove;
-                int next_y = y + vmove;
+                int next_x = x;
+                int next_y = y - 1;
                 bool found = false;
-                for (auto u : bombs)
+                for (int b = 0; b < bombs.size(); b++)
                 {
-                    if (u.get_x() == next_x & u.get_y() == next_y)
+                    if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
+                        if (power_ups[0])
+                        {
+                            bombs[b].set_direction(2);
+                            bombs[b].set_moving();
+                        }
                         found = true;
-                        break;
                     }
                 }
                 if (found)
@@ -475,15 +516,19 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     {
                         if (x_offset >= player_size / 2)
                         {
-                            int next_x = x + hmove;
-                            int next_y = y + vmove;
+                            int next_x = x;
+                            int next_y = y + 1;
                             bool found = false;
-                            for (auto u : bombs)
+                            for (int b = 0; b < bombs.size(); b++)
                             {
-                                if (u.get_x() == next_x & u.get_y() == next_y)
+                                if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
+                                    if (power_ups[0])
+                                    {
+                                        bombs[b].set_direction(4);
+                                        bombs[b].set_moving();
+                                    }
                                     found = true;
-                                    break;
                                 }
                             }
                             if (found)
@@ -504,15 +549,19 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     }
                     else
                     {
-                        int next_x = x + hmove;
-                        int next_y = y + vmove;
+                        int next_x = x;
+                        int next_y = y + 1;
                         bool found = false;
-                        for (auto u : bombs)
+                        for (int b = 0; b < bombs.size(); b++)
                         {
-                            if (u.get_x() == next_x & u.get_y() == next_y)
+                            if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
+                                if (power_ups[0])
+                                {
+                                    bombs[b].set_direction(4);
+                                    bombs[b].set_moving();
+                                }
                                 found = true;
-                                break;
                             }
                         }
                         if (found)
@@ -534,15 +583,19 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
             }
             else
             {
-                int next_x = x + hmove;
-                int next_y = y + vmove;
+                int next_x = x;
+                int next_y = y + 1;
                 bool found = false;
-                for (auto u : bombs)
+                for (int b = 0; b < bombs.size(); b++)
                 {
-                    if (u.get_x() == next_x & u.get_y() == next_y)
+                    if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
+                        if (power_ups[0])
+                        {
+                            bombs[b].set_direction(4);
+                            bombs[b].set_moving();
+                        }
                         found = true;
-                        break;
                     }
                 }
                 if (found)

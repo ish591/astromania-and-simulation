@@ -19,10 +19,12 @@ public:
     int get_direction();
     int get_size();
     int get_time_exp();
-    pair<bool, int> update_state(int, Maze &, vector<pair<int, int> >, vector<Bomb> &);
-    void update_location(Maze &, vector<pair<int, int> >);
+    pair<bool, int> update_state(int, Maze &, vector<pair<int, int>>, vector<Bomb> &);
+    void update_location(Maze &, vector<pair<int, int>>);
     void explode(Maze &);
     void render(SDL_Renderer *);
+    void set_direction(int);
+    void set_moving();
     //will have to check collision with other player or Maze walls. So need coordinates of other players also.
 
 private:
