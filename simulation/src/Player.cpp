@@ -302,6 +302,17 @@ void Player::updateLocation(Maze maze)
     }
 }
 
+void Player::checkCoinCollection(vector<Coin> &coins)
+{
+    for (int i = 0; i < coins.size(); i++)
+    {
+        if (coins[i].getCoordinates().first == x && coins[i].getCoordinates().second == y)
+        {
+            coins[i].collect();
+        }
+    }
+}
+
 void Player::render(SDL_Renderer *renderer, Maze maze)
 {
     updateLocation(maze);

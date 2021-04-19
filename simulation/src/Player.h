@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "Maze.h"
+#include "Coin.h"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ public:
     void takeAction(SDL_Event);
     void render(SDL_Renderer *, Maze);
     void updateDimensions(Maze, int, int);
+    void checkCoinCollection(vector<Coin> &);
 
 protected:
     int player_id;
