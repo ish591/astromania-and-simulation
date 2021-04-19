@@ -13,7 +13,7 @@ Bomb::Bomb(Maze &maze, int t, int x1, int y1, int x_off, int y_off, int start_ti
         radius = 5;
         x = 0;
         y = 0;
-        time_explode = 1000;
+        time_explode = 3000;
     }
     bomb_size = block_size - 20;
     x_offset = x_off;
@@ -56,7 +56,7 @@ int Bomb::get_size()
     return bomb_size;
 }
 
-pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int, int> > locations, vector<Bomb> &bombs)
+pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int, int>> locations, vector<Bomb> &bombs)
 {
     //check if moving or stationary presently
     if (moving_bomb)
@@ -104,9 +104,9 @@ pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int
     return {false, 0};
 }
 
-void Bomb::update_location(Maze &maze, vector<pair<int, int> > locations)
+void Bomb::update_location(Maze &maze, vector<pair<int, int>> locations)
 {
-    vector<vector<Box> > a = maze.getMaze();
+    vector<vector<Box>> a = maze.getMaze();
     //first check if blocked by any player
     int next_cell_x = x;
     int next_cell_y = y;
@@ -401,34 +401,50 @@ void Bomb::update_location(Maze &maze, vector<pair<int, int> > locations)
 
 void Bomb::explode(Maze &maze)
 {
-    vector<vector<Box> > a = maze.getMaze();
+    vector<vector<Box>> a = maze.getMaze();
     //just explode the bomb, in all four directions up till radius
     for (int x_curr = x; x_curr >= max(0, x - radius); x_curr--)
     {
-        if (a[y][x_curr].get_block_type() == 1)
+        if (a[y][x_curr].get_block_type() != 0)
         {
-            maze.update(y, x_curr, 0);
+            if (a[y][x_curr].get_block_type() == 1)
+            {
+                maze.update(y, x_curr, 0);
+            }
+            break;
         }
     }
     for (int x_curr = x; x_curr <= min(maze.getSize() - 1, x + radius); x_curr++)
     {
-        if (a[y][x_curr].get_block_type() == 1)
+        if (a[y][x_curr].get_block_type() != 0)
         {
-            maze.update(y, x_curr, 0);
+            if (a[y][x_curr].get_block_type() == 1)
+            {
+                maze.update(y, x_curr, 0);
+            }
+            break;
         }
     }
     for (int y_curr = y; y_curr >= max(0, y - radius); y_curr--)
     {
-        if (a[y_curr][x].get_block_type() == 1)
+        if (a[y_curr][x].get_block_type() != 0)
         {
-            maze.update(y_curr, x, 0);
+            if (a[y_curr][x].get_block_type() == 1)
+            {
+                maze.update(y_curr, x, 0);
+            }
+            break;
         }
     }
     for (int y_curr = y; y_curr <= min(maze.getSize() - 1, y + radius); y_curr++)
     {
-        if (a[y_curr][x].get_block_type() == 1)
+        if (a[y_curr][x].get_block_type() != 0)
         {
-            maze.update(y_curr, x, 0);
+            if (a[y_curr][x].get_block_type() == 1)
+            {
+                maze.update(y_curr, x, 0);
+            }
+            break;
         }
     }
     //now, check for any players in the neighbourhood.
