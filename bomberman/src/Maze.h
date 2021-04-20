@@ -12,12 +12,15 @@ class Maze
 {
 public:
     Maze(int, bool, int, int);
-    void update(int, int, int);
+    void update(int, int, int, int);
     int getSize();
     void print();
     void render(SDL_Renderer *);
     int getBlockSize();
+    void update_power_ups(int);
+    vector<Box> get_power_ups();
     vector<vector<Box>> getMaze();
+    void add_power_up(int, int);
     bool discrete_walls;
     int left_offset, top_offset;
 
@@ -27,4 +30,6 @@ private:
     int M;
     int block_size;
     vector<vector<Box>> maze;
+    vector<Box> power_ups;
+    //each powee up box has a type,coordinate, and ending time
 };

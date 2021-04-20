@@ -7,13 +7,17 @@ Bomb::Bomb(Maze &maze, int t, int x1, int y1, int x_off, int y_off, int start_ti
     time_beg = start_time;
     direction = -1;
     moving_bomb = false;
+    x = 0;
+    y = 0;
+    time_explode = 3000;
+    speed = 3;
     if (type == 1) //default type
     {
-        speed = 2;
+        radius = 3;
+    }
+    else if (type == 2)
+    {
         radius = 5;
-        x = 0;
-        y = 0;
-        time_explode = 3000;
     }
     bomb_size = block_size - 20;
     x_offset = x_off;
@@ -28,6 +32,10 @@ Bomb::Bomb(Maze &maze, int t, int x1, int y1, int x_off, int y_off, int start_ti
 void Bomb::set_direction(int d)
 {
     direction = d;
+}
+int Bomb::get_id()
+{
+    return id;
 }
 void Bomb::set_moving()
 {
@@ -69,12 +77,11 @@ pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int
     //check if moving or stationary presently
     if (moving_bomb)
     {
-        cout << "l";
         if (current_time >= time_explode + time_beg)
         {
             //bomb will explode now
 
-            explode(maze);
+            explode(maze, current_time);
             int ok = 0;
             for (int i = 0; i < bombs.size(); i++)
             {
@@ -96,7 +103,7 @@ pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int
         if (current_time >= time_explode + time_beg)
         {
             //bomb will explode now
-            explode(maze);
+            explode(maze, current_time);
             int ok = 0;
             for (int i = 0; i < bombs.size(); i++)
             {
@@ -106,7 +113,6 @@ pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int
                     break;
                 }
             }
-            cout << bombs.size() << endl;
             return {true, id};
         }
         //else, bomb will remain at the same position, so do nothing
@@ -409,7 +415,7 @@ void Bomb::update_location(Maze &maze, vector<pair<int, int>> locations)
     }
 }
 
-void Bomb::explode(Maze &maze)
+void Bomb::explode(Maze &maze, int current_time)
 {
     vector<vector<Box>> a = maze.getMaze();
     //just explode the bomb, in all four directions up till radius
@@ -419,7 +425,34 @@ void Bomb::explode(Maze &maze)
         {
             if (a[y][x_curr].get_block_type() == 1)
             {
-                maze.update(y, x_curr, 0);
+                srand(time(0));
+                //number 0 means no power up, 1 means throwing bomb power up
+                //2 means speed powerup, 3 means increase radius power up
+                //4 means non power up. so 0.6 probability of a power up
+                int number = rand() % 5;
+                if (number == 0 || number == 4)
+                {
+                    maze.update(y, x_curr, 0, current_time);
+                }
+                else if (number == 1)
+                { //throwable bomb
+                    maze.update(y, x_curr, 3, current_time);
+                }
+                else if (number == 2)
+                {
+                    //speed increased
+                    maze.update(y, x_curr, 4, current_time);
+                }
+                else if (number == 3)
+                {
+                    maze.update(y, x_curr, 5, current_time);
+                    //increase radius power up
+                }
+                if (number >= 1 && number <= 3)
+                {
+                    maze.add_power_up(y, x_curr);
+                    //this becomes a power up block
+                }
             }
             break;
         }
@@ -430,7 +463,34 @@ void Bomb::explode(Maze &maze)
         {
             if (a[y][x_curr].get_block_type() == 1)
             {
-                maze.update(y, x_curr, 0);
+                srand(time(0));
+                //number 0 means no power up, 1 means throwing bomb power up
+                //2 means speed powerup, 3 means increase radius power up
+                //4 means
+                int number = rand() % 5;
+                if (number == 0 || number == 4)
+                {
+                    maze.update(y, x_curr, 0, current_time);
+                }
+                else if (number == 1)
+                { //throwable bomb
+                    maze.update(y, x_curr, 3, current_time);
+                }
+                else if (number == 2)
+                {
+                    //speed increased
+                    maze.update(y, x_curr, 4, current_time);
+                }
+                else if (number == 3)
+                {
+                    maze.update(y, x_curr, 5, current_time);
+                    //increase radius power up
+                }
+                if (number >= 1 && number <= 3)
+                {
+                    maze.add_power_up(y, x_curr);
+                    //this becomes a power up block
+                }
             }
             break;
         }
@@ -441,7 +501,34 @@ void Bomb::explode(Maze &maze)
         {
             if (a[y_curr][x].get_block_type() == 1)
             {
-                maze.update(y_curr, x, 0);
+                srand(time(0));
+                //number 0 means no power up, 1 means throwing bomb power up
+                //2 means speed powerup, 3 means increase radius power up
+                //4 means
+                int number = rand() % 5;
+                if (number == 0 || number == 4)
+                {
+                    maze.update(y_curr, x, 0, current_time);
+                }
+                else if (number == 1)
+                { //throwable bomb
+                    maze.update(y_curr, x, 3, current_time);
+                }
+                else if (number == 2)
+                {
+                    //speed increased
+                    maze.update(y_curr, x, 4, current_time);
+                }
+                else if (number == 3)
+                {
+                    maze.update(y_curr, x, 5, current_time);
+                    //increase radius power up
+                }
+                if (number >= 1 && number <= 3)
+                {
+                    maze.add_power_up(y_curr, x);
+                    //this becomes a power up block
+                }
             }
             break;
         }
@@ -452,7 +539,34 @@ void Bomb::explode(Maze &maze)
         {
             if (a[y_curr][x].get_block_type() == 1)
             {
-                maze.update(y_curr, x, 0);
+                srand(time(0));
+                //number 0 means no power up, 1 means throwing bomb power up
+                //2 means speed powerup, 3 means increase radius power up
+                //4 means
+                int number = rand() % 5;
+                if (number == 0 || number == 4)
+                {
+                    maze.update(y_curr, x, 0, current_time);
+                }
+                else if (number == 1)
+                { //throwable bomb
+                    maze.update(y_curr, x, 3, current_time);
+                }
+                else if (number == 2)
+                {
+                    //speed increased
+                    maze.update(y_curr, x, 4, current_time);
+                }
+                else if (number == 3)
+                {
+                    maze.update(y_curr, x, 5, current_time);
+                    //increase radius power up
+                }
+                if (number >= 1 && number <= 3)
+                {
+                    maze.add_power_up(y_curr, x);
+                    //this becomes a power up block
+                }
             }
             break;
         }
@@ -474,6 +588,13 @@ void Bomb::render(SDL_Renderer *renderer)
         r = 200;
         g = 200;
         b = 0;
+        a = 255;
+    }
+    else
+    {
+        r = 50;
+        g = 200;
+        b = 120;
         a = 255;
     }
     SDL_SetRenderDrawColor(renderer, r, g, b, a);

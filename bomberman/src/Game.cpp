@@ -23,7 +23,9 @@ void Game::control(SDL_Event e, int current_time)
 
 void Game::update(int current_time)
 {
+    maze.update_power_ups(current_time);
     players[0].updateLocation(maze, players, bombs, current_time);
+    //each power up has a certain time, so update the powe up blocks also
 }
 
 void Game::render(SDL_Renderer *renderer)

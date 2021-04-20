@@ -22,7 +22,7 @@ void Maze::generate(int N)
         vector<Box> temp;
         for (int j = 0; j < M; j++)
         {
-            Box new_box = Box(0);
+            Box new_box = Box(0, i, j);
             temp.push_back(new_box);
         }
         maze.push_back(temp);
@@ -105,15 +105,15 @@ void Maze::generate(int N)
         for (int j = 0; j < N; j++)
         {
             int x = 2 * i + 1, y = 2 * j + 1;
-            maze[x][y].update(0);
-            maze[x - 1][y].update(1 - a[i][j][1]);
-            maze[x][y - 1].update(1 - a[i][j][2]);
-            maze[x + 1][y].update(1 - a[i][j][3]);
-            maze[x][y + 1].update(1 - a[i][j][4]);
-            maze[x - 1][y - 1].update(2);
-            maze[x + 1][y - 1].update(2);
-            maze[x - 1][y + 1].update(2);
-            maze[x + 1][y + 1].update(2);
+            maze[x][y].update(0, -1);
+            maze[x - 1][y].update(1 - a[i][j][1], -1);
+            maze[x][y - 1].update(1 - a[i][j][2], -1);
+            maze[x + 1][y].update(1 - a[i][j][3], -1);
+            maze[x][y + 1].update(1 - a[i][j][4], -1);
+            maze[x - 1][y - 1].update(2, -1);
+            maze[x + 1][y - 1].update(2, -1);
+            maze[x - 1][y + 1].update(2, -1);
+            maze[x + 1][y + 1].update(2, -1);
         }
     }
     for (int i = 0; i < M; i++)
@@ -122,7 +122,7 @@ void Maze::generate(int N)
         {
             if (i == 0 || j == 0 || i == M - 1 || j == M - 1)
             {
-                maze[i][j].update(2);
+                maze[i][j].update(2, -1);
             }
         }
     }
@@ -136,9 +136,9 @@ void Maze::generate(int N)
     // }
 }
 
-void Maze::update(int i, int j, int new_type)
+void Maze::update(int i, int j, int new_type, int current_time)
 {
-    maze[i][j].update(new_type);
+    maze[i][j].update(new_type, current_time);
 }
 
 vector<vector<Box>> Maze::getMaze()
@@ -178,4 +178,24 @@ void Maze::render(SDL_Renderer *renderer)
 int Maze::getBlockSize()
 {
     return block_size;
+}
+void Maze::add_power_up(int i, int j)
+{
+    power_ups.push_back(maze[i][j]);
+}
+void Maze::update_power_ups(int current_time)
+{
+    vector<Box> new_power_ups;
+    for (int i = 0; i < power_ups.size(); i++)
+    {
+        if (power_ups[i].get_start_time() + power_ups[i].get_duration() <= current_time)
+        {
+            this->update(power_ups[i].get_x(), power_ups[i].get_y(), 0, current_time);
+        }
+        else
+        {
+            new_power_ups.push_back(power_ups[i]);
+        }
+    }
+    power_ups = new_power_ups;
 }

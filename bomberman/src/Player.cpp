@@ -18,7 +18,7 @@ Player::Player(int id, Maze &maze)
     {
         power_ups.push_back(false);
     }
-    power_ups[0] = true;
+    //power_ups[0] = true;
 }
 int Player::get_x()
 {
@@ -92,7 +92,8 @@ void Player::takeAction(SDL_Event event, Maze &maze, vector<Bomb> &bombs, int cu
             {
                 //currently setting the type as 1 only
                 total_released++;
-                Bomb new_bomb = Bomb(maze, 1, x, y, block_size / 2, block_size / 2, current_time, player_id, total_released);
+                bomb_count++;
+                Bomb new_bomb = Bomb(maze, 1 + power_ups[2], x, y, block_size / 2, block_size / 2, current_time, player_id, total_released);
                 bombs.push_back(new_bomb);
             }
         default:
@@ -127,6 +128,10 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
     //new bombs have been released, and collision with bombs have been checked.
     //now, handle the sliding feature. if next cell has a slidable bomb, slide it
     //else the player will get blocked by it
+    //player can also aquire a power up now
+    //cell type 3 -> sets 1 (throwable)
+    //cell type 4 -> sets 2 (speed)
+    //cell type 5 -> sets 3 (radius increased)
     int hmove = RIGHT_PRESSED - LEFT_PRESSED;
     int vmove = DOWN_PRESSED - UP_PRESSED;
     vector<vector<Box>> a = maze.getMaze();
@@ -138,7 +143,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
         {
             x_offset -= move_size;
         }
-        else if (a[y][x - 1].get_block_type() == 0)
+        else if (a[y][x - 1].get_block_type() == 0 || a[y][x - 1].get_block_type() >= 3)
         {
             //check if blocked by a vertical cell
             if (a[y - 1][x - 1].get_block_type() >= 1)
@@ -158,7 +163,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             {
                                 if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
-                                    if (power_ups[0])
+                                    if (power_ups[0] && bombs[b].get_id() == player_id)
                                     {
                                         bombs[b].set_direction(1);
                                         bombs[b].set_moving();
@@ -173,6 +178,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             }
                             else
                             {
+                                //check for powerup
+                                int num = a[y][x - 1].get_block_type();
+                                maze.update(y, x - 1, 0, current_time);
+                                switch (num)
+                                {
+                                case 3:
+                                    power_ups[0] = true;
+                                    //throwable bomb powerup, stays with the user for
+                                    //a particular time
+                                    break;
+                                case 4:
+                                    power_ups[1] = true;
+                                    move_size = 2;
+                                    break;
+                                case 5:
+                                    power_ups[2] = true;
+                                    //increased bomb radius
+                                    break;
+                                }
                                 if (x_offset - move_size < 0)
                                     x--;
                                 x_offset = (x_offset + block_size - move_size) % block_size;
@@ -192,7 +216,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         {
                             if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
-                                if (power_ups[0])
+                                if (power_ups[0] && bombs[b].get_id() == player_id)
                                 {
                                     bombs[b].set_direction(1);
                                     bombs[b].set_moving();
@@ -208,6 +232,24 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         }
                         else
                         {
+                            int num = a[y][x - 1].get_block_type();
+                            maze.update(y, x - 1, 0, current_time);
+                            switch (num)
+                            {
+                            case 3:
+                                power_ups[0] = true;
+                                //throwable bomb powerup, stays with the user for
+                                //a particular time
+                                break;
+                            case 4:
+                                power_ups[1] = true;
+                                move_size = 2;
+                                break;
+                            case 5:
+                                power_ups[2] = true;
+                                //increased bomb radius
+                                break;
+                            }
                             if (x_offset - move_size < 0)
                                 x--;
                             x_offset = (x_offset + block_size - move_size) % block_size;
@@ -228,7 +270,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 {
                     if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
-                        if (power_ups[0])
+                        if (power_ups[0] && bombs[b].get_id() == player_id)
                         {
                             bombs[b].set_direction(1);
                             bombs[b].set_moving();
@@ -243,6 +285,24 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 }
                 else
                 {
+                    int num = a[y][x - 1].get_block_type();
+                    maze.update(y, x - 1, 0, current_time);
+                    switch (num)
+                    {
+                    case 3:
+                        power_ups[0] = true;
+                        //throwable bomb powerup, stays with the user for
+                        //a particular time
+                        break;
+                    case 4:
+                        power_ups[1] = true;
+                        move_size = 2;
+                        break;
+                    case 5:
+                        power_ups[2] = true;
+                        //increased bomb radius
+                        break;
+                    }
                     if (x_offset - move_size < 0)
                         x--;
                     x_offset = (x_offset + block_size - move_size) % block_size;
@@ -263,7 +323,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
         {
             x_offset += move_size;
         }
-        else if (a[y][x + 1].get_block_type() == 0)
+        else if (a[y][x + 1].get_block_type() == 0 || a[y][x + 1].get_block_type() >= 3)
         {
             if (a[y - 1][x + 1].get_block_type() >= 1)
             {
@@ -282,7 +342,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             {
                                 if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
-                                    if (power_ups[0])
+                                    if (power_ups[0] && bombs[b].get_id() == player_id)
                                     {
                                         bombs[b].set_direction(3);
                                         bombs[b].set_moving();
@@ -296,6 +356,24 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             }
                             else
                             {
+                                int num = a[y][x + 1].get_block_type();
+                                maze.update(y, x + 1, 0, current_time);
+                                switch (num)
+                                {
+                                case 3:
+                                    power_ups[0] = true;
+                                    //throwable bomb powerup, stays with the user for
+                                    //a particular time
+                                    break;
+                                case 4:
+                                    power_ups[1] = true;
+                                    move_size = 2;
+                                    break;
+                                case 5:
+                                    power_ups[2] = true;
+                                    //increased bomb radius
+                                    break;
+                                }
                                 if (x_offset + move_size >= block_size)
                                     x++;
                                 x_offset = (x_offset + move_size) % block_size;
@@ -315,7 +393,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         {
                             if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
-                                if (power_ups[0])
+                                if (power_ups[0] && bombs[b].get_id() == player_id)
                                 {
                                     bombs[b].set_direction(3);
                                     bombs[b].set_moving();
@@ -329,6 +407,24 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         }
                         else
                         {
+                            int num = a[y][x + 1].get_block_type();
+                            maze.update(y, x + 1, 0, current_time);
+                            switch (num)
+                            {
+                            case 3:
+                                power_ups[0] = true;
+                                //throwable bomb powerup, stays with the user for
+                                //a particular time
+                                break;
+                            case 4:
+                                power_ups[1] = true;
+                                move_size = 2;
+                                break;
+                            case 5:
+                                power_ups[2] = true;
+                                //increased bomb radius
+                                break;
+                            }
                             if (x_offset + move_size >= block_size)
                                 x++;
                             x_offset = (x_offset + move_size) % block_size;
@@ -349,7 +445,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 {
                     if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
-                        if (power_ups[0])
+                        if (power_ups[0] && bombs[b].get_id() == player_id)
                         {
                             bombs[b].set_direction(3);
                             bombs[b].set_moving();
@@ -363,6 +459,24 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 }
                 else
                 {
+                    int num = a[y][x + 1].get_block_type();
+                    maze.update(y, x + 1, 0, current_time);
+                    switch (num)
+                    {
+                    case 3:
+                        power_ups[0] = true;
+                        //throwable bomb powerup, stays with the user for
+                        //a particular time
+                        break;
+                    case 4:
+                        power_ups[1] = true;
+                        move_size = 2;
+                        break;
+                    case 5:
+                        power_ups[2] = true;
+                        //increased bomb radius
+                        break;
+                    }
                     if (x_offset + move_size >= block_size)
                         x++;
                     x_offset = (x_offset + move_size) % block_size;
@@ -387,7 +501,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
         {
             y_offset -= move_size;
         }
-        else if (a[y - 1][x].get_block_type() == 0)
+        else if (a[y - 1][x].get_block_type() == 0 || a[y - 1][x].get_block_type() >= 3)
         {
             //check if blocked by a right block
             if (a[y - 1][x + 1].get_block_type() >= 1)
@@ -405,7 +519,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             {
                                 if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
-                                    if (power_ups[0])
+                                    if (power_ups[0] && bombs[b].get_id() == player_id)
                                     {
                                         bombs[b].set_direction(2);
                                         bombs[b].set_moving();
@@ -419,6 +533,24 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             }
                             else
                             {
+                                int num = a[y - 1][x].get_block_type();
+                                maze.update(y - 1, x, 0, current_time);
+                                switch (num)
+                                {
+                                case 3:
+                                    power_ups[0] = true;
+                                    //throwable bomb powerup, stays with the user for
+                                    //a particular time
+                                    break;
+                                case 4:
+                                    power_ups[1] = true;
+                                    move_size = 2;
+                                    break;
+                                case 5:
+                                    power_ups[2] = true;
+                                    //increased bomb radius
+                                    break;
+                                }
                                 if (y_offset - move_size < 0)
                                     y--;
                                 y_offset = (y_offset + block_size - move_size) % block_size;
@@ -438,7 +570,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         {
                             if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
-                                if (power_ups[0])
+                                if (power_ups[0] && bombs[b].get_id() == player_id)
                                 {
                                     bombs[b].set_direction(2);
                                     bombs[b].set_moving();
@@ -452,6 +584,24 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         }
                         else
                         {
+                            int num = a[y - 1][x].get_block_type();
+                            maze.update(y - 1, x, 0, current_time);
+                            switch (num)
+                            {
+                            case 3:
+                                power_ups[0] = true;
+                                //throwable bomb powerup, stays with the user for
+                                //a particular time
+                                break;
+                            case 4:
+                                power_ups[1] = true;
+                                move_size = 2;
+                                break;
+                            case 5:
+                                power_ups[2] = true;
+                                //increased bomb radius
+                                break;
+                            }
                             if (y_offset - move_size < 0)
                                 y--;
                             y_offset = (y_offset + block_size - move_size) % block_size;
@@ -472,7 +622,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 {
                     if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
-                        if (power_ups[0])
+                        if (power_ups[0] && bombs[b].get_id() == player_id)
                         {
                             bombs[b].set_direction(2);
                             bombs[b].set_moving();
@@ -486,6 +636,24 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 }
                 else
                 {
+                    int num = a[y - 1][x].get_block_type();
+                    maze.update(y - 1, x, 0, current_time);
+                    switch (num)
+                    {
+                    case 3:
+                        power_ups[0] = true;
+                        //throwable bomb powerup, stays with the user for
+                        //a particular time
+                        break;
+                    case 4:
+                        power_ups[1] = true;
+                        move_size = 2;
+                        break;
+                    case 5:
+                        power_ups[2] = true;
+                        //increased bomb radius
+                        break;
+                    }
                     if (y_offset - move_size < 0)
                         y--;
                     y_offset = (y_offset + block_size - move_size) % block_size;
@@ -506,7 +674,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
         {
             y_offset += move_size;
         }
-        else if (a[y + 1][x].get_block_type() == 0)
+        else if (a[y + 1][x].get_block_type() == 0 || a[y + 1][x].get_block_type() >= 3)
         {
             if (a[y - 1][x + 1].get_block_type() >= 1)
             {
@@ -523,7 +691,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             {
                                 if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
-                                    if (power_ups[0])
+                                    if (power_ups[0] && bombs[b].get_id() == player_id)
                                     {
                                         bombs[b].set_direction(4);
                                         bombs[b].set_moving();
@@ -537,6 +705,24 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             }
                             else
                             {
+                                int num = a[y + 1][x].get_block_type();
+                                maze.update(y + 1, x, 0, current_time);
+                                switch (num)
+                                {
+                                case 3:
+                                    power_ups[0] = true;
+                                    //throwable bomb powerup, stays with the user for
+                                    //a particular time
+                                    break;
+                                case 4:
+                                    power_ups[1] = true;
+                                    move_size = 2;
+                                    break;
+                                case 5:
+                                    power_ups[2] = true;
+                                    //increased bomb radius
+                                    break;
+                                }
                                 if (y_offset + move_size >= block_size)
                                     y++;
                                 y_offset = (y_offset + move_size) % block_size;
@@ -556,7 +742,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         {
                             if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
-                                if (power_ups[0])
+                                if (power_ups[0] && bombs[b].get_id() == player_id)
                                 {
                                     bombs[b].set_direction(4);
                                     bombs[b].set_moving();
@@ -570,6 +756,24 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         }
                         else
                         {
+                            int num = a[y + 1][x].get_block_type();
+                            maze.update(y + 1, x, 0, current_time);
+                            switch (num)
+                            {
+                            case 3:
+                                power_ups[0] = true;
+                                //throwable bomb powerup, stays with the user for
+                                //a particular time
+                                break;
+                            case 4:
+                                power_ups[1] = true;
+                                move_size = 2;
+                                break;
+                            case 5:
+                                power_ups[2] = true;
+                                //increased bomb radius
+                                break;
+                            }
                             if (y_offset + move_size >= block_size)
                                 y++;
                             y_offset = (y_offset + move_size) % block_size;
@@ -590,7 +794,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 {
                     if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
-                        if (power_ups[0])
+                        if (power_ups[0] && bombs[b].get_id() == player_id)
                         {
                             bombs[b].set_direction(4);
                             bombs[b].set_moving();
@@ -604,6 +808,24 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 }
                 else
                 {
+                    int num = a[y + 1][x].get_block_type();
+                    maze.update(y + 1, x, 0, current_time);
+                    switch (num)
+                    {
+                    case 3:
+                        power_ups[0] = true;
+                        //throwable bomb powerup, stays with the user for
+                        //a particular time
+                        break;
+                    case 4:
+                        power_ups[1] = true;
+                        move_size = 2;
+                        break;
+                    case 5:
+                        power_ups[2] = true;
+                        //increased bomb radius
+                        break;
+                    }
                     if (y_offset + move_size >= block_size)
                         y++;
                     y_offset = (y_offset + move_size) % block_size;
@@ -629,24 +851,24 @@ void Player::update_bombs(Maze &maze, vector<Player> &players, vector<Bomb> &bom
     // also, decrement count of player
     vector<Bomb> new_bombs;
     vector<pair<int, int>> locations;
-    for (Player u : players)
+    for (int i = 0; i < players.size(); i++)
     {
-        locations.push_back({u.get_x(), u.get_y()});
+        locations.push_back({players[i].get_x(), players[i].get_y()});
     }
     for (Bomb u : bombs)
     {
         pair<bool, int> res = u.update_state(current_time, maze, locations, bombs);
-        if (!res.first) //bomb has exploded
+        if (!res.first) //bomb has not  exploded
         {
             new_bombs.push_back(u);
         }
         else
         {
-            for (Player u : players)
+            for (int i = 0; i < players.size(); i++)
             {
-                if (u.getId() == res.second)
+                if (players[i].getId() == res.second)
                 {
-                    u.update_bomb_count(u.get_bomb_count() - 1);
+                    players[i].update_bomb_count(players[i].get_bomb_count() - 1);
                 }
             }
         }

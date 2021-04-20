@@ -19,9 +19,10 @@ public:
     int get_direction();
     int get_size();
     int get_time_exp();
+    int get_id();
     pair<bool, int> update_state(int, Maze &, vector<pair<int, int>>, vector<Bomb> &);
     void update_location(Maze &, vector<pair<int, int>>);
-    void explode(Maze &);
+    void explode(Maze &, int);
     void render(SDL_Renderer *);
     void set_direction(int);
     void set_moving();
