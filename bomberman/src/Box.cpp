@@ -20,7 +20,7 @@ void Box::update(int new_type, int current_time)
     else
     {
         start_time = current_time;
-        duration = 2000;
+        duration = 9000;
     }
 }
 

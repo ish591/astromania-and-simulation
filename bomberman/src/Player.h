@@ -26,9 +26,11 @@ public:
     int get_y();
     int get_bomb_count();
     void update_bomb_count(int);
+    void update_power_ups(int);
 
 protected:
     int player_id;
+    int power_up_duration;
     int x_offset, y_offset;
     int x, y;
     int score;
@@ -44,6 +46,6 @@ protected:
     int move_size;
     int bomb_count;
     int total_released;
-    vector<bool> power_ups;
+    vector<pair<bool, int>> power_ups;
     //each player has some power ups. for now, 1 corresponds to the throwing power_up
 };

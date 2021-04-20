@@ -14,11 +14,12 @@ Player::Player(int id, Maze &maze)
     SPACE_PRESSED = 0;
     bomb_count = 0;
     total_released = 0;
+    power_up_duration = 8000;
     for (int i = 0; i < 5; i++)
     {
-        power_ups.push_back(false);
+        power_ups.push_back({false, -1});
     }
-    //power_ups[0] = true;
+    //power_ups[0]={true,current_time};
 }
 int Player::get_x()
 {
@@ -93,7 +94,7 @@ void Player::takeAction(SDL_Event event, Maze &maze, vector<Bomb> &bombs, int cu
                 //currently setting the type as 1 only
                 total_released++;
                 bomb_count++;
-                Bomb new_bomb = Bomb(maze, 1 + power_ups[2], x, y, block_size / 2, block_size / 2, current_time, player_id, total_released);
+                Bomb new_bomb = Bomb(maze, 1 + power_ups[2].first, x, y, block_size / 2, block_size / 2, current_time, player_id, total_released);
                 bombs.push_back(new_bomb);
             }
         default:
@@ -121,17 +122,35 @@ void Player::takeAction(SDL_Event event, Maze &maze, vector<Bomb> &bombs, int cu
         break;
     }
 }
-
+void Player::update_power_ups(int current_time)
+{
+    for (int i = 0; i < 5; i++)
+    {
+        if (power_ups[i].first)
+        {
+            if (power_ups[i].second + power_up_duration < current_time)
+            {
+                if (i == 1)
+                {
+                    move_size = 1;
+                }
+                power_ups[i] = {false, -1};
+            }
+        }
+    }
+}
 void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &bombs, int current_time)
 {
+    //first of all remove power ups of the user if time has elapsed
+    update_power_ups(current_time);
     update_bombs(maze, players, bombs, current_time);
     //new bombs have been released, and collision with bombs have been checked.
     //now, handle the sliding feature. if next cell has a slidable bomb, slide it
     //else the player will get blocked by it
     //player can also aquire a power up now
-    //cell type 3 -> sets 1 (throwable)
-    //cell type 4 -> sets 2 (speed)
-    //cell type 5 -> sets 3 (radius increased)
+    //cell type 3 -> sets 0 (throwable)
+    //cell type 4 -> sets 1 (speed)
+    //cell type 5 -> sets 1 (radius increased)
     int hmove = RIGHT_PRESSED - LEFT_PRESSED;
     int vmove = DOWN_PRESSED - UP_PRESSED;
     vector<vector<Box>> a = maze.getMaze();
@@ -163,7 +182,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             {
                                 if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
-                                    if (power_ups[0] && bombs[b].get_id() == player_id)
+                                    if (power_ups[0].first && bombs[b].get_id() == player_id)
                                     {
                                         bombs[b].set_direction(1);
                                         bombs[b].set_moving();
@@ -184,16 +203,16 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                                 switch (num)
                                 {
                                 case 3:
-                                    power_ups[0] = true;
+                                    power_ups[0] = {true, current_time};
                                     //throwable bomb powerup, stays with the user for
                                     //a particular time
                                     break;
                                 case 4:
-                                    power_ups[1] = true;
+                                    power_ups[1] = {true, current_time};
                                     move_size = 2;
                                     break;
                                 case 5:
-                                    power_ups[2] = true;
+                                    power_ups[2] = {true, current_time};
                                     //increased bomb radius
                                     break;
                                 }
@@ -216,7 +235,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         {
                             if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
-                                if (power_ups[0] && bombs[b].get_id() == player_id)
+                                if (power_ups[0].first && bombs[b].get_id() == player_id)
                                 {
                                     bombs[b].set_direction(1);
                                     bombs[b].set_moving();
@@ -237,16 +256,16 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             switch (num)
                             {
                             case 3:
-                                power_ups[0] = true;
+                                power_ups[0] = {true, current_time};
                                 //throwable bomb powerup, stays with the user for
                                 //a particular time
                                 break;
                             case 4:
-                                power_ups[1] = true;
+                                power_ups[1] = {true, current_time};
                                 move_size = 2;
                                 break;
                             case 5:
-                                power_ups[2] = true;
+                                power_ups[2] = {true, current_time};
                                 //increased bomb radius
                                 break;
                             }
@@ -270,7 +289,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 {
                     if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
-                        if (power_ups[0] && bombs[b].get_id() == player_id)
+                        if (power_ups[0].first && bombs[b].get_id() == player_id)
                         {
                             bombs[b].set_direction(1);
                             bombs[b].set_moving();
@@ -290,16 +309,16 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     switch (num)
                     {
                     case 3:
-                        power_ups[0] = true;
+                        power_ups[0] = {true, current_time};
                         //throwable bomb powerup, stays with the user for
                         //a particular time
                         break;
                     case 4:
-                        power_ups[1] = true;
+                        power_ups[1] = {true, current_time};
                         move_size = 2;
                         break;
                     case 5:
-                        power_ups[2] = true;
+                        power_ups[2] = {true, current_time};
                         //increased bomb radius
                         break;
                     }
@@ -342,7 +361,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             {
                                 if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
-                                    if (power_ups[0] && bombs[b].get_id() == player_id)
+                                    if (power_ups[0].first && bombs[b].get_id() == player_id)
                                     {
                                         bombs[b].set_direction(3);
                                         bombs[b].set_moving();
@@ -361,16 +380,16 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                                 switch (num)
                                 {
                                 case 3:
-                                    power_ups[0] = true;
+                                    power_ups[0] = {true, current_time};
                                     //throwable bomb powerup, stays with the user for
                                     //a particular time
                                     break;
                                 case 4:
-                                    power_ups[1] = true;
+                                    power_ups[1] = {true, current_time};
                                     move_size = 2;
                                     break;
                                 case 5:
-                                    power_ups[2] = true;
+                                    power_ups[2] = {true, current_time};
                                     //increased bomb radius
                                     break;
                                 }
@@ -393,7 +412,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         {
                             if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
-                                if (power_ups[0] && bombs[b].get_id() == player_id)
+                                if (power_ups[0].first && bombs[b].get_id() == player_id)
                                 {
                                     bombs[b].set_direction(3);
                                     bombs[b].set_moving();
@@ -412,16 +431,16 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             switch (num)
                             {
                             case 3:
-                                power_ups[0] = true;
+                                power_ups[0] = {true, current_time};
                                 //throwable bomb powerup, stays with the user for
                                 //a particular time
                                 break;
                             case 4:
-                                power_ups[1] = true;
+                                power_ups[1] = {true, current_time};
                                 move_size = 2;
                                 break;
                             case 5:
-                                power_ups[2] = true;
+                                power_ups[2] = {true, current_time};
                                 //increased bomb radius
                                 break;
                             }
@@ -445,7 +464,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 {
                     if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
-                        if (power_ups[0] && bombs[b].get_id() == player_id)
+                        if (power_ups[0].first && bombs[b].get_id() == player_id)
                         {
                             bombs[b].set_direction(3);
                             bombs[b].set_moving();
@@ -464,16 +483,16 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     switch (num)
                     {
                     case 3:
-                        power_ups[0] = true;
+                        power_ups[0] = {true, current_time};
                         //throwable bomb powerup, stays with the user for
                         //a particular time
                         break;
                     case 4:
-                        power_ups[1] = true;
+                        power_ups[1] = {true, current_time};
                         move_size = 2;
                         break;
                     case 5:
-                        power_ups[2] = true;
+                        power_ups[2] = {true, current_time};
                         //increased bomb radius
                         break;
                     }
@@ -519,7 +538,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             {
                                 if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
-                                    if (power_ups[0] && bombs[b].get_id() == player_id)
+                                    if (power_ups[0].first && bombs[b].get_id() == player_id)
                                     {
                                         bombs[b].set_direction(2);
                                         bombs[b].set_moving();
@@ -538,16 +557,16 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                                 switch (num)
                                 {
                                 case 3:
-                                    power_ups[0] = true;
+                                    power_ups[0] = {true, current_time};
                                     //throwable bomb powerup, stays with the user for
                                     //a particular time
                                     break;
                                 case 4:
-                                    power_ups[1] = true;
+                                    power_ups[1] = {true, current_time};
                                     move_size = 2;
                                     break;
                                 case 5:
-                                    power_ups[2] = true;
+                                    power_ups[2] = {true, current_time};
                                     //increased bomb radius
                                     break;
                                 }
@@ -570,7 +589,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         {
                             if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
-                                if (power_ups[0] && bombs[b].get_id() == player_id)
+                                if (power_ups[0].first && bombs[b].get_id() == player_id)
                                 {
                                     bombs[b].set_direction(2);
                                     bombs[b].set_moving();
@@ -589,16 +608,16 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             switch (num)
                             {
                             case 3:
-                                power_ups[0] = true;
+                                power_ups[0] = {true, current_time};
                                 //throwable bomb powerup, stays with the user for
                                 //a particular time
                                 break;
                             case 4:
-                                power_ups[1] = true;
+                                power_ups[1] = {true, current_time};
                                 move_size = 2;
                                 break;
                             case 5:
-                                power_ups[2] = true;
+                                power_ups[2] = {true, current_time};
                                 //increased bomb radius
                                 break;
                             }
@@ -622,7 +641,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 {
                     if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
-                        if (power_ups[0] && bombs[b].get_id() == player_id)
+                        if (power_ups[0].first && bombs[b].get_id() == player_id)
                         {
                             bombs[b].set_direction(2);
                             bombs[b].set_moving();
@@ -641,16 +660,16 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     switch (num)
                     {
                     case 3:
-                        power_ups[0] = true;
+                        power_ups[0] = {true, current_time};
                         //throwable bomb powerup, stays with the user for
                         //a particular time
                         break;
                     case 4:
-                        power_ups[1] = true;
+                        power_ups[1] = {true, current_time};
                         move_size = 2;
                         break;
                     case 5:
-                        power_ups[2] = true;
+                        power_ups[2] = {true, current_time};
                         //increased bomb radius
                         break;
                     }
@@ -691,7 +710,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             {
                                 if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
-                                    if (power_ups[0] && bombs[b].get_id() == player_id)
+                                    if (power_ups[0].first && bombs[b].get_id() == player_id)
                                     {
                                         bombs[b].set_direction(4);
                                         bombs[b].set_moving();
@@ -710,16 +729,16 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                                 switch (num)
                                 {
                                 case 3:
-                                    power_ups[0] = true;
+                                    power_ups[0] = {true, current_time};
                                     //throwable bomb powerup, stays with the user for
                                     //a particular time
                                     break;
                                 case 4:
-                                    power_ups[1] = true;
+                                    power_ups[1] = {true, current_time};
                                     move_size = 2;
                                     break;
                                 case 5:
-                                    power_ups[2] = true;
+                                    power_ups[2] = {true, current_time};
                                     //increased bomb radius
                                     break;
                                 }
@@ -742,7 +761,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         {
                             if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
-                                if (power_ups[0] && bombs[b].get_id() == player_id)
+                                if (power_ups[0].first && bombs[b].get_id() == player_id)
                                 {
                                     bombs[b].set_direction(4);
                                     bombs[b].set_moving();
@@ -761,16 +780,16 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             switch (num)
                             {
                             case 3:
-                                power_ups[0] = true;
+                                power_ups[0] = {true, current_time};
                                 //throwable bomb powerup, stays with the user for
                                 //a particular time
                                 break;
                             case 4:
-                                power_ups[1] = true;
+                                power_ups[1] = {true, current_time};
                                 move_size = 2;
                                 break;
                             case 5:
-                                power_ups[2] = true;
+                                power_ups[2] = {true, current_time};
                                 //increased bomb radius
                                 break;
                             }
@@ -794,7 +813,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 {
                     if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
-                        if (power_ups[0] && bombs[b].get_id() == player_id)
+                        if (power_ups[0].first && bombs[b].get_id() == player_id)
                         {
                             bombs[b].set_direction(4);
                             bombs[b].set_moving();
@@ -813,16 +832,16 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     switch (num)
                     {
                     case 3:
-                        power_ups[0] = true;
+                        power_ups[0] = {true, current_time};
                         //throwable bomb powerup, stays with the user for
                         //a particular time
                         break;
                     case 4:
-                        power_ups[1] = true;
+                        power_ups[1] = {true, current_time};
                         move_size = 2;
                         break;
                     case 5:
-                        power_ups[2] = true;
+                        power_ups[2] = {true, current_time};
                         //increased bomb radius
                         break;
                     }
