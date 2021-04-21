@@ -18,22 +18,56 @@ void Game::newLevel()
 
 void Game::control(SDL_Event e, int current_time)
 {
-    players[0].takeAction(e, maze, bombs, current_time);
+    if (players.size() != 0)
+    {
+        players[0].takeAction(e, maze, bombs, current_time);
+    }
 }
 
 void Game::update(int current_time)
 {
+    vector<vector<int>> player_info;
+    for (int i = 0; i < players.size(); i++)
+    {
+        player_info.push_back({players[i].getId(), players[i].get_x(), players[i].get_y(), players[i].get_x_offset(), players[i].get_y_offset(), players[i].get_size()});
+    }
+    for (int i = 0; i < explosions.size(); i++)
+    {
+        vector<int> final_ids = explosions[i].update(current_time, explosions, maze, player_info);
+        vector<Player> new_players;
+        for (int i = 0; i < players.size(); i++)
+        {
+            for (int j = 0; j < final_ids.size(); j++)
+            {
+                if (players[i].getId() == final_ids[j])
+                {
+                    new_players.push_back(players[i]);
+                    break;
+                }
+            }
+        }
+        players = new_players;
+    }
     maze.update_power_ups(current_time);
-    players[0].updateLocation(maze, players, bombs, current_time);
-    //each power up has a certain time, so update the powe up blocks also
+    for (int i = 0; i < players.size(); i++)
+    {
+        players[i].updateLocation(maze, players, bombs, current_time, explosions);
+    }
 }
 
 void Game::render(SDL_Renderer *renderer)
 {
     maze.render(renderer);
-    players[0].render(renderer);
-    for (auto u : bombs)
+    for (int i = 0; i < players.size(); i++)
     {
-        u.render(renderer);
+        players[i].render(renderer);
+    }
+    for (int i = 0; i < bombs.size(); i++)
+    {
+        bombs[i].render(renderer);
+    }
+    for (int i = 0; i < explosions.size(); i++)
+    {
+        explosions[i].render(renderer);
     }
 }

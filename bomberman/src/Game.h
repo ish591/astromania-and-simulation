@@ -3,12 +3,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <vector>
-
-#include "Maze.h"
 #include "Player.h"
-#include "Block.h"
-#include "Bomb.h"
-
 using namespace std;
 
 class Game
@@ -23,6 +18,7 @@ public:
     int width, height;
     vector<Player> players;
     vector<Bomb> bombs;
+    vector<Explosion> explosions;
     int maze_size = 7;
     int level;
 };

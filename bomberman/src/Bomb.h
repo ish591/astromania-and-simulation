@@ -2,8 +2,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <stdlib.h>
-
-#include "Maze.h"
+#include "Explosion.h"
 class Bomb
 {
 public:
@@ -20,9 +19,9 @@ public:
     int get_size();
     int get_time_exp();
     int get_id();
-    pair<bool, int> update_state(int, Maze &, vector<pair<int, int>>, vector<Bomb> &);
+    pair<bool, int> update_state(int, Maze &, vector<pair<int, int>>, vector<Bomb> &, vector<Explosion> &);
     void update_location(Maze &, vector<pair<int, int>>);
-    void explode(Maze &, int);
+    void explode(Maze &, int, vector<Explosion> &);
     void render(SDL_Renderer *);
     void set_direction(int);
     void set_moving();

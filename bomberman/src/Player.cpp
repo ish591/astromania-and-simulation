@@ -33,6 +33,18 @@ int Player::get_y()
 {
     return y;
 }
+int Player::get_x_offset()
+{
+    return x_offset;
+}
+int Player::get_y_offset()
+{
+    return y_offset;
+}
+int Player::get_size()
+{
+    return player_size;
+}
 int Player::get_bomb_count()
 {
     return bomb_count;
@@ -139,11 +151,11 @@ void Player::update_power_ups(int current_time)
         }
     }
 }
-void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &bombs, int current_time)
+void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &bombs, int current_time, vector<Explosion> &explosions)
 {
     //first of all remove power ups of the user if time has elapsed
     update_power_ups(current_time);
-    update_bombs(maze, players, bombs, current_time);
+    update_bombs(maze, players, bombs, current_time, explosions);
     //new bombs have been released, and collision with bombs have been checked.
     //now, handle the sliding feature. if next cell has a slidable bomb, slide it
     //else the player will get blocked by it
@@ -863,7 +875,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
         break;
     }
 }
-void Player::update_bombs(Maze &maze, vector<Player> &players, vector<Bomb> &bombs, int current_time)
+void Player::update_bombs(Maze &maze, vector<Player> &players, vector<Bomb> &bombs, int current_time, vector<Explosion> &explosions)
 {
     //first of all update all the bombs
     // if a bomb explodes, remove it from this vector.
@@ -876,7 +888,7 @@ void Player::update_bombs(Maze &maze, vector<Player> &players, vector<Bomb> &bom
     }
     for (Bomb u : bombs)
     {
-        pair<bool, int> res = u.update_state(current_time, maze, locations, bombs);
+        pair<bool, int> res = u.update_state(current_time, maze, locations, bombs, explosions);
         if (!res.first) //bomb has not  exploded
         {
             new_bombs.push_back(u);
