@@ -3,8 +3,32 @@
 Player::Player(int id, Maze &maze)
 {
     player_id = id;
-    x = 1;
-    y = 1;
+    if (id == 1)
+    {
+        x = 1;
+        y = 1;
+        color_r = 255;
+        color_g = 255;
+        color_b = 0;
+        UP = SDLK_UP;
+        DOWN = SDLK_DOWN;
+        RIGHT = SDLK_RIGHT;
+        LEFT = SDLK_LEFT;
+        DROP_BOMB = SDLK_RETURN;
+    }
+    if (id == 2)
+    {
+        x = maze.getSize() - 2;
+        y = x;
+        color_r = 0;
+        color_g = 255;
+        color_b = 0;
+        UP = SDLK_w;
+        DOWN = SDLK_s;
+        RIGHT = SDLK_d;
+        LEFT = SDLK_a;
+        DROP_BOMB = SDLK_SPACE;
+    }
     x_offset = 0, y_offset = 0;
     score = 0;
     UP_PRESSED = 0;
@@ -15,11 +39,12 @@ Player::Player(int id, Maze &maze)
     bomb_count = 0;
     total_released = 0;
     power_up_duration = 8000;
-    for (int i = 0; i < 5; i++)
-    {
-        power_ups.push_back({false, -1});
-    }
-    //power_ups[0]={true,current_time};
+    lives = 3;
+    last_life_loss_time = -5000;
+    power_ups.push_back({0, -1});
+    power_ups.push_back({1, -1});
+    power_ups.push_back({2, -1});
+    power_ups.push_back({1, -1});
 }
 int Player::get_x()
 {
@@ -53,20 +78,6 @@ void Player::update_bomb_count(int new_count)
 {
     bomb_count = new_count;
 }
-
-// void Player::reset_bombs(Maze &maze, int x1, int y1)
-// {
-//     released = false;
-//     bombs.clear();
-//     collision_status.clear();
-//     for (int i = 0; i < 4; i++)
-//     {
-//         collision_status.push_back(false);
-//         Bomb new_bomb = Bomb(maze, bomb_type, i + 1, x1, y1, x_offset, y_offset); //i+1 denotes the direction
-//         bombs.push_back(new_bomb);
-//     }
-// }
-
 void Player::updateDimensions(Maze &maze, int w, int h)
 {
     block_size = maze.getBlockSize();
@@ -78,76 +89,55 @@ void Player::updateDimensions(Maze &maze, int w, int h)
     top_offset = maze.top_offset;
     x_offset = block_size / 2;
     y_offset = block_size / 2;
-    move_size = 1;
+    power_ups[1].first = 1;
 }
 
 void Player::takeAction(SDL_Event event, Maze &maze, vector<Bomb> &bombs, int current_time)
 {
-    switch (event.type)
+
+    if (event.type == SDL_KEYDOWN)
     {
-    case SDL_KEYDOWN:
-        switch (event.key.keysym.sym)
-        {
-        case SDLK_LEFT:
+        SDL_Keycode key_press = event.key.keysym.sym;
+        if (key_press == LEFT)
             LEFT_PRESSED = 1;
-            break;
-        case SDLK_RIGHT:
+        else if (key_press == RIGHT)
             RIGHT_PRESSED = 1;
-            break;
-        case SDLK_UP:
+        else if (key_press == UP)
             UP_PRESSED = 1;
-            break;
-        case SDLK_DOWN:
+        else if (key_press == DOWN)
             DOWN_PRESSED = 1;
-            break;
-        case SDLK_SPACE:
-            if (bomb_count == 0) //then only release
+        else if (key_press == DROP_BOMB)
+        {
+            if (bomb_count < power_ups[3].first) //then only release
             {
                 //currently setting the type as 1 only
                 total_released++;
                 bomb_count++;
-                Bomb new_bomb = Bomb(maze, 1 + power_ups[2].first, x, y, block_size / 2, block_size / 2, current_time, player_id, total_released);
+                Bomb new_bomb = Bomb(maze, min(5, power_ups[2].first), x, y, block_size / 2, block_size / 2, current_time, player_id, total_released, color_r, color_g, color_b);
                 bombs.push_back(new_bomb);
             }
-        default:
-            break;
         }
-        break;
-    case SDL_KEYUP:
-        switch (event.key.keysym.sym)
-        {
-        case SDLK_LEFT:
+    }
+    else if (event.type == SDL_KEYUP)
+    {
+        SDL_Keycode key_press = event.key.keysym.sym;
+        if (key_press == LEFT)
             LEFT_PRESSED = 0;
-            break;
-        case SDLK_RIGHT:
+        else if (key_press == RIGHT)
             RIGHT_PRESSED = 0;
-            break;
-        case SDLK_UP:
+        else if (key_press == UP)
             UP_PRESSED = 0;
-            break;
-        case SDLK_DOWN:
+        else if (key_press == DOWN)
             DOWN_PRESSED = 0;
-            break;
-        default:
-            break;
-        }
-        break;
     }
 }
 void Player::update_power_ups(int current_time)
 {
-    for (int i = 0; i < 5; i++)
+    if (power_ups[1].first > 1)
     {
-        if (power_ups[i].first)
+        if (power_ups[1].second + power_up_duration < current_time)
         {
-            if (power_ups[i].second + power_up_duration < current_time)
-            {
-                if (i == 1)
-                {
-                    move_size = 1;
-                }
-                power_ups[i] = {false, -1};
-            }
+            power_ups[1] = {1, -1};
         }
     }
 }
@@ -165,14 +155,14 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
     //cell type 5 -> sets 1 (radius increased)
     int hmove = RIGHT_PRESSED - LEFT_PRESSED;
     int vmove = DOWN_PRESSED - UP_PRESSED;
-    vector<vector<Box>> a = maze.getMaze();
+    vector<vector<Box> > a = maze.getMaze();
     // cout << hmove << vmove << endl;
     switch (hmove)
     {
     case -1:
-        if (x_offset - move_size - player_size / 2 > 0)
+        if (x_offset - power_ups[1].first - player_size / 2 > 0)
         {
-            x_offset -= move_size;
+            x_offset -= power_ups[1].first;
         }
         else if (a[y][x - 1].get_block_type() == 0 || a[y][x - 1].get_block_type() >= 3)
         {
@@ -215,22 +205,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                                 switch (num)
                                 {
                                 case 3:
-                                    power_ups[0] = {true, current_time};
+                                    power_ups[0] = {1, current_time};
                                     //throwable bomb powerup, stays with the user for
                                     //a particular time
                                     break;
                                 case 4:
-                                    power_ups[1] = {true, current_time};
-                                    move_size = 2;
+                                    power_ups[1] = {2, current_time};
+                                    power_ups[1].first = 2;
                                     break;
                                 case 5:
-                                    power_ups[2] = {true, current_time};
+                                    power_ups[2].first++;
                                     //increased bomb radius
                                     break;
+                                case 6:
+                                    power_ups[3].first++;
+                                    break;
                                 }
-                                if (x_offset - move_size < 0)
+                                if (x_offset - power_ups[1].first < 0)
                                     x--;
-                                x_offset = (x_offset + block_size - move_size) % block_size;
+                                x_offset = (x_offset + block_size - power_ups[1].first) % block_size;
                             }
                         }
                         else
@@ -268,22 +261,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             switch (num)
                             {
                             case 3:
-                                power_ups[0] = {true, current_time};
+                                power_ups[0] = {1, current_time};
                                 //throwable bomb powerup, stays with the user for
                                 //a particular time
                                 break;
                             case 4:
-                                power_ups[1] = {true, current_time};
-                                move_size = 2;
+                                power_ups[1] = {2, current_time};
+                                power_ups[1].first = 2;
                                 break;
                             case 5:
-                                power_ups[2] = {true, current_time};
+                                power_ups[2].first++;
                                 //increased bomb radius
                                 break;
+                            case 6:
+                                power_ups[3].first++;
+                                break;
                             }
-                            if (x_offset - move_size < 0)
+                            if (x_offset - power_ups[1].first < 0)
                                 x--;
-                            x_offset = (x_offset + block_size - move_size) % block_size;
+                            x_offset = (x_offset + block_size - power_ups[1].first) % block_size;
                         }
                     }
                 }
@@ -321,22 +317,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     switch (num)
                     {
                     case 3:
-                        power_ups[0] = {true, current_time};
+                        power_ups[0] = {1, current_time};
                         //throwable bomb powerup, stays with the user for
                         //a particular time
                         break;
                     case 4:
-                        power_ups[1] = {true, current_time};
-                        move_size = 2;
+                        power_ups[1] = {2, current_time};
+                        power_ups[1].first = 2;
                         break;
                     case 5:
-                        power_ups[2] = {true, current_time};
+                        power_ups[2].first++;
                         //increased bomb radius
                         break;
+                    case 6:
+                        power_ups[3].first++;
+                        break;
                     }
-                    if (x_offset - move_size < 0)
+                    if (x_offset - power_ups[1].first < 0)
                         x--;
-                    x_offset = (x_offset + block_size - move_size) % block_size;
+                    x_offset = (x_offset + block_size - power_ups[1].first) % block_size;
                 }
             }
         }
@@ -350,9 +349,9 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
         break;
 
     case 1:
-        if (x_offset + move_size + player_size / 2 < block_size)
+        if (x_offset + power_ups[1].first + player_size / 2 < block_size)
         {
-            x_offset += move_size;
+            x_offset += power_ups[1].first;
         }
         else if (a[y][x + 1].get_block_type() == 0 || a[y][x + 1].get_block_type() >= 3)
         {
@@ -392,22 +391,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                                 switch (num)
                                 {
                                 case 3:
-                                    power_ups[0] = {true, current_time};
+                                    power_ups[0] = {1, current_time};
                                     //throwable bomb powerup, stays with the user for
                                     //a particular time
                                     break;
                                 case 4:
-                                    power_ups[1] = {true, current_time};
-                                    move_size = 2;
+                                    power_ups[1] = {2, current_time};
+                                    power_ups[1].first = 2;
                                     break;
                                 case 5:
-                                    power_ups[2] = {true, current_time};
+                                    power_ups[2].first++;
                                     //increased bomb radius
                                     break;
+                                case 6:
+                                    power_ups[3].first++;
+                                    break;
                                 }
-                                if (x_offset + move_size >= block_size)
+                                if (x_offset + power_ups[1].first >= block_size)
                                     x++;
-                                x_offset = (x_offset + move_size) % block_size;
+                                x_offset = (x_offset + power_ups[1].first) % block_size;
                             }
                         }
                         else
@@ -443,22 +445,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             switch (num)
                             {
                             case 3:
-                                power_ups[0] = {true, current_time};
+                                power_ups[0] = {1, current_time};
                                 //throwable bomb powerup, stays with the user for
                                 //a particular time
                                 break;
                             case 4:
-                                power_ups[1] = {true, current_time};
-                                move_size = 2;
+                                power_ups[1] = {2, current_time};
+                                power_ups[1].first = 2;
                                 break;
                             case 5:
-                                power_ups[2] = {true, current_time};
+                                power_ups[2].first++;
                                 //increased bomb radius
                                 break;
+                            case 6:
+                                power_ups[3].first++;
+                                break;
                             }
-                            if (x_offset + move_size >= block_size)
+                            if (x_offset + power_ups[1].first >= block_size)
                                 x++;
-                            x_offset = (x_offset + move_size) % block_size;
+                            x_offset = (x_offset + power_ups[1].first) % block_size;
                         }
                     }
                 }
@@ -495,22 +500,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     switch (num)
                     {
                     case 3:
-                        power_ups[0] = {true, current_time};
+                        power_ups[0] = {1, current_time};
                         //throwable bomb powerup, stays with the user for
                         //a particular time
                         break;
                     case 4:
-                        power_ups[1] = {true, current_time};
-                        move_size = 2;
+                        power_ups[1] = {2, current_time};
+                        power_ups[1].first = 2;
                         break;
                     case 5:
-                        power_ups[2] = {true, current_time};
+                        power_ups[2].first++;
                         //increased bomb radius
                         break;
+                    case 6:
+                        power_ups[3].first++;
+                        break;
                     }
-                    if (x_offset + move_size >= block_size)
+                    if (x_offset + power_ups[1].first >= block_size)
                         x++;
-                    x_offset = (x_offset + move_size) % block_size;
+                    x_offset = (x_offset + power_ups[1].first) % block_size;
                 }
             }
         }
@@ -528,9 +536,9 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
     switch (vmove)
     {
     case -1:
-        if (y_offset - move_size - player_size / 2 > 0)
+        if (y_offset - power_ups[1].first - player_size / 2 > 0)
         {
-            y_offset -= move_size;
+            y_offset -= power_ups[1].first;
         }
         else if (a[y - 1][x].get_block_type() == 0 || a[y - 1][x].get_block_type() >= 3)
         {
@@ -569,22 +577,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                                 switch (num)
                                 {
                                 case 3:
-                                    power_ups[0] = {true, current_time};
+                                    power_ups[0] = {1, current_time};
                                     //throwable bomb powerup, stays with the user for
                                     //a particular time
                                     break;
                                 case 4:
-                                    power_ups[1] = {true, current_time};
-                                    move_size = 2;
+                                    power_ups[1] = {2, current_time};
+                                    power_ups[1].first = 2;
                                     break;
                                 case 5:
-                                    power_ups[2] = {true, current_time};
+                                    power_ups[2].first++;
                                     //increased bomb radius
                                     break;
+                                case 6:
+                                    power_ups[3].first++;
+                                    break;
                                 }
-                                if (y_offset - move_size < 0)
+                                if (y_offset - power_ups[1].first < 0)
                                     y--;
-                                y_offset = (y_offset + block_size - move_size) % block_size;
+                                y_offset = (y_offset + block_size - power_ups[1].first) % block_size;
                             }
                         }
                         else
@@ -620,22 +631,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             switch (num)
                             {
                             case 3:
-                                power_ups[0] = {true, current_time};
+                                power_ups[0] = {1, current_time};
                                 //throwable bomb powerup, stays with the user for
                                 //a particular time
                                 break;
                             case 4:
-                                power_ups[1] = {true, current_time};
-                                move_size = 2;
+                                power_ups[1] = {2, current_time};
+                                power_ups[1].first = 2;
                                 break;
                             case 5:
-                                power_ups[2] = {true, current_time};
+                                power_ups[2].first++;
                                 //increased bomb radius
                                 break;
+                            case 6:
+                                power_ups[3].first++;
+                                break;
                             }
-                            if (y_offset - move_size < 0)
+                            if (y_offset - power_ups[1].first < 0)
                                 y--;
-                            y_offset = (y_offset + block_size - move_size) % block_size;
+                            y_offset = (y_offset + block_size - power_ups[1].first) % block_size;
                         }
                     }
                 }
@@ -672,22 +686,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     switch (num)
                     {
                     case 3:
-                        power_ups[0] = {true, current_time};
+                        power_ups[0] = {1, current_time};
                         //throwable bomb powerup, stays with the user for
                         //a particular time
                         break;
                     case 4:
-                        power_ups[1] = {true, current_time};
-                        move_size = 2;
+                        power_ups[1] = {2, current_time};
+                        power_ups[1].first = 2;
                         break;
                     case 5:
-                        power_ups[2] = {true, current_time};
+                        power_ups[2].first++;
                         //increased bomb radius
                         break;
+                    case 6:
+                        power_ups[3].first++;
+                        break;
                     }
-                    if (y_offset - move_size < 0)
+                    if (y_offset - power_ups[1].first < 0)
                         y--;
-                    y_offset = (y_offset + block_size - move_size) % block_size;
+                    y_offset = (y_offset + block_size - power_ups[1].first) % block_size;
                 }
             }
         }
@@ -701,9 +718,9 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
         break;
 
     case 1:
-        if (y_offset + move_size + player_size / 2 < block_size)
+        if (y_offset + power_ups[1].first + player_size / 2 < block_size)
         {
-            y_offset += move_size;
+            y_offset += power_ups[1].first;
         }
         else if (a[y + 1][x].get_block_type() == 0 || a[y + 1][x].get_block_type() >= 3)
         {
@@ -741,22 +758,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                                 switch (num)
                                 {
                                 case 3:
-                                    power_ups[0] = {true, current_time};
+                                    power_ups[0] = {1, current_time};
                                     //throwable bomb powerup, stays with the user for
                                     //a particular time
                                     break;
                                 case 4:
-                                    power_ups[1] = {true, current_time};
-                                    move_size = 2;
+                                    power_ups[1] = {2, current_time};
+                                    power_ups[1].first = 2;
                                     break;
                                 case 5:
-                                    power_ups[2] = {true, current_time};
+                                    power_ups[2].first++;
                                     //increased bomb radius
                                     break;
+                                case 6:
+                                    power_ups[3].first++;
+                                    break;
                                 }
-                                if (y_offset + move_size >= block_size)
+                                if (y_offset + power_ups[1].first >= block_size)
                                     y++;
-                                y_offset = (y_offset + move_size) % block_size;
+                                y_offset = (y_offset + power_ups[1].first) % block_size;
                             }
                         }
                         else
@@ -792,22 +812,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             switch (num)
                             {
                             case 3:
-                                power_ups[0] = {true, current_time};
+                                power_ups[0] = {1, current_time};
                                 //throwable bomb powerup, stays with the user for
                                 //a particular time
                                 break;
                             case 4:
-                                power_ups[1] = {true, current_time};
-                                move_size = 2;
+                                power_ups[1] = {2, current_time};
+                                power_ups[1].first = 2;
                                 break;
                             case 5:
-                                power_ups[2] = {true, current_time};
+                                power_ups[2].first++;
                                 //increased bomb radius
                                 break;
+                            case 6:
+                                power_ups[3].first++;
+                                break;
                             }
-                            if (y_offset + move_size >= block_size)
+                            if (y_offset + power_ups[1].first >= block_size)
                                 y++;
-                            y_offset = (y_offset + move_size) % block_size;
+                            y_offset = (y_offset + power_ups[1].first) % block_size;
                         }
                     }
                 }
@@ -844,22 +867,25 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                     switch (num)
                     {
                     case 3:
-                        power_ups[0] = {true, current_time};
+                        power_ups[0] = {1, current_time};
                         //throwable bomb powerup, stays with the user for
                         //a particular time
                         break;
                     case 4:
-                        power_ups[1] = {true, current_time};
-                        move_size = 2;
+                        power_ups[1] = {2, current_time};
+                        power_ups[1].first = 2;
                         break;
                     case 5:
-                        power_ups[2] = {true, current_time};
+                        power_ups[2].first++;
                         //increased bomb radius
                         break;
+                    case 6:
+                        power_ups[3].first++;
+                        break;
                     }
-                    if (y_offset + move_size >= block_size)
+                    if (y_offset + power_ups[1].first >= block_size)
                         y++;
-                    y_offset = (y_offset + move_size) % block_size;
+                    y_offset = (y_offset + power_ups[1].first) % block_size;
                 }
             }
         }
@@ -881,7 +907,7 @@ void Player::update_bombs(Maze &maze, vector<Player> &players, vector<Bomb> &bom
     // if a bomb explodes, remove it from this vector.
     // also, decrement count of player
     vector<Bomb> new_bombs;
-    vector<pair<int, int>> locations;
+    vector<pair<int, int> > locations;
     for (int i = 0; i < players.size(); i++)
     {
         locations.push_back({players[i].get_x(), players[i].get_y()});
@@ -909,9 +935,29 @@ void Player::update_bombs(Maze &maze, vector<Player> &players, vector<Bomb> &bom
     // now time for releasing a new bomb!
 }
 
+void Player::kill(int cur_time)
+{
+    cout << cur_time << endl;
+    if (last_life_loss_time + 1500 < cur_time)
+    {
+        lives--;
+        cout << lives << endl;
+        last_life_loss_time = cur_time;
+    }
+}
+
+bool Player::isAlive()
+{
+    if (lives > 0)
+        return true;
+    return false;
+}
+
 void Player::render(SDL_Renderer *renderer)
 {
     SDL_Rect rect = {x * block_size + x_offset + left_offset - (player_size / 2), y * block_size + y_offset + top_offset - (player_size / 2), player_size, player_size};
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, color_r, color_g, color_b, 255);
+    int gap = SDL_GetTicks() - last_life_loss_time;
+    if (gap > 2000 || (gap / 100) % 5 < 4)
+        SDL_RenderFillRect(renderer, &rect);
 }

@@ -1,8 +1,7 @@
 #include "Bomb.h"
 #include "Explosion.h"
-Bomb::Bomb(Maze &maze, int t, int x1, int y1, int x_off, int y_off, int start_time, int pl_id, int total_released)
+Bomb::Bomb(Maze &maze, int r, int x1, int y1, int x_off, int y_off, int start_time, int pl_id, int total_released, int red, int green, int blue)
 {
-    type = t;
     block_size = maze.getBlockSize();
     time_beg = start_time;
     direction = -1;
@@ -11,14 +10,7 @@ Bomb::Bomb(Maze &maze, int t, int x1, int y1, int x_off, int y_off, int start_ti
     y = 0;
     time_explode = 3000;
     speed = 3;
-    if (type == 1) //default type
-    {
-        radius = 3;
-    }
-    else if (type == 2)
-    {
-        radius = 5;
-    }
+    radius = r;
     bomb_size = block_size - 20;
     x_offset = x_off;
     y_offset = y_off;
@@ -28,6 +20,9 @@ Bomb::Bomb(Maze &maze, int t, int x1, int y1, int x_off, int y_off, int start_ti
     y = y1;
     id = pl_id;
     count = total_released;
+    color_r = red;
+    color_g = green;
+    color_b = blue;
 }
 void Bomb::set_direction(int d)
 {
@@ -41,11 +36,6 @@ void Bomb::set_moving()
 {
     moving_bomb = true;
 }
-int Bomb::get_type()
-{
-    return type;
-}
-
 int Bomb::get_x()
 {
     return x;
@@ -72,7 +62,7 @@ int Bomb::get_size()
     return bomb_size;
 }
 
-pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int, int>> locations, vector<Bomb> &bombs, vector<Explosion> &explosions)
+pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int, int> > locations, vector<Bomb> &bombs, vector<Explosion> &explosions)
 {
     //check if moving or stationary presently
     if (moving_bomb)
@@ -120,9 +110,9 @@ pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int
     return {false, 0};
 }
 
-void Bomb::update_location(Maze &maze, vector<pair<int, int>> locations)
+void Bomb::update_location(Maze &maze, vector<pair<int, int> > locations)
 {
-    vector<vector<Box>> a = maze.getMaze();
+    vector<vector<Box> > a = maze.getMaze();
     //first check if blocked by any player
     int next_cell_x = x;
     int next_cell_y = y;
@@ -417,7 +407,7 @@ void Bomb::update_location(Maze &maze, vector<pair<int, int>> locations)
 
 void Bomb::explode(Maze &maze, int current_time, vector<Explosion> &explosions)
 {
-    vector<vector<Box>> a = maze.getMaze();
+    vector<vector<Box> > a = maze.getMaze();
     //just explode the bomb, in all four directions up till radius
     int left = x;
     int right = x;
@@ -427,11 +417,7 @@ void Bomb::explode(Maze &maze, int current_time, vector<Explosion> &explosions)
     {
         if (a[y][x_curr].get_block_type() == 1 || a[y][x_curr].get_block_type() == 2)
         {
-            if (a[y][x_curr].get_block_type() == 1)
-            {
-                srand(time(0));
-                left = x_curr;
-            }
+            left = x_curr;
             break;
         }
         left = x_curr;
@@ -440,12 +426,8 @@ void Bomb::explode(Maze &maze, int current_time, vector<Explosion> &explosions)
     {
         if (a[y][x_curr].get_block_type() == 1 || a[y][x_curr].get_block_type() == 2)
         {
-            if (a[y][x_curr].get_block_type() == 1)
-            {
-                srand(time(0));
-                right = x_curr;
-                break;
-            }
+            right = x_curr;
+            break;
         }
         right = x_curr;
     }
@@ -455,11 +437,7 @@ void Bomb::explode(Maze &maze, int current_time, vector<Explosion> &explosions)
     {
         if (a[y_curr][x].get_block_type() == 1 || a[y_curr][x].get_block_type() == 2)
         {
-            if (a[y_curr][x].get_block_type() == 1)
-            {
-                srand(time(0));
-                top = y_curr;
-            }
+            top = y_curr;
             break;
         }
         top = y_curr;
@@ -468,11 +446,7 @@ void Bomb::explode(Maze &maze, int current_time, vector<Explosion> &explosions)
     {
         if (a[y_curr][x].get_block_type() == 1 || a[y_curr][x].get_block_type() == 2)
         {
-            if (a[y_curr][x].get_block_type() == 1)
-            {
-                srand(time(0));
-                bottom = y_curr;
-            }
+            bottom = y_curr;
             break;
         }
         bottom = y_curr;
@@ -491,21 +465,6 @@ void Bomb::render(SDL_Renderer *renderer)
     int h = bomb_size;
     SDL_Rect rect;
     rect = {x1, y1, w, h};
-    int r, g, b, a;
-    if (type == 1)
-    {
-        r = 200;
-        g = 200;
-        b = 0;
-        a = 255;
-    }
-    else
-    {
-        r = 50;
-        g = 200;
-        b = 120;
-        a = 255;
-    }
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    SDL_SetRenderDrawColor(renderer, color_r, color_g, color_b, 255);
     SDL_RenderFillRect(renderer, &rect);
 }

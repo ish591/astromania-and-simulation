@@ -12,7 +12,7 @@ int main()
     cin >> n;
     cout << "Enter 0 for continuous walls, 1 for discrete:";
     cin >> fl;
-    cout << "Enter game name: ";
+    // cout << "Enter game name: ";
     Game current_game = Game(1, 7, 1280, 720);
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)

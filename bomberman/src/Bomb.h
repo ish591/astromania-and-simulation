@@ -9,7 +9,7 @@ public:
     //each bomb has a movement speed, x and y coordinates, radius of impact, distance of explosion,
     //a type, and a skin associated with that type, and an audio associated with that type.
     //each player has an object of type bomb associated with it
-    Bomb(Maze &, int, int, int, int, int, int, int, int); //initialise bomb with a type, and coordinates, and x,y offsets
+    Bomb(Maze &, int, int, int, int, int, int, int, int, int, int, int); //initialise bomb with a type, and coordinates, and x,y offsets
     int get_speed();
     int get_x();
     int get_y();
@@ -19,8 +19,8 @@ public:
     int get_size();
     int get_time_exp();
     int get_id();
-    pair<bool, int> update_state(int, Maze &, vector<pair<int, int>>, vector<Bomb> &, vector<Explosion> &);
-    void update_location(Maze &, vector<pair<int, int>>);
+    pair<bool, int> update_state(int, Maze &, vector<pair<int, int> >, vector<Bomb> &, vector<Explosion> &);
+    void update_location(Maze &, vector<pair<int, int> >);
     void explode(Maze &, int, vector<Explosion> &);
     void render(SDL_Renderer *);
     void set_direction(int);
@@ -43,4 +43,5 @@ private:
     int x_offset, y_offset;
     int left_offset, top_offset;
     bool moving_bomb;
+    int color_r, color_g, color_b;
 };

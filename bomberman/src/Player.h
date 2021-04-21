@@ -28,6 +28,8 @@ public:
     int get_bomb_count();
     void update_bomb_count(int);
     void update_power_ups(int);
+    void kill(int);
+    bool isAlive();
 
 protected:
     int player_id;
@@ -47,6 +49,10 @@ protected:
     int move_size;
     int bomb_count;
     int total_released;
-    vector<pair<bool, int>> power_ups;
+    int lives;
+    int last_life_loss_time;
+    int color_r, color_g, color_b;
+    vector<pair<int, int> > power_ups;
+    SDL_Keycode UP, DOWN, RIGHT, LEFT, DROP_BOMB;
     //each player has some power ups. for now, 1 corresponds to the throwing power_up
 };

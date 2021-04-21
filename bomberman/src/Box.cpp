@@ -91,6 +91,13 @@ void Box::render(SDL_Renderer *renderer, int x, int y, int w, int h)
         b = 0;
         a = 200;
     }
+    else
+    {
+        r = 100;
+        g = 100;
+        b = 100;
+        a = 200;
+    }
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
     SDL_RenderFillRect(renderer, &rect);
 }

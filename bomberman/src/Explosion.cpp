@@ -9,7 +9,7 @@ Explosion::Explosion(int passed_id, int c1, int c2, int other, int direction, Ma
     left_offset = maze.left_offset;
     top_offset = maze.top_offset;
     Explosion::direction = direction;
-    duration = 4000;
+    duration = 2000;
     end_time = cur_time + duration;
     explosion_offset = 10;
     id = passed_id;
@@ -37,7 +37,7 @@ void Explosion::create_actual_rectangle()
         height = (max_coord - min_coord + 1) * block_size - 2 * explosion_offset;
     }
 }
-vector<int> Explosion::update(int cur_ticks, vector<Explosion> &explosions, Maze &maze, vector<vector<int>> player_info)
+vector<int> Explosion::update(int cur_ticks, vector<Explosion> &explosions, Maze &maze, vector<vector<int> > player_info)
 {
     //make this return a vector of player id's !
     if (isOver(cur_ticks))
@@ -52,10 +52,10 @@ vector<int> Explosion::update(int cur_ticks, vector<Explosion> &explosions, Maze
             }
         }
         vector<int> new_players;
-        for (int i = 0; i < player_info.size(); i++)
-        {
-            new_players.push_back(player_info[i][0]);
-        }
+        // for (int i = 0; i < player_info.size(); i++)
+        // {
+        //     new_players.push_back(player_info[i][0]);
+        // }
         return new_players;
     }
     else
@@ -72,7 +72,7 @@ bool Explosion::isOver(int cur_ticks)
 }
 void Explosion::kill_blocks(Maze &maze, int x, int y, int current_time)
 {
-    int number = rand() % 5;
+    int number = rand() % 6;
     if (number <= 1)
     {
         maze.update(y, x, 0, current_time);
@@ -95,12 +95,12 @@ bool Explosion::check_player_killed(vector<int> x_coords, vector<int> y_coords)
     }
     return false;
 }
-vector<int> Explosion::kill(Maze &maze, vector<vector<int>> player_info, int current_time)
+vector<int> Explosion::kill(Maze &maze, vector<vector<int> > player_info, int current_time)
 {
     //player_info contains player id, x,y,xoff, yoff ,playersize
     //destroy blocks and people
     //block will always be there at extreme ends.
-    vector<vector<Box>> a = maze.getMaze();
+    vector<vector<Box> > a = maze.getMaze();
     int x1, y1, x2, y2;
     if (direction == 0)
     {
@@ -127,21 +127,17 @@ vector<int> Explosion::kill(Maze &maze, vector<vector<int>> player_info, int cur
     for (int i = 0; i < player_info.size(); i++)
     {
         //check if player is in current rectangle, see 5 points
-        int px1, px2, px3, px4, px5, py1, py2, py3, py4, py5; //clockwise + centre
+        int px1, px2, px3, py1, py2, py3; //clockwise + centre
         px1 = player_info[i][1] * block_size + player_info[i][3] + left_offset - (player_info[i][5]) / 2;
         px2 = px1 + player_info[i][5];
-        px3 = px2;
-        px4 = px1;
-        px5 = (px1 + px2) / 2;
-        py1 = player_info[i][2] * block_size + player_info[i][5] + top_offset - (player_info[i][5]) / 2;
+        px3 = (px1 + px2) / 2;
+        py1 = player_info[i][2] * block_size + player_info[i][4] + top_offset - (player_info[i][5]) / 2;
         py2 = py1 + player_info[i][5];
-        py3 = py2;
-        py4 = py1;
-        py5 = (py1 + py2) / 2;
-        vector<int> x_coords = {px1, px2, px3, px4, px5};
-        vector<int> y_coords = {py1, py2, py3, py4, py5};
+        py3 = (py1 + py2) / 2;
+        vector<int> x_coords = {px1, px2, px3, px3, px3};
+        vector<int> y_coords = {py3, py3, py1, py3, py2};
         bool player_killed = check_player_killed(x_coords, y_coords);
-        if (!player_killed)
+        if (player_killed)
         {
             new_players.push_back(player_info[i][0]);
         }
