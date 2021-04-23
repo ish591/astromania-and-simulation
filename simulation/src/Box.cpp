@@ -7,7 +7,8 @@ Box::Box(int t)
 
 void Box::update(int new_type)
 {
-    type = new_type;
+    if (new_type != 1 || rand() % 100 < 80)
+        type = new_type;
 }
 
 int Box::get_block_type()
@@ -27,18 +28,11 @@ void Box::render(SDL_Renderer *renderer, int x, int y, int w, int h)
         b = 0;
         a = 255;
     }
-    else if (type == 1)
+    else
     {
         r = 0;
         g = 0;
         b = 255;
-        a = 200;
-    }
-    else
-    {
-        r = 200;
-        g = 20;
-        b = 0;
         a = 255;
     }
     SDL_SetRenderDrawColor(renderer, r, g, b, a);

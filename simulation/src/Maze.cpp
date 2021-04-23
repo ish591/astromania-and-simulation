@@ -115,6 +115,13 @@ void Maze::generate(int N)
             maze[x - 1][y + 1].update(2);
             maze[x + 1][y + 1].update(2);
         }
+        for (int i = 0; i < M; i++)
+        {
+            maze[i][0].update(2);
+            maze[0][i].update(2);
+            maze[i][M - 1].update(2);
+            maze[M - 1][i].update(2);
+        }
     }
     // for (int i = 0; i < N; i++)
     // {
