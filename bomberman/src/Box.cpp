@@ -44,13 +44,14 @@ int Box::get_y()
 {
     return y;
 }
-void Box::render(SDL_Renderer *renderer, int x, int y, int w, int h)
+void Box::render(SDL_Renderer *renderer, int x, int y, int w, int h, SDL_Surface *surface, vector<SDL_Surface *> &block_surfaces)
 {
     SDL_Rect rect;
     rect = {x, y, w, h};
     int r, g, b, a;
     if (type == 0)
     {
+
         r = 0;
         g = 0;
         b = 0;
@@ -98,6 +99,28 @@ void Box::render(SDL_Renderer *renderer, int x, int y, int w, int h)
         b = 100;
         a = 200;
     }
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
-    SDL_RenderFillRect(renderer, &rect);
+    if (type < 3)
+    {
+        SDL_SetRenderDrawColor(renderer, r, g, b, a);
+        SDL_RenderFillRect(renderer, &rect);
+    }
+    else
+    {
+        surface = (block_surfaces[type - 3]);
+        if (!surface)
+        {
+            cout << "Failed to create surface" << endl;
+        }
+        SDL_Texture *curr_texture = SDL_CreateTextureFromSurface(renderer, surface);
+        if (!curr_texture)
+        {
+            cout << "Failed to create texture" << endl;
+            SDL_SetRenderDrawColor(renderer, r, g, b, a);
+            SDL_RenderFillRect(renderer, &rect);
+        }
+        else
+        {
+            SDL_RenderCopy(renderer, curr_texture, nullptr, &rect);
+        }
+    }
 }

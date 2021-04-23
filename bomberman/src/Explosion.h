@@ -15,7 +15,7 @@ public:
     void kill_blocks(Maze &, int, int, int);
     bool check_player_killed(vector<int>, vector<int>);
     vector<int> kill(Maze &, vector<vector<int>>, int);
-    void render(SDL_Renderer *);
+    void render(SDL_Renderer *, SDL_Surface *, SDL_Surface *);
 
 private:
     int top_x, top_y;

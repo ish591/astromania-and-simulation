@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include <utility>
+#include <SDL2/SDL_image.h>
 #include "Bomb.h"
 using namespace std;
 
@@ -15,7 +16,7 @@ public:
     // pair<int, int> getLocation();
     void updateLocation(Maze &, vector<Player> &, vector<Bomb> &, int, vector<Explosion> &);
     void takeAction(SDL_Event, Maze &, vector<Bomb> &, int);
-    void render(SDL_Renderer *);
+    void render(SDL_Renderer *, SDL_Surface *, vector<vector<SDL_Surface *>> &);
     void updateDimensions(Maze &, int, int);
     void set_bomb_type(int);
     void update_bombs(Maze &, vector<Player> &, vector<Bomb> &, int, vector<Explosion> &);
@@ -33,6 +34,7 @@ public:
 
 protected:
     int player_id;
+    int player_state; //direction in which player is looking, 0 front, 1 back, 2 left, 3 right
     int power_up_duration;
     int x_offset, y_offset;
     int x, y;
@@ -52,7 +54,7 @@ protected:
     int lives;
     int last_life_loss_time;
     int color_r, color_g, color_b;
-    vector<pair<int, int> > power_ups;
+    vector<pair<int, int>> power_ups;
     SDL_Keycode UP, DOWN, RIGHT, LEFT, DROP_BOMB;
     //each player has some power ups. for now, 1 corresponds to the throwing power_up
 };

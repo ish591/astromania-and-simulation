@@ -3,7 +3,8 @@
 Player::Player(int id, Maze &maze)
 {
     player_id = id;
-    if (id == 1)
+    player_state = 0;
+    if (id == 1 || id == 3)
     {
         x = 1;
         y = 1;
@@ -16,7 +17,7 @@ Player::Player(int id, Maze &maze)
         LEFT = SDLK_LEFT;
         DROP_BOMB = SDLK_RETURN;
     }
-    if (id == 2)
+    if (id == 2 || id == 4)
     {
         x = maze.getSize() - 2;
         y = x;
@@ -41,10 +42,10 @@ Player::Player(int id, Maze &maze)
     power_up_duration = 8000;
     lives = 3;
     last_life_loss_time = -5000;
-    power_ups.push_back({0, -1});
-    power_ups.push_back({1, -1});
-    power_ups.push_back({2, -1});
-    power_ups.push_back({1, -1});
+    power_ups.push_back({0, -1}); //slidable bomb
+    power_ups.push_back({1, -1}); //speed increased
+    power_ups.push_back({2, -1}); //radius increased
+    power_ups.push_back({1, -1}); //more number of bombs
 }
 int Player::get_x()
 {
@@ -99,13 +100,25 @@ void Player::takeAction(SDL_Event event, Maze &maze, vector<Bomb> &bombs, int cu
     {
         SDL_Keycode key_press = event.key.keysym.sym;
         if (key_press == LEFT)
+        {
             LEFT_PRESSED = 1;
+            player_state = 2;
+        }
         else if (key_press == RIGHT)
+        {
             RIGHT_PRESSED = 1;
+            player_state = 3;
+        }
         else if (key_press == UP)
+        {
             UP_PRESSED = 1;
+            player_state = 1;
+        }
         else if (key_press == DOWN)
+        {
             DOWN_PRESSED = 1;
+            player_state = 0;
+        }
         else if (key_press == DROP_BOMB)
         {
             if (bomb_count < power_ups[3].first) //then only release
@@ -155,7 +168,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
     //cell type 5 -> sets 1 (radius increased)
     int hmove = RIGHT_PRESSED - LEFT_PRESSED;
     int vmove = DOWN_PRESSED - UP_PRESSED;
-    vector<vector<Box> > a = maze.getMaze();
+    vector<vector<Box>> a = maze.getMaze();
     // cout << hmove << vmove << endl;
     switch (hmove)
     {
@@ -206,18 +219,19 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                                 {
                                 case 3:
                                     power_ups[0] = {1, current_time};
-                                    //throwable bomb powerup, stays with the user for
-                                    //a particular time
+                                    //throwable bomb powerup
                                     break;
                                 case 4:
                                     power_ups[1] = {2, current_time};
                                     power_ups[1].first = 2;
+                                    //increased speed
                                     break;
                                 case 5:
                                     power_ups[2].first++;
                                     //increased bomb radius
                                     break;
                                 case 6:
+                                    //more bombs
                                     power_ups[3].first++;
                                     break;
                                 }
@@ -907,7 +921,7 @@ void Player::update_bombs(Maze &maze, vector<Player> &players, vector<Bomb> &bom
     // if a bomb explodes, remove it from this vector.
     // also, decrement count of player
     vector<Bomb> new_bombs;
-    vector<pair<int, int> > locations;
+    vector<pair<int, int>> locations;
     for (int i = 0; i < players.size(); i++)
     {
         locations.push_back({players[i].get_x(), players[i].get_y()});
@@ -937,11 +951,11 @@ void Player::update_bombs(Maze &maze, vector<Player> &players, vector<Bomb> &bom
 
 void Player::kill(int cur_time)
 {
-    cout << cur_time << endl;
+    //cout << cur_time << endl;
     if (last_life_loss_time + 1500 < cur_time)
     {
         lives--;
-        cout << lives << endl;
+        //cout << lives << endl;
         last_life_loss_time = cur_time;
     }
 }
@@ -953,11 +967,27 @@ bool Player::isAlive()
     return false;
 }
 
-void Player::render(SDL_Renderer *renderer)
+void Player::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<vector<SDL_Surface *>> &player_surfaces)
 {
+    surface = (player_surfaces[player_id - 1][player_state]);
+    if (!surface)
+    {
+        cout << "Failed to create surface" << endl;
+    }
+    SDL_Texture *curr_text = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_Rect rect = {x * block_size + x_offset + left_offset - (player_size / 2), y * block_size + y_offset + top_offset - (player_size / 2), player_size, player_size};
-    SDL_SetRenderDrawColor(renderer, color_r, color_g, color_b, 255);
     int gap = SDL_GetTicks() - last_life_loss_time;
     if (gap > 2000 || (gap / 100) % 5 < 4)
-        SDL_RenderFillRect(renderer, &rect);
+    {
+        if (!curr_text)
+        {
+            cout << "Failed to create texture" << endl;
+            SDL_SetRenderDrawColor(renderer, color_r, color_g, color_b, 255);
+            SDL_RenderFillRect(renderer, &rect);
+        }
+        else
+        {
+            SDL_RenderCopy(renderer, curr_text, nullptr, &rect);
+        }
+    }
 }

@@ -15,11 +15,11 @@ public:
     void update(int, int, int, int);
     int getSize();
     void print();
-    void render(SDL_Renderer *);
+    void render(SDL_Renderer *, SDL_Surface *, vector<SDL_Surface *> &);
     int getBlockSize();
     void update_power_ups(int);
     vector<Box> get_power_ups();
-    vector<vector<Box> > getMaze();
+    vector<vector<Box>> getMaze();
     void add_power_up(int, int);
     bool discrete_walls;
     int left_offset, top_offset;
@@ -30,7 +30,7 @@ private:
     int N;
     int M;
     int block_size;
-    vector<vector<Box> > maze;
+    vector<vector<Box>> maze;
     vector<Box> power_ups;
     //each powee up box has a type,coordinate, and ending time
 };

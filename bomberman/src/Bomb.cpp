@@ -62,7 +62,7 @@ int Bomb::get_size()
     return bomb_size;
 }
 
-pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int, int> > locations, vector<Bomb> &bombs, vector<Explosion> &explosions)
+pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int, int>> locations, vector<Bomb> &bombs, vector<Explosion> &explosions)
 {
     //check if moving or stationary presently
     if (moving_bomb)
@@ -110,9 +110,9 @@ pair<bool, int> Bomb::update_state(int current_time, Maze &maze, vector<pair<int
     return {false, 0};
 }
 
-void Bomb::update_location(Maze &maze, vector<pair<int, int> > locations)
+void Bomb::update_location(Maze &maze, vector<pair<int, int>> locations)
 {
-    vector<vector<Box> > a = maze.getMaze();
+    vector<vector<Box>> a = maze.getMaze();
     //first check if blocked by any player
     int next_cell_x = x;
     int next_cell_y = y;
@@ -407,7 +407,7 @@ void Bomb::update_location(Maze &maze, vector<pair<int, int> > locations)
 
 void Bomb::explode(Maze &maze, int current_time, vector<Explosion> &explosions)
 {
-    vector<vector<Box> > a = maze.getMaze();
+    vector<vector<Box>> a = maze.getMaze();
     //just explode the bomb, in all four directions up till radius
     int left = x;
     int right = x;
@@ -457,7 +457,7 @@ void Bomb::explode(Maze &maze, int current_time, vector<Explosion> &explosions)
         explosions.push_back(new_expl1);
     }
 }
-void Bomb::render(SDL_Renderer *renderer)
+void Bomb::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<SDL_Surface *> &bomb_surfaces)
 {
     int x1 = x * block_size + x_offset + left_offset - (bomb_size / 2);
     int y1 = y * block_size + y_offset + top_offset - (bomb_size / 2);
@@ -465,6 +465,20 @@ void Bomb::render(SDL_Renderer *renderer)
     int h = bomb_size;
     SDL_Rect rect;
     rect = {x1, y1, w, h};
-    SDL_SetRenderDrawColor(renderer, color_r, color_g, color_b, 255);
-    SDL_RenderFillRect(renderer, &rect);
+    surface = (bomb_surfaces[0]);
+    if (!surface)
+    {
+        cout << "Failed to create surface" << endl;
+    }
+    SDL_Texture *curr_texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (!curr_texture)
+    {
+        cout << "Failed to create texture" << endl;
+        SDL_SetRenderDrawColor(renderer, color_r, color_g, color_b, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
+    else
+    {
+        SDL_RenderCopy(renderer, curr_texture, nullptr, &rect);
+    }
 }

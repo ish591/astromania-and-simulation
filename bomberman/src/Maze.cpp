@@ -140,7 +140,7 @@ void Maze::generate(int N)
     Maze::N = N;
     M = 2 * N + 1;
     maze.clear();
-    maze = vector<vector<Box> >();
+    maze = vector<vector<Box>>();
     srand(time(0));
     for (int i = 0; i < M; i++)
     {
@@ -185,7 +185,7 @@ void Maze::update(int i, int j, int new_type, int current_time)
     maze[i][j].update(new_type, current_time);
 }
 
-vector<vector<Box> > Maze::getMaze()
+vector<vector<Box>> Maze::getMaze()
 {
     return maze;
 }
@@ -208,13 +208,13 @@ void Maze::print()
     }
 }
 
-void Maze::render(SDL_Renderer *renderer)
+void Maze::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<SDL_Surface *> &block_surfaces)
 {
     for (int i = 0; i < M; i++)
     {
         for (int j = 0; j < M; j++)
         {
-            maze[i][j].render(renderer, j * (block_size) + left_offset, i * (block_size) + top_offset, block_size - discrete_walls, block_size - discrete_walls);
+            maze[i][j].render(renderer, j * (block_size) + left_offset, i * (block_size) + top_offset, block_size - discrete_walls, block_size - discrete_walls, surface, block_surfaces);
         }
     }
 }

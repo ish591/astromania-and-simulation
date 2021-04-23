@@ -37,7 +37,7 @@ void Explosion::create_actual_rectangle()
         height = (max_coord - min_coord + 1) * block_size - 2 * explosion_offset;
     }
 }
-vector<int> Explosion::update(int cur_ticks, vector<Explosion> &explosions, Maze &maze, vector<vector<int> > player_info)
+vector<int> Explosion::update(int cur_ticks, vector<Explosion> &explosions, Maze &maze, vector<vector<int>> player_info)
 {
     //make this return a vector of player id's !
     if (isOver(cur_ticks))
@@ -78,7 +78,7 @@ void Explosion::kill_blocks(Maze &maze, int x, int y, int current_time)
         maze.update(y, x, 0, current_time);
     }
     else
-    { //throwable bomb
+    {
         maze.update(y, x, number + 1, current_time);
         maze.add_power_up(y, x);
     }
@@ -95,12 +95,12 @@ bool Explosion::check_player_killed(vector<int> x_coords, vector<int> y_coords)
     }
     return false;
 }
-vector<int> Explosion::kill(Maze &maze, vector<vector<int> > player_info, int current_time)
+vector<int> Explosion::kill(Maze &maze, vector<vector<int>> player_info, int current_time)
 {
     //player_info contains player id, x,y,xoff, yoff ,playersize
     //destroy blocks and people
     //block will always be there at extreme ends.
-    vector<vector<Box> > a = maze.getMaze();
+    vector<vector<Box>> a = maze.getMaze();
     int x1, y1, x2, y2;
     if (direction == 0)
     {
@@ -144,8 +144,7 @@ vector<int> Explosion::kill(Maze &maze, vector<vector<int> > player_info, int cu
     }
     return new_players;
 }
-void Explosion::render(SDL_Renderer *renderer)
-
+void Explosion::render(SDL_Renderer *renderer, SDL_Surface *surface, SDL_Surface *explosion_surface)
 {
     SDL_Rect rect = {top_x, top_y, width, height};
     int r, g, b, a;
@@ -153,6 +152,16 @@ void Explosion::render(SDL_Renderer *renderer)
     g = 100;
     b = 220;
     a = 150;
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
-    SDL_RenderFillRect(renderer, &rect);
+    surface = explosion_surface;
+    if (!surface)
+    {
+        cout << "Failed to create surface" << endl;
+        SDL_SetRenderDrawColor(renderer, r, g, b, a);
+        SDL_RenderFillRect(renderer, &rect);
+    }
+    else
+    {
+        SDL_Texture *curr_text = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_RenderCopy(renderer, curr_text, nullptr, &rect);
+    }
 }

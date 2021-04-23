@@ -2,6 +2,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <stdlib.h>
+#include <SDL2/SDL_image.h>
 #include "Explosion.h"
 class Bomb
 {
@@ -19,10 +20,10 @@ public:
     int get_size();
     int get_time_exp();
     int get_id();
-    pair<bool, int> update_state(int, Maze &, vector<pair<int, int> >, vector<Bomb> &, vector<Explosion> &);
-    void update_location(Maze &, vector<pair<int, int> >);
+    pair<bool, int> update_state(int, Maze &, vector<pair<int, int>>, vector<Bomb> &, vector<Explosion> &);
+    void update_location(Maze &, vector<pair<int, int>>);
     void explode(Maze &, int, vector<Explosion> &);
-    void render(SDL_Renderer *);
+    void render(SDL_Renderer *, SDL_Surface *, vector<SDL_Surface *> &);
     void set_direction(int);
     void set_moving();
     //will have to check collision with other player or Maze walls. So need coordinates of other players also.
