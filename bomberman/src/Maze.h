@@ -12,6 +12,7 @@ class Maze
 {
 public:
     Maze(int, bool, int, int);
+    void update(int);
     void update(int, int, int, int);
     int getSize();
     void print();
@@ -23,7 +24,8 @@ public:
     void add_power_up(int, int);
     bool discrete_walls;
     int left_offset, top_offset;
-    void close(int);
+    void close(int, int);
+    int close_radius;
 
 private:
     void generate(int);
@@ -32,5 +34,8 @@ private:
     int block_size;
     vector<vector<Box>> maze;
     vector<Box> power_ups;
+    pair<int, int> last_close;
+    int close_direction;
+    int last_close_time;
     //each powee up box has a type,coordinate, and ending time
 };

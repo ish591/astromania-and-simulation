@@ -52,6 +52,8 @@ void Game::loadTextures()
     }
     string image_explosion = "./Images/explosion.png";
     explosion_surface = IMG_Load(image_explosion.c_str());
+
+    start_time = SDL_GetTicks();
 }
 void Game::newLevel()
 {
@@ -69,14 +71,26 @@ void Game::control(SDL_Event e, int current_time)
 
 void Game::update(int current_time)
 {
+    if (current_time > start_time + 20000)
+    {
+        maze.close(current_time, maze.close_radius + 1);
+        start_time = current_time;
+    }
+    int alive_count = 0;
+    maze.update(current_time);
     vector<vector<int>> player_info;
     for (int i = 0; i < players.size(); i++)
     {
         if (players[i].isAlive())
         {
             player_info.push_back({players[i].getId(), players[i].get_x(), players[i].get_y(), players[i].get_x_offset(), players[i].get_y_offset(), players[i].get_size()});
+            alive_count++;
         }
     }
+
+    if (alive_count <= 1 && maze.close_radius != 100)
+        maze.close(current_time, 100);
+
     for (int i = 0; i < explosions.size(); i++)
     {
         vector<int> final_ids = explosions[i].update(current_time, explosions, maze, player_info);

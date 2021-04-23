@@ -8,6 +8,10 @@ Maze::Maze(int N, bool discrete_walls, int width, int height)
     block_size = x / M - discrete_walls;
     left_offset = (width - block_size * M) / 2;
     top_offset = (height - block_size * M) / 2;
+    close_direction = 0;
+    last_close = {1, 0};
+    close_radius = 0;
+    last_close_time = 0;
 }
 
 // void Maze::generate(int N)
@@ -182,7 +186,8 @@ void Maze::generate(int N)
 
 void Maze::update(int i, int j, int new_type, int current_time)
 {
-    maze[i][j].update(new_type, current_time);
+    if (maze[i][j].get_block_type() != 2)
+        maze[i][j].update(new_type, current_time);
 }
 
 vector<vector<Box>> Maze::getMaze()
@@ -243,11 +248,51 @@ void Maze::update_power_ups(int current_time)
     }
     power_ups = new_power_ups;
 }
-// void Maze::update(int cur_time, )
-// {
-// }
-// void Maze::close(int cur_time, int r)
-// {
-//     close_start_time = cur_time;
-//     close_radius = r;
-// }
+void Maze::update(int cur_time)
+{
+    // cout << last_close.first << " " << last_close.second << " " << close_radius << " " << close_direction << endl;
+    // cout << last_close_time << " " << cur_time << " ";
+    int delay;
+    if (close_radius == 100)
+        delay = 10;
+    else
+        delay = 200;
+    cout << close_radius << " " << close_direction << " " << delay << endl;
+
+    if (cur_time > last_close_time + delay && close_direction / 4 < close_radius && close_direction < 2 * M - 5)
+    {
+        if (close_direction % 4 == 0)
+        {
+            maze[last_close.first][++last_close.second].update(2, -1);
+            if (last_close.first + last_close.second == M - 1)
+                close_direction++;
+        }
+        if (close_direction % 4 == 1)
+        {
+            maze[++last_close.first][last_close.second].update(2, -1);
+            if (last_close.first == last_close.second)
+                close_direction++;
+        }
+        if (close_direction % 4 == 2)
+        {
+            maze[last_close.first][--last_close.second].update(2, -1);
+            if (last_close.first + last_close.second == M - 1)
+                close_direction++;
+        }
+        if (close_direction % 4 == 3)
+        {
+            maze[--last_close.first][last_close.second].update(2, -1);
+            if (last_close.first - last_close.second == 1)
+            {
+                close_direction++;
+                close_radius--;
+            }
+        }
+        last_close_time = cur_time;
+    }
+}
+void Maze::close(int cur_time, int r)
+{
+    last_close_time = cur_time;
+    close_radius = r;
+}

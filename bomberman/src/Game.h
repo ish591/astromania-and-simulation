@@ -26,4 +26,5 @@ public:
     SDL_Surface *explosion_surface;
     int maze_size = 7;
     int level;
+    int start_time;
 };

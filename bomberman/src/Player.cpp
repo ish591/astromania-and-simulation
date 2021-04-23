@@ -951,11 +951,12 @@ void Player::update_bombs(Maze &maze, vector<Player> &players, vector<Bomb> &bom
 
 void Player::kill(int cur_time)
 {
-    //cout << cur_time << endl;
+
+    // cout << cur_time << endl;
     if (last_life_loss_time + 1500 < cur_time)
     {
         lives--;
-        //cout << lives << endl;
+        // cout << lives << endl;
         last_life_loss_time = cur_time;
     }
 }
