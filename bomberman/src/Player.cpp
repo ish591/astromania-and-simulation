@@ -970,7 +970,7 @@ bool Player::isAlive()
 
 void Player::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<vector<SDL_Surface *>> &player_surfaces)
 {
-    surface = (player_surfaces[player_id - 1][player_state]);
+    surface = (player_surfaces[0][player_state]);
     if (!surface)
     {
         cout << "Failed to create surface" << endl;
@@ -982,7 +982,7 @@ void Player::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<vector<
     {
         if (!curr_text)
         {
-            cout << "Failed to create texture" << endl;
+            // cout << "Failed to create texture" << endl;
             SDL_SetRenderDrawColor(renderer, color_r, color_g, color_b, 255);
             SDL_RenderFillRect(renderer, &rect);
         }
@@ -991,4 +991,5 @@ void Player::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<vector<
             SDL_RenderCopy(renderer, curr_text, nullptr, &rect);
         }
     }
+    SDL_DestroyTexture(curr_text);
 }

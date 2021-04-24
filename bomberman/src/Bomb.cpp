@@ -481,4 +481,5 @@ void Bomb::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<SDL_Surfa
     {
         SDL_RenderCopy(renderer, curr_texture, nullptr, &rect);
     }
+    SDL_DestroyTexture(curr_texture);
 }

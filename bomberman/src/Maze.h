@@ -11,7 +11,7 @@ using namespace std;
 class Maze
 {
 public:
-    Maze(int, bool, int, int);
+    Maze(int, bool, int, int, int);
     void update(int);
     void update(int, int, int, int);
     int getSize();
@@ -28,7 +28,7 @@ public:
     int close_radius;
 
 private:
-    void generate(int);
+    void generate(int, int);
     int N;
     int M;
     int block_size;

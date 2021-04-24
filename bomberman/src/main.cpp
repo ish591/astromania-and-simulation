@@ -2,19 +2,13 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_image.h>
-#include "Game.h"
+#include <cstring>
+#include "OfflineGame.h"
+#include "OnlineGame.h"
 
 using namespace std;
 int main()
 {
-    int n, fl;
-    cout << "Enter maze dimension: ";
-    cin >> n;
-    cout << "Enter 0 for continuous walls, 1 for discrete:";
-    cin >> fl;
-    // cout << "Enter game name: ";
-    Game current_game = Game(1, 7, 1280, 720);
-
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
     {
         cout << "Error: " << SDL_GetError() << endl;
@@ -39,26 +33,65 @@ int main()
     SDL_Surface *surface = nullptr;
     Uint32 startTicks = SDL_GetTicks();
     int updates = 0;
-    while (!quit)
+
+    bool online;
+    cout << "Enter Mode(0 for offline, 1 for online): " << endl;
+    cin >> online;
+    if (online)
     {
-        Uint32 curTicks = SDL_GetTicks();
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-        current_game.render(renderer, surface);
-        int val = (curTicks - startTicks) / 5;
-        for (; updates < val; updates++)
+        OnlineGame current_game = OnlineGame(1, 7, 1280, 720);
+        while (!quit)
         {
-            current_game.update(curTicks - (val - updates + 1) * 5);
-        }
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
+            Uint32 curTicks = SDL_GetTicks();
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+            current_game.render(renderer, surface);
+            int val = (curTicks - startTicks) / 5;
+            for (; updates < val; updates++)
             {
-                quit = true;
+                current_game.update(curTicks - (val - updates + 1) * 5);
             }
-            current_game.control(e, curTicks);
+            while (SDL_PollEvent(&e))
+            {
+
+                if (e.type == SDL_QUIT)
+                {
+                    quit = true;
+                    break;
+                }
+
+                current_game.control(e, curTicks);
+            }
+            SDL_RenderPresent(renderer);
         }
-        SDL_RenderPresent(renderer);
+    }
+    else
+    {
+        OfflineGame current_game = OfflineGame(1, 7, 1280, 720);
+        while (!quit)
+        {
+            Uint32 curTicks = SDL_GetTicks();
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+            current_game.render(renderer, surface);
+            int val = (curTicks - startTicks) / 5;
+            for (; updates < val; updates++)
+            {
+                current_game.update(curTicks - (val - updates + 1) * 5);
+            }
+            while (SDL_PollEvent(&e))
+            {
+
+                if (e.type == SDL_QUIT)
+                {
+                    quit = true;
+                    break;
+                }
+
+                current_game.control(e, curTicks);
+            }
+            SDL_RenderPresent(renderer);
+        }
     }
     SDL_DestroyWindow(win);
     IMG_Quit();

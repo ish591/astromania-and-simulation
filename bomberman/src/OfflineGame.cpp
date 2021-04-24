@@ -1,10 +1,10 @@
-#include "Game.h"
+#include "OfflineGame.h"
 
-Game::Game(int num_players, int maze_size, int width, int height)
+OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height)
 {
-    Game::maze_size = maze_size;
-    Game::width = width;
-    Game::height = height;
+    OfflineGame::maze_size = maze_size;
+    OfflineGame::width = width;
+    OfflineGame::height = height;
     newLevel();
 
     for (int i = 1; i <= 2; i++)
@@ -15,7 +15,7 @@ Game::Game(int num_players, int maze_size, int width, int height)
     }
     loadTextures();
 }
-void Game::loadTextures()
+void OfflineGame::loadTextures()
 {
     string pref_players = "./Images/player";
     for (int i = 0; i < players.size(); i++)
@@ -55,12 +55,12 @@ void Game::loadTextures()
 
     start_time = SDL_GetTicks();
 }
-void Game::newLevel()
+void OfflineGame::newLevel()
 {
-    maze = Maze(maze_size, 1, width, height);
+    maze = Maze(maze_size, 1, width, height, time(0));
 }
 
-void Game::control(SDL_Event e, int current_time)
+void OfflineGame::control(SDL_Event e, int current_time)
 {
     for (int i = 0; i < players.size(); i++)
     {
@@ -69,7 +69,7 @@ void Game::control(SDL_Event e, int current_time)
     }
 }
 
-void Game::update(int current_time)
+void OfflineGame::update(int current_time)
 {
     if (current_time > start_time + 20000)
     {
@@ -118,7 +118,7 @@ void Game::update(int current_time)
     }
 }
 
-void Game::render(SDL_Renderer *renderer, SDL_Surface *surface)
+void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
 {
     maze.render(renderer, surface, block_surfaces);
     for (int i = 0; i < players.size(); i++)

@@ -163,5 +163,6 @@ void Explosion::render(SDL_Renderer *renderer, SDL_Surface *surface, SDL_Surface
     {
         SDL_Texture *curr_text = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_RenderCopy(renderer, curr_text, nullptr, &rect);
+        SDL_DestroyTexture(curr_text);
     }
 }

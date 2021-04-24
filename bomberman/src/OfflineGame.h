@@ -6,16 +6,16 @@
 #include "Player.h"
 using namespace std;
 
-class Game
+class OfflineGame
 {
 public:
-    Game(int, int, int, int);
+    OfflineGame(int, int, int, int);
     void newLevel();
     void render(SDL_Renderer *, SDL_Surface *);
     void update(int);
     void control(SDL_Event, int);
     void loadTextures();
-    Maze maze = Maze(1, 100, 100, 100);
+    Maze maze = Maze(1, 100, 100, 100, 0);
     int width, height;
     vector<Player> players;
     vector<Bomb> bombs;

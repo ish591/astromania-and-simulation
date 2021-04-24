@@ -122,5 +122,6 @@ void Box::render(SDL_Renderer *renderer, int x, int y, int w, int h, SDL_Surface
         {
             SDL_RenderCopy(renderer, curr_texture, nullptr, &rect);
         }
+        SDL_DestroyTexture(curr_texture);
     }
 }

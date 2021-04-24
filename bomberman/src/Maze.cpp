@@ -1,8 +1,8 @@
 #include "Maze.h"
 
-Maze::Maze(int N, bool discrete_walls, int width, int height)
+Maze::Maze(int N, bool discrete_walls, int width, int height, int seed)
 {
-    generate(N);
+    generate(N, seed);
     int x = min(width, height);
     Maze::discrete_walls = discrete_walls;
     block_size = x / M - discrete_walls;
@@ -139,13 +139,13 @@ Maze::Maze(int N, bool discrete_walls, int width, int height)
 // //     cout << endl;
 // // }
 // }
-void Maze::generate(int N)
+void Maze::generate(int N, int seed)
 {
     Maze::N = N;
     M = 2 * N + 1;
     maze.clear();
     maze = vector<vector<Box>>();
-    srand(time(0));
+    srand(seed);
     for (int i = 0; i < M; i++)
     {
         vector<Box> temp;
@@ -257,7 +257,7 @@ void Maze::update(int cur_time)
         delay = 10;
     else
         delay = 200;
-    cout << close_radius << " " << close_direction << " " << delay << endl;
+    // cout << close_radius << " " << close_direction << " " << delay << endl;
 
     if (cur_time > last_close_time + delay && close_direction / 4 < close_radius && close_direction < 2 * M - 5)
     {
