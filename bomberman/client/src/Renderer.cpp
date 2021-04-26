@@ -7,7 +7,8 @@ Renderer::Renderer()
 }
 void Renderer::loadTextures()
 {
-    string pref_players = "../Images/player";
+    string assets_dir = "../assets/";
+    string pref_players = assets_dir + "images/player";
     for (int i = 0; i < 2; i++)
     {
         vector<SDL_Surface *> curr;
@@ -26,23 +27,24 @@ void Renderer::loadTextures()
         curr.push_back(new_surface3);
         player_surfaces.push_back(curr);
     }
-    string pref_bombs = "../Images/bomb";
+    string pref_bombs = assets_dir + "images/bomb";
     for (int i = 0; i < 1; i++)
     {
         string image_path = pref_bombs + to_string(i + 1) + ".png";
         SDL_Surface *new_surface = IMG_Load(image_path.c_str());
         bomb_surfaces.push_back(new_surface);
     }
-    string pref_power_ups = "../Images/power_ups";
+    string pref_power_ups = assets_dir + "images/power_ups";
     for (int i = 0; i < 4; i++)
     {
         string image_path = pref_power_ups + to_string(i + 1) + ".png";
         SDL_Surface *new_surface = IMG_Load(image_path.c_str());
         block_surfaces.push_back(new_surface);
     }
-    string image_explosion = "./Images/explosion.png";
+    string image_explosion = assets_dir + "images/explosion.png";
     explosion_surface = IMG_Load(image_explosion.c_str());
 }
+
 void Renderer::update(vector<int> obj)
 {
     if (obj.empty())
@@ -78,7 +80,15 @@ void Renderer::update(vector<int> obj)
         }
         break;
     case 2:
-        maze.update(obj[1], obj[2], obj[3]);
+        for (int i = 1; i < obj.size(); i += 3)
+        {
+            int x = obj[i];
+            int y = obj[i + 1];
+            int t = obj[i + 2];
+            maze.update(x, y, t);
+        }
+        break;
+
         break;
     }
 }

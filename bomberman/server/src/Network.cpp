@@ -52,7 +52,6 @@ vector<vector<int>> Network::recv()
                 } while (tmp[strlen(tmp) - 1] != '\n');
                 sscanf(tmp, "%d %d %d %d", &v[0], &v[1], &v[2], &v[3]);
                 player_states.push_back(v);
-                // cout << v[0] << " " << v[1] << v[2] << endl;
             }
         }
     }

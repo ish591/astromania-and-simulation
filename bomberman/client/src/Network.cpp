@@ -21,7 +21,7 @@ Network::~Network()
 void Network::send(int id, int up_down, int direction)
 {
     // <id> <Up or Down> <direction 0-4> <newline>
-    cout << "SEND:" << id << up_down << direction << endl;
+    // cout << "SEND:" << id << up_down << direction << endl;
     sprintf(tmp, "1 %d %d %d \n", id, up_down, direction);
     // cout << printf("%s", tmp) << endl;
     int size = 0;

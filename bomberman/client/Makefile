@@ -28,10 +28,6 @@ $(BUILD_DIR)/%.o: %.cpp
 
 -include $(DEPENDENCIES)
 
-server: 
-	$(CC) -std=c++11 $(SDL) server.cpp -o build/server
-	./build/server
-	
 play:
 	./build/play
 

@@ -20,7 +20,6 @@ OnlineGame::OnlineGame(int num_players, int maze_size, int width, int height)
         player.updateDimensions(maze, width, height);
         players.push_back(player);
     }
-
     start_time = SDL_GetTicks();
     maze_update_time = start_time;
 }
@@ -41,7 +40,7 @@ bool OnlineGame::run()
     {
         update(curTicks - (val - updates + 1) * 5);
     }
-    SDL_Delay(1);
+    SDL_Delay(20);
     return false;
 }
 
@@ -149,5 +148,14 @@ void OnlineGame::render()
     {
         s += explosions[i].render();
     }
+
+    string maze_updates = maze.getBoxUpdates();
+    // cout << maze_updates << endl;
+    for (int i = 0; i < 20; i++)
+    {
+        if (maze_updates.length() > 4)
+            network.sendState(maze_updates);
+    }
+    SDL_Delay(3);
     network.sendState(s);
 }

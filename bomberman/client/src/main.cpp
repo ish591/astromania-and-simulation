@@ -105,7 +105,7 @@ int main()
                 network.send(player_id, sending_info[0], sending_info[1]);
         }
         SDL_RenderPresent(renderer);
-        SDL_Delay(5);
+        SDL_Delay(1);
     }
 
     SDL_DestroyWindow(win);

@@ -12,6 +12,14 @@ Maze::Maze(int N, bool discrete_walls, int width, int height, int seed)
     last_close = {1, 0};
     close_radius = 0;
     last_close_time = 0;
+    maze_matrix = vector<vector<int>>(M, vector<int>(M, 0));
+    for (int i = 0; i < M; i++)
+    {
+        for (int j = 0; j < M; j++)
+        {
+            maze_matrix[i][j] = maze[i][j].get_block_type();
+        }
+    }
 }
 
 // void Maze::generate(int N)
@@ -256,7 +264,7 @@ void Maze::update(int cur_time)
     if (close_radius == 100)
         delay = 10;
     else
-        delay = 200;
+        delay = 1000;
     // cout << close_radius << " " << close_direction << " " << delay << endl;
 
     if (cur_time > last_close_time + delay && close_direction / 4 < close_radius && close_direction < 2 * M - 5)
@@ -295,4 +303,21 @@ void Maze::close(int cur_time, int r)
 {
     last_close_time = cur_time;
     close_radius = r;
+}
+
+string Maze::getBoxUpdates()
+{
+    string s = "2 ";
+    for (int i = 0; i < M; i++)
+    {
+        for (int j = 0; j < M; j++)
+        {
+            if (maze_matrix[i][j] != maze[i][j].get_block_type())
+            {
+                maze_matrix[i][j] = maze[i][j].get_block_type();
+                s += (to_string(i) + " " + to_string(j) + " " + to_string(maze_matrix[i][j]) + " ");
+            }
+        }
+    }
+    return s;
 }

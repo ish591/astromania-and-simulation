@@ -1,11 +1,13 @@
 #pragma once
+
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <stdlib.h>
 #include <stack>
 #include <vector>
+
 #include "Box.h"
-//this is the interface file basically
+
 using namespace std;
 
 class Maze
@@ -26,8 +28,10 @@ public:
     int left_offset, top_offset;
     void close(int, int);
     int close_radius;
+    string getBoxUpdates();
 
 private:
+    vector<vector<int>> maze_matrix;
     void generate(int, int);
     int N;
     int M;
