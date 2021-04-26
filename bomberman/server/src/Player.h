@@ -15,8 +15,9 @@ public:
     int getId();
     // pair<int, int> getLocation();
     void updateLocation(Maze &, vector<Player> &, vector<Bomb> &, int, vector<Explosion> &);
-    void takeAction(SDL_Event, Maze &, vector<Bomb> &, int);
+    void takeAction(int, SDL_Keycode, Maze &, vector<Bomb> &, int);
     void render(SDL_Renderer *, SDL_Surface *, vector<vector<SDL_Surface *>> &);
+    string render();
     void updateDimensions(Maze &, int, int);
     void set_bomb_type(int);
     void update_bombs(Maze &, vector<Player> &, vector<Bomb> &, int, vector<Explosion> &);
@@ -31,6 +32,7 @@ public:
     void update_power_ups(int);
     void kill(int);
     bool isAlive();
+    SDL_Keycode UP, DOWN, RIGHT, LEFT, DROP_BOMB;
 
 protected:
     int player_id;
@@ -55,6 +57,6 @@ protected:
     int last_life_loss_time;
     int color_r, color_g, color_b;
     vector<pair<int, int>> power_ups;
-    SDL_Keycode UP, DOWN, RIGHT, LEFT, DROP_BOMB;
+
     //each player has some power ups. for now, 1 corresponds to the throwing power_up
 };

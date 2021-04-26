@@ -166,3 +166,8 @@ void Explosion::render(SDL_Renderer *renderer, SDL_Surface *surface, SDL_Surface
         SDL_DestroyTexture(curr_text);
     }
 }
+string Explosion::render()
+{
+    SDL_Rect rect = {top_x, top_y, width, height};
+    return ("6 " + to_string(rect.x) + " " + to_string(rect.y) + " " + to_string(rect.w) + " " + to_string(rect.h) + " ");
+}

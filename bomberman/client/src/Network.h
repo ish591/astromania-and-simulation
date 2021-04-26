@@ -12,7 +12,7 @@ class Network
 public:
     Network(const char *ipchar);
     ~Network();
-    void send(int, int, int, int, int);
+    void send(int, int, int);
     void sendBomb();
     vector<int> recv();
 

@@ -24,6 +24,7 @@ public:
     void update_location(Maze &, vector<pair<int, int>>);
     void explode(Maze &, int, vector<Explosion> &);
     void render(SDL_Renderer *, SDL_Surface *, vector<SDL_Surface *> &);
+    string render();
     void set_direction(int);
     void set_moving();
     //will have to check collision with other player or Maze walls. So need coordinates of other players also.

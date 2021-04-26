@@ -10,6 +10,8 @@ class OfflineGame
 {
 public:
     OfflineGame(int, int, int, int);
+    ~OfflineGame();
+    bool run();
     void newLevel();
     void render(SDL_Renderer *, SDL_Surface *);
     void update(int);
@@ -26,5 +28,10 @@ public:
     SDL_Surface *explosion_surface;
     int maze_size = 7;
     int level;
-    int start_time;
+    int start_time, maze_update_time;
+    SDL_Surface *surface;
+    SDL_Renderer *renderer;
+    SDL_Window *win;
+    SDL_Event e;
+    int updates;
 };

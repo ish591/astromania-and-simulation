@@ -93,12 +93,11 @@ void Player::updateDimensions(Maze &maze, int w, int h)
     power_ups[1].first = 1;
 }
 
-void Player::takeAction(SDL_Event event, Maze &maze, vector<Bomb> &bombs, int current_time)
+void Player::takeAction(int down_press, SDL_Keycode key_press, Maze &maze, vector<Bomb> &bombs, int current_time)
 {
 
-    if (event.type == SDL_KEYDOWN)
+    if (down_press == 0)
     {
-        SDL_Keycode key_press = event.key.keysym.sym;
         if (key_press == LEFT)
         {
             LEFT_PRESSED = 1;
@@ -131,9 +130,8 @@ void Player::takeAction(SDL_Event event, Maze &maze, vector<Bomb> &bombs, int cu
             }
         }
     }
-    else if (event.type == SDL_KEYUP)
+    else
     {
-        SDL_Keycode key_press = event.key.keysym.sym;
         if (key_press == LEFT)
             LEFT_PRESSED = 0;
         else if (key_press == RIGHT)
@@ -144,6 +142,7 @@ void Player::takeAction(SDL_Event event, Maze &maze, vector<Bomb> &bombs, int cu
             DOWN_PRESSED = 0;
     }
 }
+
 void Player::update_power_ups(int current_time)
 {
     if (power_ups[1].first > 1)
@@ -992,4 +991,16 @@ void Player::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<vector<
         }
     }
     SDL_DestroyTexture(curr_text);
+}
+
+string Player::render()
+{
+
+    SDL_Rect rect = {x * block_size + x_offset + left_offset - (player_size / 2), y * block_size + y_offset + top_offset - (player_size / 2), player_size, player_size};
+    int gap = SDL_GetTicks() - last_life_loss_time;
+    if (gap > 2000 || (gap / 100) % 5 < 4)
+    {
+        return (to_string(player_id) + " " + to_string(rect.x) + " " + to_string(rect.y) + " " + to_string(rect.w) + " " + to_string(rect.h) + " ");
+    }
+    return "";
 }

@@ -483,3 +483,14 @@ void Bomb::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<SDL_Surfa
     }
     SDL_DestroyTexture(curr_texture);
 }
+
+string Bomb::render()
+{
+    int x1 = x * block_size + x_offset + left_offset - (bomb_size / 2);
+    int y1 = y * block_size + y_offset + top_offset - (bomb_size / 2);
+    int w = bomb_size;
+    int h = bomb_size;
+    SDL_Rect rect;
+    rect = {x1, y1, w, h};
+    return ("5 " + to_string(rect.x) + " " + to_string(rect.y) + " " + to_string(rect.w) + " " + to_string(rect.h) + " ");
+}

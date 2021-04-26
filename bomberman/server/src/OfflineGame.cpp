@@ -2,11 +2,30 @@
 
 OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height)
 {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
+    {
+        cout << "Error: " << SDL_GetError() << endl;
+        exit(3);
+    }
+    if (IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) != (IMG_INIT_PNG | IMG_INIT_JPG))
+    {
+        cout << " Image failed to be initialised" << SDL_GetError() << endl;
+        exit(3);
+    }
+    win = SDL_CreateWindow("TEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, 0);
+    renderer = SDL_CreateRenderer(win, -1, 0); //-1 denotes its the first renderer
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    if (!win)
+    {
+        cout << "Error" << endl;
+        SDL_Quit();
+    }
+
     OfflineGame::maze_size = maze_size;
     OfflineGame::width = width;
     OfflineGame::height = height;
     newLevel();
-
+    updates = 0;
     for (int i = 1; i <= 2; i++)
     {
         Player player(i, maze);
@@ -14,10 +33,46 @@ OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height)
         players.push_back(player);
     }
     loadTextures();
+    start_time = SDL_GetTicks();
+    maze_update_time = start_time;
 }
+
+OfflineGame::~OfflineGame()
+{
+    SDL_DestroyWindow(win);
+    IMG_Quit();
+    SDL_Quit();
+}
+
+bool OfflineGame::run()
+{
+    Uint32 curTicks = SDL_GetTicks();
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    render(renderer, surface);
+    int val = (curTicks - start_time) / 5;
+    for (; updates < val; updates++)
+    {
+        update(curTicks - (val - updates + 1) * 5);
+    }
+
+    while (SDL_PollEvent(&e))
+    {
+
+        if (e.type == SDL_QUIT)
+        {
+            return true;
+        }
+
+        control(e, curTicks);
+    }
+    SDL_RenderPresent(renderer);
+    return false;
+}
+
 void OfflineGame::loadTextures()
 {
-    string pref_players = "./Images/player";
+    string pref_players = "../Images/player";
     for (int i = 0; i < players.size(); i++)
     {
         vector<SDL_Surface *> curr;
@@ -36,24 +91,22 @@ void OfflineGame::loadTextures()
         curr.push_back(new_surface3);
         player_surfaces.push_back(curr);
     }
-    string pref_bombs = "./Images/bomb";
+    string pref_bombs = "../Images/bomb";
     for (int i = 0; i < 1; i++)
     {
         string image_path = pref_bombs + to_string(i + 1) + ".png";
         SDL_Surface *new_surface = IMG_Load(image_path.c_str());
         bomb_surfaces.push_back(new_surface);
     }
-    string pref_power_ups = "./Images/power_ups";
+    string pref_power_ups = "../Images/power_ups";
     for (int i = 0; i < 4; i++)
     {
         string image_path = pref_power_ups + to_string(i + 1) + ".png";
         SDL_Surface *new_surface = IMG_Load(image_path.c_str());
         block_surfaces.push_back(new_surface);
     }
-    string image_explosion = "./Images/explosion.png";
+    string image_explosion = "../Images/explosion.png";
     explosion_surface = IMG_Load(image_explosion.c_str());
-
-    start_time = SDL_GetTicks();
 }
 void OfflineGame::newLevel()
 {
@@ -65,16 +118,27 @@ void OfflineGame::control(SDL_Event e, int current_time)
     for (int i = 0; i < players.size(); i++)
     {
         if (players[i].isAlive())
-            players[i].takeAction(e, maze, bombs, current_time);
+        {
+            if (e.type == SDL_KEYDOWN)
+            {
+                // cout << "hello" << endl;
+                players[i].takeAction(0, e.key.keysym.sym, maze, bombs, current_time);
+            }
+            else if (e.type == SDL_KEYUP)
+            {
+                players[i].takeAction(1, e.key.keysym.sym, maze, bombs, current_time);
+                // cout << "bye" << endl;
+            }
+        }
     }
 }
 
 void OfflineGame::update(int current_time)
 {
-    if (current_time > start_time + 20000)
+    if (current_time > maze_update_time + 20000)
     {
         maze.close(current_time, maze.close_radius + 1);
-        start_time = current_time;
+        maze_update_time = current_time;
     }
     int alive_count = 0;
     maze.update(current_time);
