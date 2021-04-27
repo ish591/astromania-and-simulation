@@ -1,5 +1,5 @@
 # Directories
-SRC_DIR ?= ./src
+SRC_DIR ?= ./src ../logic
 BUILD_DIR ?= ./build
 INC_DIRS := $(shell find $(SRC_DIR) -type d)
 
@@ -12,11 +12,11 @@ DEPENDENCIES := $(OBJS:.o=.d)
 CC = g++
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 CPPFLAGS ?= -std=c++11 $(INC_FLAGS) -MMD -MP
-SDL ?= -l SDL2-2.0.0 -l sdl2_mixer -l sdl2_image -l sdl2_net # Set path to SDL here
+SDL ?= -l SDL2-2.0.0 -l sdl2_mixer -l sdl2_image -l sdl2_net -l sdl2_ttf # Set path to SDL here
 LDFLAGS ?= $(SDL)
 
 # Target Executable
-TARGET_EXECUTABLE ?= play
+TARGET_EXECUTABLE ?= game
 
 $(BUILD_DIR)/$(TARGET_EXECUTABLE): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
@@ -28,8 +28,8 @@ $(BUILD_DIR)/%.o: %.cpp
 
 -include $(DEPENDENCIES)
 
-play:
-	./build/play
+game:
+	./build/game
 
 .PHONY: clean
 

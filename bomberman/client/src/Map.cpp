@@ -1,10 +1,10 @@
-#include "Maze.h"
+#include "Map.h"
 
-Maze::Maze(int N, bool discrete_walls, int width, int height, int seed)
+Map::Map(int N, bool discrete_walls, int width, int height, int seed)
 {
     generate(N, seed);
     int x = min(width, height);
-    Maze::discrete_walls = discrete_walls;
+    Map::discrete_walls = discrete_walls;
     block_size = x / M - discrete_walls;
     left_offset = (width - block_size * M) / 2;
     top_offset = (height - block_size * M) / 2;
@@ -14,22 +14,22 @@ Maze::Maze(int N, bool discrete_walls, int width, int height, int seed)
     last_close_time = 0;
 }
 
-// void Maze::generate(int N)
+// void Map::generate(int N)
 // {
-// Using DFS to generate a line boundary maze and then convert it to block walls
-// Maze::N = N;
+// Using DFS to generate a line boundary map and then convert it to block walls
+// Map::N = N;
 // M = 2 * N + 1;
-// maze.clear();
-// maze = vector<vector<Box> >();
+// map.clear();
+// map = vector<vector<Block> >();
 // for (int i = 0; i < M; i++)
 // {
-//     vector<Box> temp;
+//     vector<Block> temp;
 //     for (int j = 0; j < M; j++)
 //     {
-//         Box new_box = Box(0, i, j);
+//         Block new_box = Block(0, i, j);
 //         temp.push_back(new_box);
 //     }
-//     maze.push_back(temp);
+//     map.push_back(temp);
 // }
 // int a[N][N][5];
 
@@ -109,15 +109,15 @@ Maze::Maze(int N, bool discrete_walls, int width, int height, int seed)
 //     for (int j = 0; j < N; j++)
 //     {
 //         int x = 2 * i + 1, y = 2 * j + 1;
-//         maze[x][y].update(0, -1);
-//         maze[x - 1][y].update(1 - a[i][j][1], -1);
-//         maze[x][y - 1].update(1 - a[i][j][2], -1);
-//         maze[x + 1][y].update(1 - a[i][j][3], -1);
-//         maze[x][y + 1].update(1 - a[i][j][4], -1);
-//         maze[x - 1][y - 1].update(2, -1);
-//         maze[x + 1][y - 1].update(2, -1);
-//         maze[x - 1][y + 1].update(2, -1);
-//         maze[x + 1][y + 1].update(2, -1);
+//         map[x][y].update(0, -1);
+//         map[x - 1][y].update(1 - a[i][j][1], -1);
+//         map[x][y - 1].update(1 - a[i][j][2], -1);
+//         map[x + 1][y].update(1 - a[i][j][3], -1);
+//         map[x][y + 1].update(1 - a[i][j][4], -1);
+//         map[x - 1][y - 1].update(2, -1);
+//         map[x + 1][y - 1].update(2, -1);
+//         map[x - 1][y + 1].update(2, -1);
+//         map[x + 1][y + 1].update(2, -1);
 //     }
 // }
 // for (int i = 0; i < M; i++)
@@ -126,7 +126,7 @@ Maze::Maze(int N, bool discrete_walls, int width, int height, int seed)
 //     {
 //         if (i == 0 || j == 0 || i == M - 1 || j == M - 1)
 //         {
-//             maze[i][j].update(2, -1);
+//             map[i][j].update(2, -1);
 //         }
 //     }
 // }
@@ -139,98 +139,98 @@ Maze::Maze(int N, bool discrete_walls, int width, int height, int seed)
 // //     cout << endl;
 // // }
 // }
-void Maze::generate(int N, int seed)
+void Map::generate(int N, int seed)
 {
-    Maze::N = N;
+    Map::N = N;
     M = 2 * N + 1;
-    maze.clear();
-    maze = vector<vector<Box>>();
+    map.clear();
+    map = vector<vector<Block>>();
     srand(seed);
     for (int i = 0; i < M; i++)
     {
-        vector<Box> temp;
+        vector<Block> temp;
         for (int j = 0; j < M; j++)
         {
-            Box new_box = Box(0, i, j);
+            Block new_box = Block(0, i, j);
             temp.push_back(new_box);
         }
-        maze.push_back(temp);
+        map.push_back(temp);
     }
 
     for (int i = 0; i < M; i++)
     {
-        maze[i][M - 1].update(2);
-        maze[0][i].update(2);
-        maze[i][0].update(2);
-        maze[M - 1][i].update(2);
+        map[i][M - 1].update(2);
+        map[0][i].update(2);
+        map[i][0].update(2);
+        map[M - 1][i].update(2);
     }
     for (int i = 1; i < M - 1; i++)
     {
-        vector<Box> temp;
+        vector<Block> temp;
 
         for (int j = 1; j < M - 1; j++)
         {
             if (i % 2 == 0 && j % 2 == 0)
-                maze[i][j].update(2);
+                map[i][j].update(2);
             else
-                maze[i][j].update(rand() % 2);
+                map[i][j].update(rand() % 2);
         }
     }
-    maze[1][1].update(0);
-    maze[1][2].update(0);
-    maze[2][1].update(0);
-    maze[1][M - 2].update(0);
-    maze[1][M - 3].update(0);
-    maze[2][M - 2].update(0);
-    maze[M - 2][1].update(0);
-    maze[M - 2][2].update(0);
-    maze[M - 3][1].update(0);
-    maze[M - 2][M - 3].update(0);
-    maze[M - 2][M - 2].update(0);
-    maze[M - 3][M - 2].update(0);
+    map[1][1].update(0);
+    map[1][2].update(0);
+    map[2][1].update(0);
+    map[1][M - 2].update(0);
+    map[1][M - 3].update(0);
+    map[2][M - 2].update(0);
+    map[M - 2][1].update(0);
+    map[M - 2][2].update(0);
+    map[M - 3][1].update(0);
+    map[M - 2][M - 3].update(0);
+    map[M - 2][M - 2].update(0);
+    map[M - 3][M - 2].update(0);
 }
 
-void Maze::update(int i, int j, int new_type)
+void Map::update(int i, int j, int new_type)
 {
-    if (maze[i][j].get_block_type() != 2)
-        maze[i][j].update(new_type);
+    if (map[i][j].get_block_type() != 2)
+        map[i][j].update(new_type);
 }
 
-vector<vector<Box>> Maze::getMaze()
+vector<vector<Block>> Map::getMap()
 {
-    return maze;
+    return map;
 }
 
-int Maze::getSize()
+int Map::getSize()
 {
     return M;
 }
 
-void Maze::print()
+void Map::print()
 {
     for (int i = 0; i < M; i++)
     {
         for (int j = 0; j < M; j++)
         {
 
-            cout << maze[i][j].get_block_type();
+            cout << map[i][j].get_block_type();
         }
         cout << endl;
     }
 }
 
-void Maze::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<SDL_Surface *> &block_surfaces)
+void Map::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<SDL_Surface *> &block_surfaces)
 {
     for (int i = 0; i < M; i++)
     {
         for (int j = 0; j < M; j++)
         {
-            maze[i][j].render(renderer, j * (block_size) + left_offset, i * (block_size) + top_offset, block_size - discrete_walls, block_size - discrete_walls, surface, block_surfaces);
+            map[i][j].render(renderer, j * (block_size) + left_offset, i * (block_size) + top_offset, block_size - discrete_walls, block_size - discrete_walls, surface, block_surfaces);
         }
     }
 }
 
-int Maze::getBlockSize()
+int Map::getBlockSize()
 {
     return block_size;
 }

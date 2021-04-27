@@ -52,8 +52,8 @@ void Renderer::update(vector<int> obj)
     switch (obj[0])
     {
     case 0:
-        if (maze.getSize() < 4)
-            maze = Maze(obj[3], 1, 640, 480, obj[2]);
+        if (map.getSize() < 4)
+            map = Map(obj[3], 1, 640, 480, obj[2]);
         break;
     case 1:
         players.clear();
@@ -89,8 +89,8 @@ void Renderer::update(vector<int> obj)
             int y = obj[i + 1];
             int t = obj[i + 2];
             // cout << x << " " << y << " " << t << endl;
-            if (x >= 0 && y >= 0 && x < maze.getSize() && y < maze.getSize() && t >= 0 && t <= 6)
-                maze.update(x, y, t);
+            if (x >= 0 && y >= 0 && x < map.getSize() && y < map.getSize() && t >= 0 && t <= 6)
+                map.update(x, y, t);
         }
 
         break;
@@ -100,7 +100,7 @@ void Renderer::update(vector<int> obj)
 void Renderer::render_all(SDL_Renderer *renderer, SDL_Surface *surface)
 {
 
-    maze.render(renderer, surface, block_surfaces);
+    map.render(renderer, surface, block_surfaces);
     for (int i = 0; i < players.size(); i++)
     {
         render_player(renderer, surface, players[i].first, players[i].second);

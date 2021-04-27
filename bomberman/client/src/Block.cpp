@@ -1,30 +1,30 @@
-#include "Box.h"
+#include "Block.h"
 
-Box::Box(int t, int i, int j)
+Block::Block(int t, int i, int j)
 {
-    Box::type = t;
-    Box::x = i;
-    Box::y = j;
+    Block::type = t;
+    Block::x = i;
+    Block::y = j;
 }
 
-void Box::update(int new_type)
+void Block::update(int new_type)
 {
     type = new_type;
 }
 
-int Box::get_block_type()
+int Block::get_block_type()
 {
     return type;
 }
-int Box::get_x()
+int Block::get_x()
 {
     return x;
 }
-int Box::get_y()
+int Block::get_y()
 {
     return y;
 }
-void Box::render(SDL_Renderer *renderer, int x, int y, int w, int h, SDL_Surface *surface, vector<SDL_Surface *> &block_surfaces)
+void Block::render(SDL_Renderer *renderer, int x, int y, int w, int h, SDL_Surface *surface, vector<SDL_Surface *> &block_surfaces)
 {
     SDL_Rect rect;
     rect = {x, y, w, h};

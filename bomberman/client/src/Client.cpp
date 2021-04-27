@@ -1,6 +1,6 @@
-#include "Network.h"
+#include "Client.h"
 using namespace std;
-Network::Network(const char *ipchar)
+Client::Client(const char *ipchar)
 {
     SDLNet_Init();
     IPaddress ip;
@@ -12,13 +12,13 @@ Network::Network(const char *ipchar)
     server = SDLNet_AllocSocketSet(1);
     SDLNet_TCP_AddSocket(server, connection);
 }
-Network::~Network()
+Client::~Client()
 {
     SDLNet_TCP_Close(connection);
     SDLNet_FreeSocketSet(server);
     SDLNet_Quit();
 }
-void Network::send(int id, int up_down, int direction)
+void Client::send(int id, int up_down, int direction)
 {
     // <id> <Up or Down> <direction 0-4> <newline>
     // cout << "SEND:" << id << up_down << direction << endl;
@@ -33,7 +33,7 @@ void Network::send(int id, int up_down, int direction)
     // cout << "sending: " << sendctr++ << endl;
 }
 
-vector<int> Network::recv()
+vector<int> Client::recv()
 {
     // SDL_Delay(5);
     while (SDLNet_CheckSockets(server, 0) > 0 && SDLNet_SocketReady(connection))

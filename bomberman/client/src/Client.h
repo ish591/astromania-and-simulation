@@ -7,11 +7,11 @@
 
 using namespace std;
 
-class Network
+class Client
 {
 public:
-    Network(const char *ipchar);
-    ~Network();
+    Client(const char *ipchar);
+    ~Client();
     void send(int, int, int);
     void sendBomb();
     vector<int> recv();
