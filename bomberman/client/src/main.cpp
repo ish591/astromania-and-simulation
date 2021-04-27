@@ -64,7 +64,7 @@ int main()
         cout << " Image failed to be initialised" << SDL_GetError() << endl;
         return 1;
     }
-    SDL_Window *win = SDL_CreateWindow("TEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, 0);
+    SDL_Window *win = SDL_CreateWindow("TEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, 0);
     SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, 0); //-1 denotes its the first renderer
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     if (!win)
@@ -82,16 +82,18 @@ int main()
     Uint32 prevTicks = startTicks;
     queue<vector<int>> event_queue;
     int last_event_send_time = startTicks;
+
     while (!quit)
     {
         Uint32 curTicks = SDL_GetTicks();
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         // if (curTicks - prevTicks > 1000)
         // {
         //     prevTicks = curTicks;
         //     cout << network.sent << endl;
         //     network.sent = 0;
         // }
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
         SDL_RenderClear(renderer);
         vector<int> v = network.recv();
         if (v.size() && v[0] == 0)
@@ -111,6 +113,7 @@ int main()
             }
             //send packet to server regarding the key press
             vector<int> sending_info = get_send_info(e);
+
             if (sending_info[0] != -1 && sending_info[1] != -1)
             {
                 event_queue.push({player_id, sending_info[0], sending_info[1]});

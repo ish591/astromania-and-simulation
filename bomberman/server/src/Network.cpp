@@ -52,13 +52,14 @@ vector<vector<int>> Network::recv()
                 } while (tmp[strlen(tmp) - 1] != '\n');
                 sscanf(tmp, "%d %d %d %d", &v[0], &v[1], &v[2], &v[3]);
                 player_states.push_back(v);
+                // cout << "Received: " << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << endl;
             }
         }
     }
 
     for (int k = 0; k < socketvector.size(); k++)
     {
-        if (SDL_GetTicks() - socketvector[k].timeout > 10000)
+        if (SDL_GetTicks() - socketvector[k].timeout > 100000)
         {
             cout << "Disconnected!" << endl;
             SDLNet_TCP_DelSocket(sockets, socketvector[k].socket);

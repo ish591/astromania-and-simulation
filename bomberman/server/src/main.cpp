@@ -19,7 +19,7 @@ int main()
     int updates = 0;
     if (online)
     {
-        OnlineGame game(1, 7, 1280, 720);
+        OnlineGame game(4, 7, 640, 480);
         while (!quit)
             quit = game.run();
     }

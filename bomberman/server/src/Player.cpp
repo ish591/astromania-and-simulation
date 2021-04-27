@@ -4,7 +4,7 @@ Player::Player(int id, Maze &maze)
 {
     player_id = id;
     player_state = 0;
-    if (id == 1 || id == 3)
+    if (id == 1)
     {
         x = 1;
         y = 1;
@@ -17,7 +17,7 @@ Player::Player(int id, Maze &maze)
         LEFT = SDLK_LEFT;
         DROP_BOMB = SDLK_RETURN;
     }
-    if (id == 2 || id == 4)
+    if (id == 2)
     {
         x = maze.getSize() - 2;
         y = x;
@@ -25,11 +25,38 @@ Player::Player(int id, Maze &maze)
         color_g = 255;
         color_b = 0;
         UP = SDLK_w;
+        LEFT = SDLK_a;
         DOWN = SDLK_s;
         RIGHT = SDLK_d;
-        LEFT = SDLK_a;
         DROP_BOMB = SDLK_SPACE;
     }
+    if (id == 3)
+    {
+        x = 1;
+        y = maze.getSize() - 2;
+        color_r = 0;
+        color_g = 255;
+        color_b = 0;
+        UP = SDLK_y;
+        LEFT = SDLK_g;
+        DOWN = SDLK_h;
+        RIGHT = SDLK_j;
+        DROP_BOMB = SDLK_u;
+    }
+    if (id == 4)
+    {
+        x = maze.getSize() - 2;
+        y = 1;
+        color_r = 0;
+        color_g = 255;
+        color_b = 0;
+        UP = SDLK_1;
+        LEFT = SDLK_2;
+        DOWN = SDLK_3;
+        RIGHT = SDLK_4;
+        DROP_BOMB = SDLK_5;
+    }
+
     x_offset = 0, y_offset = 0;
     score = 0;
     UP_PRESSED = 0;
@@ -169,6 +196,10 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
     int vmove = DOWN_PRESSED - UP_PRESSED;
     vector<vector<Box>> a = maze.getMaze();
     // cout << hmove << vmove << endl;
+    if (a[y][x].get_block_type() == 2)
+    {
+        kill(current_time);
+    }
     switch (hmove)
     {
     case -1:

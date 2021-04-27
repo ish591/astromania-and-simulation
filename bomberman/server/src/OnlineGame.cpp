@@ -14,7 +14,7 @@ OnlineGame::OnlineGame(int num_players, int maze_size, int width, int height)
     network.maze_size = maze_size;
     newLevel();
     updates = 0;
-    for (int i = 1; i <= 2; i++)
+    for (int i = 1; i <= num_players; i++)
     {
         Player player(i, maze);
         player.updateDimensions(maze, width, height);
@@ -76,7 +76,10 @@ void OnlineGame::control(vector<vector<int>> actions, int current_time)
             case 4:
                 key_press = players[actions[i][1] - 1].DROP_BOMB;
             }
-            players[actions[i][0] - 1].takeAction(actions[i][2], key_press, maze, bombs, current_time);
+            if (players[action[i][1] - 1].isAlive())
+            {
+                players[actions[i][1] - 1].takeAction(actions[i][2], key_press, maze, bombs, current_time);
+            }
             break;
         default:
             break;
@@ -86,11 +89,11 @@ void OnlineGame::control(vector<vector<int>> actions, int current_time)
 
 void OnlineGame::update(int current_time)
 {
-    if (current_time > maze_update_time + 20000)
-    {
-        maze.close(current_time, maze.close_radius + 1);
-        maze_update_time = current_time;
-    }
+    // if (current_time > maze_update_time + 20000)
+    // {
+    //     maze.close(current_time, maze.close_radius + 1);
+    //     maze_update_time = current_time;
+    // }
     if (current_time > maze_update_send_time + 200)
     {
         string maze_updates = maze.getBoxUpdates();

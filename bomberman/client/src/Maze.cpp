@@ -179,6 +179,12 @@ void Maze::generate(int N, int seed)
     maze[1][1].update(0);
     maze[1][2].update(0);
     maze[2][1].update(0);
+    maze[1][M - 2].update(0);
+    maze[1][M - 3].update(0);
+    maze[2][M - 2].update(0);
+    maze[M - 2][1].update(0);
+    maze[M - 2][2].update(0);
+    maze[M - 3][1].update(0);
     maze[M - 2][M - 3].update(0);
     maze[M - 2][M - 2].update(0);
     maze[M - 3][M - 2].update(0);
