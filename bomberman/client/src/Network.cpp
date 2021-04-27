@@ -30,17 +30,18 @@ void Network::send(int id, int up_down, int direction)
     {
         size += SDLNet_TCP_Send(connection, tmp + size, len - size);
     }
+    // cout << "sending: " << sendctr++ << endl;
 }
 
 vector<int> Network::recv()
 {
-
+    // SDL_Delay(5);
     while (SDLNet_CheckSockets(server, 0) > 0 && SDLNet_SocketReady(connection))
     {
         int offset = 0;
         do
         {
-            offset += SDLNet_TCP_Recv(connection, tmp + offset, 1400);
+            offset += SDLNet_TCP_Recv(connection, tmp + offset, 4000);
             if (offset <= 0)
                 return vector<int>({});
         } while (tmp[strlen(tmp) - 1] != '\n');

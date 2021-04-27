@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
-
+#include <queue>
 #include "Renderer.h"
 #include "Network.h"
 using namespace std;
@@ -79,9 +79,18 @@ int main()
     Uint32 startTicks = SDL_GetTicks();
     int updates = 0;
     Renderer renderIt = Renderer();
+    Uint32 prevTicks = startTicks;
+    queue<vector<int>> event_queue;
+    int last_event_send_time = startTicks;
     while (!quit)
     {
         Uint32 curTicks = SDL_GetTicks();
+        // if (curTicks - prevTicks > 1000)
+        // {
+        //     prevTicks = curTicks;
+        //     cout << network.sent << endl;
+        //     network.sent = 0;
+        // }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         vector<int> v = network.recv();
@@ -91,7 +100,8 @@ int main()
         }
         renderIt.update(v);
         renderIt.render_all(renderer, surface);
-        int val = (curTicks - startTicks) / 5;
+        //int val = (curTicks - startTicks) / 5;
+
         while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_QUIT)
@@ -102,10 +112,17 @@ int main()
             //send packet to server regarding the key press
             vector<int> sending_info = get_send_info(e);
             if (sending_info[0] != -1 && sending_info[1] != -1)
-                network.send(player_id, sending_info[0], sending_info[1]);
+            {
+                event_queue.push({player_id, sending_info[0], sending_info[1]});
+            }
+        }
+        if (curTicks > last_event_send_time + 50 && !(event_queue.empty()))
+        {
+            last_event_send_time = curTicks;
+            network.send(event_queue.front()[0], event_queue.front()[1], event_queue.front()[2]);
+            event_queue.pop();
         }
         SDL_RenderPresent(renderer);
-        SDL_Delay(1);
     }
 
     SDL_DestroyWindow(win);

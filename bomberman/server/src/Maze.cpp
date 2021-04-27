@@ -314,8 +314,8 @@ string Maze::getBoxUpdates()
         {
             if (maze_matrix[i][j] != maze[i][j].get_block_type())
             {
-                maze_matrix[i][j] = maze[i][j].get_block_type();
-                s += (to_string(i) + " " + to_string(j) + " " + to_string(maze_matrix[i][j]) + " ");
+                // maze_matrix[i][j] = maze[i][j].get_block_type();
+                s += (to_string(i) + " " + to_string(j) + " " + to_string(maze[i][j].get_block_type()) + " ");
             }
         }
     }

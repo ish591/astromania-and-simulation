@@ -46,7 +46,7 @@ vector<vector<int>> Network::recv()
                 int offset = 0;
                 do
                 {
-                    offset += SDLNet_TCP_Recv(socketvector[i].socket, tmp + offset, 1400);
+                    offset += SDLNet_TCP_Recv(socketvector[i].socket, tmp + offset, 8000);
                     if (offset <= 0)
                         break;
                 } while (tmp[strlen(tmp) - 1] != '\n');

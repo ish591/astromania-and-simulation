@@ -16,7 +16,7 @@ public:
     ~OnlineGame();
     bool run();
     void newLevel();
-    void render();
+    void render(int);
     void update(int);
     void control(vector<vector<int>>, int);
     Maze maze = Maze(1, 100, 100, 100, 0);
@@ -26,7 +26,8 @@ public:
     vector<Explosion> explosions;
     int maze_size = 7;
     int level;
-    int start_time, maze_update_time;
+    int start_time, maze_update_time, maze_update_send_time;
+    int render_state_send_time = 0;
     int updates;
     Network network;
 };

@@ -35,3 +35,6 @@ play:
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+free:
+	kill  $(shell lsof -ti:1234)

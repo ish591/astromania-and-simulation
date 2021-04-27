@@ -52,7 +52,8 @@ void Renderer::update(vector<int> obj)
     switch (obj[0])
     {
     case 0:
-        maze = Maze(obj[3], 1, 1280, 720, obj[2]);
+        if (maze.getSize() < 4)
+            maze = Maze(obj[3], 1, 1280, 720, obj[2]);
         break;
     case 1:
         players.clear();
@@ -64,18 +65,20 @@ void Renderer::update(vector<int> obj)
             int y = obj[i + 2];
             int w = obj[i + 3];
             int h = obj[i + 4];
-
-            if (obj[i] < 4)
+            if (x >= 0 && y >= 0 && w >= 0 && h >= 0)
             {
-                players.push_back({obj[i], SDL_Rect({x, y, w, h})});
-            }
-            if (obj[i] == 5)
-            {
-                bombs.push_back(SDL_Rect({x, y, w, h}));
-            }
-            if (obj[i] == 6)
-            {
-                explosions.push_back(SDL_Rect({x, y, w, h}));
+                if (obj[i] < 4)
+                {
+                    players.push_back({obj[i], SDL_Rect({x, y, w, h})});
+                }
+                if (obj[i] == 5)
+                {
+                    bombs.push_back(SDL_Rect({x, y, w, h}));
+                }
+                if (obj[i] == 6)
+                {
+                    explosions.push_back(SDL_Rect({x, y, w, h}));
+                }
             }
         }
         break;
@@ -85,9 +88,10 @@ void Renderer::update(vector<int> obj)
             int x = obj[i];
             int y = obj[i + 1];
             int t = obj[i + 2];
-            maze.update(x, y, t);
+            // cout << x << " " << y << " " << t << endl;
+            if (x >= 0 && y >= 0 && x < maze.getSize() && y < maze.getSize() && t >= 0 && t <= 6)
+                maze.update(x, y, t);
         }
-        break;
 
         break;
     }
