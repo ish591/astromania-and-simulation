@@ -22,6 +22,7 @@ OnlineGame::OnlineGame(int num_players, int maze_size, int width, int height)
     }
     start_time = SDL_GetTicks();
     maze_update_time = start_time;
+    maze_update_send_time = 0;
 }
 
 OnlineGame::~OnlineGame()
@@ -34,13 +35,14 @@ bool OnlineGame::run()
     Uint32 curTicks = SDL_GetTicks();
     vector<vector<int>> actions = network.recv();
     control(actions, curTicks);
-    render();
+    render(curTicks);
+
     int val = (curTicks - start_time) / 5;
     for (; updates < val; updates++)
     {
         update(curTicks - (val - updates + 1) * 5);
     }
-    SDL_Delay(20);
+    SDL_Delay(1);
     return false;
 }
 
@@ -89,6 +91,22 @@ void OnlineGame::update(int current_time)
         maze.close(current_time, maze.close_radius + 1);
         maze_update_time = current_time;
     }
+    if (current_time > maze_update_send_time + 200)
+    {
+        string maze_updates = maze.getBoxUpdates();
+        for (int i = 0; i < 2; i++)
+        {
+            // cout << maze_updates << endl;
+            if (maze_updates.length() > 4)
+            {
+                // cout << maze_updates << endl;
+                network.sendState(maze_updates);
+                SDL_Delay(10);
+            }
+        }
+        maze_update_send_time = current_time;
+    }
+
     int alive_count = 0;
     maze.update(current_time);
     vector<vector<int>> player_info;
@@ -131,31 +149,28 @@ void OnlineGame::update(int current_time)
     }
 }
 
-void OnlineGame::render()
+void OnlineGame::render(int current_time)
 {
     // maze.render(renderer, surface, block_surfaces);
-    string s = "1 ";
-    for (int i = 0; i < players.size(); i++)
-    {
-        if (players[i].isAlive())
-            s += players[i].render();
-    }
-    for (int i = 0; i < bombs.size(); i++)
-    {
-        s += bombs[i].render();
-    }
-    for (int i = 0; i < explosions.size(); i++)
-    {
-        s += explosions[i].render();
-    }
 
-    string maze_updates = maze.getBoxUpdates();
-    // cout << maze_updates << endl;
-    for (int i = 0; i < 20; i++)
+    if (current_time > render_state_send_time + 30)
     {
-        if (maze_updates.length() > 4)
-            network.sendState(maze_updates);
+
+        string s = "1 ";
+        for (int i = 0; i < players.size(); i++)
+        {
+            if (players[i].isAlive())
+                s += players[i].render();
+        }
+        for (int i = 0; i < bombs.size(); i++)
+        {
+            s += bombs[i].render();
+        }
+        for (int i = 0; i < explosions.size(); i++)
+        {
+            s += explosions[i].render();
+        }
+        network.sendState(s);
+        render_state_send_time = current_time;
     }
-    SDL_Delay(3);
-    network.sendState(s);
 }

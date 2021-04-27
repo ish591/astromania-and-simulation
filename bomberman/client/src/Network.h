@@ -15,9 +15,11 @@ public:
     void send(int, int, int);
     void sendBomb();
     vector<int> recv();
+    int sent = 0;
 
 private:
     SDLNet_SocketSet server;
     TCPsocket connection;
-    char tmp[1400];
+    char tmp[4000];
+    int sendctr, recvctr;
 };
