@@ -3,7 +3,7 @@
 Player::Player(int id, Maze &maze)
 {
     player_id = id;
-    player_state = 0;
+    player_state = 2;
     if (id == 1)
     {
         x = 1;
@@ -128,22 +128,18 @@ void Player::takeAction(int down_press, SDL_Keycode key_press, Maze &maze, vecto
         if (key_press == LEFT)
         {
             LEFT_PRESSED = 1;
-            player_state = 2;
         }
         else if (key_press == RIGHT)
         {
             RIGHT_PRESSED = 1;
-            player_state = 3;
         }
         else if (key_press == UP)
         {
             UP_PRESSED = 1;
-            player_state = 1;
         }
         else if (key_press == DOWN)
         {
             DOWN_PRESSED = 1;
-            player_state = 0;
         }
         else if (key_press == DROP_BOMB)
         {
@@ -203,6 +199,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
     switch (hmove)
     {
     case -1:
+        player_state = 2;
         if (x_offset - power_ups[1].first - player_size / 2 > 0)
         {
             x_offset -= power_ups[1].first;
@@ -393,6 +390,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
         break;
 
     case 1:
+        player_state = 3;
         if (x_offset + power_ups[1].first + player_size / 2 < block_size)
         {
             x_offset += power_ups[1].first;
@@ -580,6 +578,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
     switch (vmove)
     {
     case -1:
+        // player_state = 1;
         if (y_offset - power_ups[1].first - player_size / 2 > 0)
         {
             y_offset -= power_ups[1].first;
@@ -762,6 +761,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
         break;
 
     case 1:
+        // player_state = 0;
         if (y_offset + power_ups[1].first + player_size / 2 < block_size)
         {
             y_offset += power_ups[1].first;
@@ -1000,7 +1000,9 @@ bool Player::isAlive()
 
 void Player::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<vector<SDL_Surface *>> &player_surfaces)
 {
-    surface = (player_surfaces[0][player_state]);
+    if (!isAlive())
+        player_state = 4;
+    surface = (player_surfaces[player_id - 1][player_state - 2]);
     if (!surface)
     {
         cout << "Failed to create surface" << endl;
@@ -1026,12 +1028,13 @@ void Player::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<vector<
 
 string Player::render()
 {
-
+    if (!isAlive())
+        player_state = 4;
     SDL_Rect rect = {x * block_size + x_offset + left_offset - (player_size / 2), y * block_size + y_offset + top_offset - (player_size / 2), player_size, player_size};
     int gap = SDL_GetTicks() - last_life_loss_time;
     if (gap > 2000 || (gap / 100) % 5 < 4)
     {
-        return (to_string(player_id) + " " + to_string(rect.x) + " " + to_string(rect.y) + " " + to_string(rect.w) + " " + to_string(rect.h) + " ");
+        return (to_string(player_id) + " " + to_string(rect.x) + " " + to_string(rect.y) + " " + to_string(rect.w) + " " + to_string(rect.h) + " " + to_string(player_state) + " ");
     }
     return "";
 }

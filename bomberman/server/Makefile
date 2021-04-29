@@ -1,6 +1,6 @@
 # Directories
-SRC_DIR ?= ./src
-BUILD_DIR ?= ./build
+SRC_DIR ?= ./src ../logic
+BUILD_DIR ?= ./build/server
 INC_DIRS := $(shell find $(SRC_DIR) -type d)
 
 # Files list
@@ -16,7 +16,7 @@ SDL ?= -l SDL2-2.0.0 -l sdl2_mixer -l sdl2_image -l sdl2_net # Set path to SDL h
 LDFLAGS ?= $(SDL)
 
 # Target Executable
-TARGET_EXECUTABLE ?= play
+TARGET_EXECUTABLE ?= ../server.out
 
 $(BUILD_DIR)/$(TARGET_EXECUTABLE): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
@@ -28,10 +28,10 @@ $(BUILD_DIR)/%.o: %.cpp
 
 -include $(DEPENDENCIES)
 	
-play:
-	./build/play
+server:
+	./build/server.out
 
-.PHONY: clean
+.PHONY: clean server
 
 clean:
 	rm -rf $(BUILD_DIR)

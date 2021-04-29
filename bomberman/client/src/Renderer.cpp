@@ -1,40 +1,46 @@
 #include "Renderer.h"
 
-Renderer::Renderer()
+Renderer::Renderer(int w, int h)
 {
+    WINDOW_WIDTH = w;
+    WINDOW_HEIGHT = h;
     cout << "HELLO" << endl;
-    loadTextures();
+    loadTextures(6);
 }
-void Renderer::loadTextures()
+void Renderer::loadTextures(int n)
 {
     string assets_dir = "../assets/";
-    string pref_players = assets_dir + "images/player";
-    for (int i = 0; i < 2; i++)
+    string pref_players = assets_dir + "images/characters/";
+    string colors[] = {"red", "green", "blue", "pink", "yellow", "purple"};
+    for (int i = 0; i < n; i++)
     {
         vector<SDL_Surface *> curr;
-        string image_path = pref_players + to_string(i + 1);
-        string front_im = image_path + "front.png";
-        SDL_Surface *new_surface = IMG_Load(front_im.c_str());
-        curr.push_back(new_surface);
-        string back_im = image_path + "back.png";
-        SDL_Surface *new_surface1 = IMG_Load(back_im.c_str());
-        curr.push_back(new_surface1);
-        string left_im = image_path + "left.png";
+        string image_path = pref_players + colors[i];
+        // string front_im = image_path + "_front.png";
+        // SDL_Surface *new_surface = IMG_Load(front_im.c_str());
+        // curr.push_back(new_surface);
+        // string back_im = image_path + "_back.png";
+        // SDL_Surface *new_surface1 = IMG_Load(back_im.c_str());
+        // curr.push_back(new_surface1);
+        string left_im = image_path + "_left.png";
         SDL_Surface *new_surface2 = IMG_Load(left_im.c_str());
         curr.push_back(new_surface2);
-        string right_im = image_path + "right.png";
+        string right_im = image_path + "_right.png";
         SDL_Surface *new_surface3 = IMG_Load(right_im.c_str());
         curr.push_back(new_surface3);
+        string dead_im = image_path + "_dead.png";
+        SDL_Surface *new_surface4 = IMG_Load(dead_im.c_str());
+        curr.push_back(new_surface4);
         player_surfaces.push_back(curr);
     }
     string pref_bombs = assets_dir + "images/bomb";
     for (int i = 0; i < 1; i++)
     {
-        string image_path = pref_bombs + to_string(i + 1) + ".png";
+        string image_path = pref_bombs + ".png";
         SDL_Surface *new_surface = IMG_Load(image_path.c_str());
         bomb_surfaces.push_back(new_surface);
     }
-    string pref_power_ups = assets_dir + "images/power_ups";
+    string pref_power_ups = assets_dir + "images/powerups/";
     for (int i = 0; i < 4; i++)
     {
         string image_path = pref_power_ups + to_string(i + 1) + ".png";
@@ -53,7 +59,7 @@ void Renderer::update(vector<int> obj)
     {
     case 0:
         if (map.getSize() < 4)
-            map = Map(obj[3], 1, 640, 480, obj[2]);
+            map = Map(obj[3], 1, WINDOW_WIDTH, WINDOW_HEIGHT, obj[2]);
         break;
     case 1:
         players.clear();
@@ -69,13 +75,14 @@ void Renderer::update(vector<int> obj)
             {
                 if (obj[i] <= 4)
                 {
-                    players.push_back({obj[i], SDL_Rect({x, y, w, h})});
+                    players.push_back({{obj[i], obj[i + 5]}, SDL_Rect({x, y, w, h})});
+                    i++;
                 }
-                if (obj[i] == 5)
+                else if (obj[i] == 5)
                 {
                     bombs.push_back(SDL_Rect({x, y, w, h}));
                 }
-                if (obj[i] == 6)
+                else if (obj[i] == 6)
                 {
                     explosions.push_back(SDL_Rect({x, y, w, h}));
                 }
@@ -103,7 +110,7 @@ void Renderer::render_all(SDL_Renderer *renderer, SDL_Surface *surface)
     map.render(renderer, surface, block_surfaces);
     for (int i = 0; i < players.size(); i++)
     {
-        render_player(renderer, surface, players[i].first, players[i].second);
+        render_player(renderer, surface, players[i].first.first, players[i].first.second, players[i].second);
     }
 
     for (int i = 0; i < bombs.size(); i++)
@@ -117,9 +124,9 @@ void Renderer::render_all(SDL_Renderer *renderer, SDL_Surface *surface)
     }
 }
 
-void Renderer::render_player(SDL_Renderer *renderer, SDL_Surface *surface, int player_id, SDL_Rect rect)
+void Renderer::render_player(SDL_Renderer *renderer, SDL_Surface *surface, int player_id, int player_state, SDL_Rect rect)
 {
-    surface = (player_surfaces[0][0]);
+    surface = (player_surfaces[player_id - 1][player_state - 2]);
     if (!surface)
     {
         cout << "Failed to create surface" << endl;

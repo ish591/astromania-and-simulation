@@ -76,7 +76,7 @@ void OnlineGame::control(vector<vector<int>> actions, int current_time)
             case 4:
                 key_press = players[actions[i][1] - 1].DROP_BOMB;
             }
-            if (players[action[i][1] - 1].isAlive())
+            if (players[actions[i][1] - 1].isAlive())
             {
                 players[actions[i][1] - 1].takeAction(actions[i][2], key_press, maze, bombs, current_time);
             }
@@ -158,12 +158,11 @@ void OnlineGame::render(int current_time)
 
     if (current_time > render_state_send_time + 30)
     {
-
         string s = "1 ";
         for (int i = 0; i < players.size(); i++)
         {
-            if (players[i].isAlive())
-                s += players[i].render();
+            // if (players[i].isAlive())
+            s += players[i].render();
         }
         for (int i = 0; i < bombs.size(); i++)
         {

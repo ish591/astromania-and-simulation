@@ -11,12 +11,11 @@ class OfflineGame
 public:
     OfflineGame(int, int, int, int);
     ~OfflineGame();
-    bool run();
     void newLevel();
     void render(SDL_Renderer *, SDL_Surface *);
     void update(int);
     void control(SDL_Event, int);
-    void loadTextures();
+    void loadTextures(int);
     Maze maze = Maze(1, 100, 100, 100, 0);
     int width, height;
     vector<Player> players;

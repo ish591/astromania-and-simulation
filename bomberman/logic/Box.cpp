@@ -66,9 +66,9 @@ void Box::render(SDL_Renderer *renderer, int x, int y, int w, int h, SDL_Surface
     }
     else if (type == 2)
     {
-        r = 200;
-        g = 20;
-        b = 0;
+        r = 135;
+        g = 120;
+        b = 105;
         a = 255;
     }
     else if (type == 3) //power ups for now

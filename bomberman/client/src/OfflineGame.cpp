@@ -2,104 +2,61 @@
 
 OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height)
 {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
-    {
-        cout << "Error: " << SDL_GetError() << endl;
-        exit(3);
-    }
-    if (IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) != (IMG_INIT_PNG | IMG_INIT_JPG))
-    {
-        cout << " Image failed to be initialised" << SDL_GetError() << endl;
-        exit(3);
-    }
-    win = SDL_CreateWindow("TEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, 0);
-    renderer = SDL_CreateRenderer(win, -1, 0); //-1 denotes its the first renderer
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    if (!win)
-    {
-        cout << "Error" << endl;
-        SDL_Quit();
-    }
-
     OfflineGame::maze_size = maze_size;
     OfflineGame::width = width;
     OfflineGame::height = height;
     newLevel();
     updates = 0;
-    for (int i = 1; i <= 2; i++)
+    for (int i = 1; i <= num_players; i++)
     {
         Player player(i, maze);
         player.updateDimensions(maze, width, height);
         players.push_back(player);
     }
-    loadTextures();
+    loadTextures(num_players);
     start_time = SDL_GetTicks();
     maze_update_time = start_time;
 }
 
 OfflineGame::~OfflineGame()
 {
-    SDL_DestroyWindow(win);
-    IMG_Quit();
-    SDL_Quit();
+    // Destroy object
 }
 
-bool OfflineGame::run()
-{
-    Uint32 curTicks = SDL_GetTicks();
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    render(renderer, surface);
-    int val = (curTicks - start_time) / 5;
-    for (; updates < val; updates++)
-    {
-        update(curTicks - (val - updates + 1) * 5);
-    }
-
-    while (SDL_PollEvent(&e))
-    {
-
-        if (e.type == SDL_QUIT)
-        {
-            return true;
-        }
-
-        control(e, curTicks);
-    }
-    SDL_RenderPresent(renderer);
-    return false;
-}
-
-void OfflineGame::loadTextures()
+void OfflineGame::loadTextures(int n)
 {
     string assets_dir = "../assets/";
-    string pref_players = assets_dir + "images/player";
-    for (int i = 0; i < 2; i++)
+    string pref_players = assets_dir + "images/characters/";
+    string colors[] = {"red", "green", "blue", "pink", "yellow", "purple"};
+    for (int i = 0; i < n; i++)
     {
         vector<SDL_Surface *> curr;
-        string image_path = pref_players + to_string(i + 1);
-        string front_im = image_path + "front.png";
-        SDL_Surface *new_surface = IMG_Load(front_im.c_str());
-        curr.push_back(new_surface);
-        string back_im = image_path + "back.png";
-        SDL_Surface *new_surface1 = IMG_Load(back_im.c_str());
-        curr.push_back(new_surface1);
-        string left_im = image_path + "left.png";
+        string image_path = pref_players + colors[i];
+        // string front_im = image_path + "_front.png";
+        // SDL_Surface *new_surface = IMG_Load(front_im.c_str());
+        // curr.push_back(new_surface);
+        // string back_im = image_path + "_back.png";
+        // SDL_Surface *new_surface1 = IMG_Load(back_im.c_str());
+        // curr.push_back(new_surface1);
+        string left_im = image_path + "_left.png";
         SDL_Surface *new_surface2 = IMG_Load(left_im.c_str());
         curr.push_back(new_surface2);
-        string right_im = image_path + "right.png";
+        string right_im = image_path + "_right.png";
         SDL_Surface *new_surface3 = IMG_Load(right_im.c_str());
         curr.push_back(new_surface3);
+        string dead_im = image_path + "_dead.png";
+        SDL_Surface *new_surface4 = IMG_Load(dead_im.c_str());
+        curr.push_back(new_surface4);
         player_surfaces.push_back(curr);
     }
     string pref_bombs = assets_dir + "images/bomb";
     for (int i = 0; i < 1; i++)
     {
-        string image_path = pref_bombs + to_string(i + 1) + ".png";
+        string image_path = pref_bombs + ".png";
         SDL_Surface *new_surface = IMG_Load(image_path.c_str());
         bomb_surfaces.push_back(new_surface);
     }
-    string pref_power_ups = assets_dir + "images/power_ups";
+    string pref_power_ups = assets_dir + "images/powerups/";
     for (int i = 0; i < 4; i++)
     {
         string image_path = pref_power_ups + to_string(i + 1) + ".png";
@@ -189,8 +146,8 @@ void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
     maze.render(renderer, surface, block_surfaces);
     for (int i = 0; i < players.size(); i++)
     {
-        if (players[i].isAlive())
-            players[i].render(renderer, surface, player_surfaces);
+        // if (players[i].isAlive())
+        players[i].render(renderer, surface, player_surfaces);
     }
     for (int i = 0; i < bombs.size(); i++)
     {

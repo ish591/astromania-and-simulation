@@ -1,6 +1,6 @@
 # Directories
 SRC_DIR ?= ./src ../logic
-BUILD_DIR ?= ./build
+BUILD_DIR ?= ./build/client
 INC_DIRS := $(shell find $(SRC_DIR) -type d)
 
 # Files list
@@ -16,7 +16,7 @@ SDL ?= -l SDL2-2.0.0 -l sdl2_mixer -l sdl2_image -l sdl2_net -l sdl2_ttf # Set p
 LDFLAGS ?= $(SDL)
 
 # Target Executable
-TARGET_EXECUTABLE ?= game
+TARGET_EXECUTABLE ?= ../game
 
 $(BUILD_DIR)/$(TARGET_EXECUTABLE): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
