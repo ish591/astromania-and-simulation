@@ -9,10 +9,9 @@ using namespace std;
 class Renderer
 {
 public:
-    Renderer(int, int);
+    Renderer(int, int, vector<vector<SDL_Surface *>>, vector<SDL_Surface *>, vector<SDL_Surface *>, vector<SDL_Surface *>);
     void render_all(SDL_Renderer *, SDL_Surface *);
     void update(vector<int>);
-    void loadTextures(int);
     Map map = Map(1, 1, 100, 100, 0);
 
 private:
@@ -22,7 +21,7 @@ private:
     vector<vector<SDL_Surface *>> player_surfaces;
     vector<SDL_Surface *> bomb_surfaces;
     vector<SDL_Surface *> block_surfaces;
-    SDL_Surface *explosion_surface;
+    vector<SDL_Surface *> explosion_surfaces;
     void render_player(SDL_Renderer *, SDL_Surface *, int, int, SDL_Rect);
     void render_bomb(SDL_Renderer *, SDL_Surface *, SDL_Rect);
     void render_explosion(SDL_Renderer *, SDL_Surface *, SDL_Rect);

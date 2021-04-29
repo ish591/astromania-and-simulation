@@ -10,7 +10,7 @@ int main()
 {
     bool quit = false;
 
-    OnlineGame game(4, 7, 640, 480);
+    OnlineGame game(4, 7, 1280, 720);
     cout << "Running on port 1234" << endl;
     while (!quit)
         quit = game.run();

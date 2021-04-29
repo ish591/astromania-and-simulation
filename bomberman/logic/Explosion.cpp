@@ -144,7 +144,7 @@ vector<int> Explosion::kill(Maze &maze, vector<vector<int>> player_info, int cur
     }
     return new_players;
 }
-void Explosion::render(SDL_Renderer *renderer, SDL_Surface *surface, SDL_Surface *explosion_surface)
+void Explosion::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<SDL_Surface *> explosion_surface)
 {
     SDL_Rect rect = {top_x, top_y, width, height};
     int r, g, b, a;
@@ -152,7 +152,10 @@ void Explosion::render(SDL_Renderer *renderer, SDL_Surface *surface, SDL_Surface
     g = 100;
     b = 220;
     a = 150;
-    surface = explosion_surface;
+    if (width > height)
+        surface = explosion_surface[0];
+    else
+        surface = explosion_surface[1];
     if (!surface)
     {
         cout << "Failed to create surface" << endl;

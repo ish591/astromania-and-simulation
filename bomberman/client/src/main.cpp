@@ -17,7 +17,57 @@
 
 using namespace std;
 
-int player_id = 1;
+vector<vector<SDL_Surface *>> player_surfaces;
+vector<SDL_Surface *> block_surfaces;
+vector<SDL_Surface *> bomb_surfaces;
+vector<SDL_Surface *> explosion_surfaces;
+
+int player_id = -1;
+void loadTextures()
+{
+    string assets_dir = "../assets/";
+    string pref_players = assets_dir + "images/characters/";
+    string colors[] = {"red", "green", "blue", "pink", "yellow", "purple"};
+    for (int i = 0; i < 6; i++)
+    {
+        vector<SDL_Surface *> curr;
+        string image_path = pref_players + colors[i];
+        // string front_im = image_path + "_front.png";
+        // SDL_Surface *new_surface = IMG_Load(front_im.c_str());
+        // curr.push_back(new_surface);
+        // string back_im = image_path + "_back.png";
+        // SDL_Surface *new_surface1 = IMG_Load(back_im.c_str());
+        // curr.push_back(new_surface1);
+        string left_im = image_path + "_left.png";
+        SDL_Surface *new_surface2 = IMG_Load(left_im.c_str());
+        curr.push_back(new_surface2);
+        string right_im = image_path + "_right.png";
+        SDL_Surface *new_surface3 = IMG_Load(right_im.c_str());
+        curr.push_back(new_surface3);
+        string dead_im = image_path + "_dead.png";
+        SDL_Surface *new_surface4 = IMG_Load(dead_im.c_str());
+        curr.push_back(new_surface4);
+        player_surfaces.push_back(curr);
+    }
+    string pref_bombs = assets_dir + "images/bomb";
+    for (int i = 0; i < 1; i++)
+    {
+        string image_path = pref_bombs + ".png";
+        SDL_Surface *new_surface = IMG_Load(image_path.c_str());
+        bomb_surfaces.push_back(new_surface);
+    }
+    string pref_power_ups = assets_dir + "images/powerups/";
+    for (int i = 0; i < 4; i++)
+    {
+        string image_path = pref_power_ups + to_string(i + 1) + ".png";
+        SDL_Surface *new_surface = IMG_Load(image_path.c_str());
+        block_surfaces.push_back(new_surface);
+    }
+    string image_explosion = assets_dir + "images/explosion_horizontal.png";
+    explosion_surfaces.push_back(IMG_Load(image_explosion.c_str()));
+    image_explosion = assets_dir + "images/explosion_vertical.png";
+    explosion_surfaces.push_back(IMG_Load(image_explosion.c_str()));
+}
 
 vector<int> get_send_info(SDL_Event event)
 {
@@ -58,6 +108,7 @@ vector<int> get_send_info(SDL_Event event)
     }
     return vector<int>{up_down, direction};
 }
+
 int Init()
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -73,10 +124,11 @@ int Init()
     TTF_Init();
     return 1;
 }
+
 int main()
 {
-    Client client("127.0.0.1");
     Init();
+    loadTextures();
     int offline;
     cout << "offline?";
     cin >> offline;
@@ -94,7 +146,6 @@ int main()
     SDL_Surface *surface = nullptr;
     Uint32 startTicks = SDL_GetTicks();
     int updates = 0;
-    Renderer renderIt = Renderer(WINDOW_WIDTH, WINDOW_HEIGHT);
     Uint32 prevTicks = startTicks;
     queue<vector<int>> event_queue;
     int last_event_send_time = startTicks;
@@ -124,7 +175,7 @@ int main()
         int players;
         cout << "Enter number of players: ";
         cin >> players;
-        OfflineGame game(players, 7, WINDOW_WIDTH, WINDOW_HEIGHT);
+        OfflineGame game(players, 7, WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces);
         int start_time = SDL_GetTicks();
         while (!quit)
         {
@@ -153,6 +204,8 @@ int main()
     }
     else
     {
+        Client client("127.0.0.1");
+        Renderer renderIt = Renderer(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces);
         while (!quit)
         {
             Uint32 curTicks = SDL_GetTicks();

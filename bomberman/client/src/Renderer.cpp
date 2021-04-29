@@ -1,54 +1,14 @@
 #include "Renderer.h"
 
-Renderer::Renderer(int w, int h)
+Renderer::Renderer(int w, int h, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces)
 {
+    Renderer::player_surfaces = player_surfaces;
+    Renderer::block_surfaces = block_surfaces;
+    Renderer::bomb_surfaces = bomb_surfaces;
+    Renderer::explosion_surfaces = explosion_surfaces;
     WINDOW_WIDTH = w;
     WINDOW_HEIGHT = h;
     cout << "HELLO" << endl;
-    loadTextures(6);
-}
-void Renderer::loadTextures(int n)
-{
-    string assets_dir = "../assets/";
-    string pref_players = assets_dir + "images/characters/";
-    string colors[] = {"red", "green", "blue", "pink", "yellow", "purple"};
-    for (int i = 0; i < n; i++)
-    {
-        vector<SDL_Surface *> curr;
-        string image_path = pref_players + colors[i];
-        // string front_im = image_path + "_front.png";
-        // SDL_Surface *new_surface = IMG_Load(front_im.c_str());
-        // curr.push_back(new_surface);
-        // string back_im = image_path + "_back.png";
-        // SDL_Surface *new_surface1 = IMG_Load(back_im.c_str());
-        // curr.push_back(new_surface1);
-        string left_im = image_path + "_left.png";
-        SDL_Surface *new_surface2 = IMG_Load(left_im.c_str());
-        curr.push_back(new_surface2);
-        string right_im = image_path + "_right.png";
-        SDL_Surface *new_surface3 = IMG_Load(right_im.c_str());
-        curr.push_back(new_surface3);
-        string dead_im = image_path + "_dead.png";
-        SDL_Surface *new_surface4 = IMG_Load(dead_im.c_str());
-        curr.push_back(new_surface4);
-        player_surfaces.push_back(curr);
-    }
-    string pref_bombs = assets_dir + "images/bomb";
-    for (int i = 0; i < 1; i++)
-    {
-        string image_path = pref_bombs + ".png";
-        SDL_Surface *new_surface = IMG_Load(image_path.c_str());
-        bomb_surfaces.push_back(new_surface);
-    }
-    string pref_power_ups = assets_dir + "images/powerups/";
-    for (int i = 0; i < 4; i++)
-    {
-        string image_path = pref_power_ups + to_string(i + 1) + ".png";
-        SDL_Surface *new_surface = IMG_Load(image_path.c_str());
-        block_surfaces.push_back(new_surface);
-    }
-    string image_explosion = assets_dir + "images/explosion.png";
-    explosion_surface = IMG_Load(image_explosion.c_str());
 }
 
 void Renderer::update(vector<int> obj)
@@ -168,7 +128,11 @@ void Renderer::render_bomb(SDL_Renderer *renderer, SDL_Surface *surface, SDL_Rec
 }
 void Renderer::render_explosion(SDL_Renderer *renderer, SDL_Surface *surface, SDL_Rect rect)
 {
-    surface = explosion_surface;
+    if (rect.w > rect.h)
+        surface = explosion_surfaces[0];
+    else
+        surface = explosion_surfaces[1];
+
     if (!surface)
     {
         cout << "Failed to create surface" << endl;

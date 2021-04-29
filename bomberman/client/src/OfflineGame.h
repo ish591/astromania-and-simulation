@@ -9,13 +9,12 @@ using namespace std;
 class OfflineGame
 {
 public:
-    OfflineGame(int, int, int, int);
+    OfflineGame(int, int, int, int, vector<vector<SDL_Surface *>>, vector<SDL_Surface *>, vector<SDL_Surface *>, vector<SDL_Surface *>);
     ~OfflineGame();
     void newLevel();
     void render(SDL_Renderer *, SDL_Surface *);
     void update(int);
     void control(SDL_Event, int);
-    void loadTextures(int);
     Maze maze = Maze(1, 100, 100, 100, 0);
     int width, height;
     vector<Player> players;
@@ -24,7 +23,7 @@ public:
     vector<vector<SDL_Surface *>> player_surfaces;
     vector<SDL_Surface *> block_surfaces;
     vector<SDL_Surface *> bomb_surfaces;
-    SDL_Surface *explosion_surface;
+    vector<SDL_Surface *> explosion_surfaces;
     int maze_size = 7;
     int level;
     int start_time, maze_update_time;
