@@ -28,7 +28,7 @@ OfflineGame::~OfflineGame()
 
 void OfflineGame::newLevel()
 {
-    maze = Maze(maze_size, 1, width, height, time(0));
+    maze = Maze(maze_size, 0, width, height, time(0));
 }
 
 void OfflineGame::control(SDL_Event e, int current_time)

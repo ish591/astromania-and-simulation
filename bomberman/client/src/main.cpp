@@ -55,10 +55,10 @@ void loadTextures()
         SDL_Surface *new_surface = IMG_Load(image_path.c_str());
         bomb_surfaces.push_back(new_surface);
     }
-    string pref_power_ups = assets_dir + "images/powerups/";
-    for (int i = 0; i < 4; i++)
+    string pref_power_ups = assets_dir + "images/blocks/";
+    for (int i = 0; i < 7; i++)
     {
-        string image_path = pref_power_ups + to_string(i + 1) + ".png";
+        string image_path = pref_power_ups + to_string(i) + ".png";
         SDL_Surface *new_surface = IMG_Load(image_path.c_str());
         block_surfaces.push_back(new_surface);
     }
