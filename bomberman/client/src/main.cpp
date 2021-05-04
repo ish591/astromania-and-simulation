@@ -6,7 +6,6 @@
 #include <vector>
 #include <cstring>
 #include <queue>
-
 #include "Renderer.h"
 #include "Client.h"
 #include "OfflineGame.h"
@@ -128,11 +127,11 @@ int Init()
 int main()
 {
     Init();
-    loadTextures();
-    int offline;
-    cout << "offline?";
-    cin >> offline;
-    Menu menu = Menu();
+    bool offline = false;
+    bool online = false;
+    //cout << "offline?";
+    //cin >> offline;
+    Menu menu = Menu(WINDOW_WIDTH, WINDOW_HEIGHT);
     SDL_Window *win = SDL_CreateWindow("TEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, 0); //-1 denotes its the first renderer
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -152,29 +151,46 @@ int main()
     // TTF_Font *font = TTF_OpenFont("src/m5x7.ttf", 24); //24 is the font size
     //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     bool quit = false;
-    // while (!quit)
-    // {
-    //     Uint32 curTicks = SDL_GetTicks();
-    //     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    //     SDL_RenderClear(renderer);
-    //     while (SDL_PollEvent(&e))
-    //     {
-    //         if (e.type == SDL_QUIT)
-    //         {
-    //             quit = true;
-    //             break;
-    //         }
-    //     }
-    //     menu.display(renderer, surface);
-    // }
-
+    int players;
+    while (!quit)
+    {
+        Uint32 curTicks = SDL_GetTicks();
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        while (SDL_PollEvent(&e))
+        {
+            if (e.type == SDL_QUIT)
+            {
+                quit = true;
+                break;
+            }
+            else
+            {
+                menu.HandleEvents(e);
+            }
+        }
+        if (menu.ended())
+        {
+            quit = true;
+            if (menu.offline_selected)
+            {
+                offline = true;
+                players = menu.players_selected;
+            }
+            if (menu.online_selected)
+            {
+                online = true;
+            }
+        }
+        menu.display(renderer, surface);
+    }
     quit = false;
-
+    SDL_FreeSurface(surface);
+    loadTextures();
     if (offline)
     {
-        int players;
-        cout << "Enter number of players: ";
-        cin >> players;
+        //cout << "Enter number of players: ";
+        //cin >> players;
         OfflineGame game(players, 7, WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces);
         int start_time = SDL_GetTicks();
         while (!quit)
@@ -188,7 +204,6 @@ int main()
             {
                 game.update(curTicks - (val - updates + 1) * 5);
             }
-
             while (SDL_PollEvent(&e))
             {
 
@@ -202,9 +217,9 @@ int main()
             SDL_RenderPresent(renderer);
         }
     }
-    else
+    else if (online)
     {
-        Client client("127.0.0.1");
+        Client client(menu.IP_address.c_str());
         Renderer renderIt = Renderer(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces);
         while (!quit)
         {
