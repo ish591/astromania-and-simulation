@@ -50,7 +50,7 @@ bool OnlineGame::run()
 
 void OnlineGame::newLevel()
 {
-    maze = Maze(maze_size, 1, width, height, network.seed);
+    maze = Maze(maze_size, 0, width, height, network.seed);
 }
 
 void OnlineGame::control(vector<vector<int>> actions, int current_time)

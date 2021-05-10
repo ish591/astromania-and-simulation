@@ -1,6 +1,6 @@
 #include "OfflineGame.h"
 
-OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces, SDL_Surface *heart)
+OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces, SDL_Surface *heart, Mix_Chunk *win_sound, Mix_Chunk *explosion_sound)
 {
     OfflineGame::player_surfaces = player_surfaces;
     OfflineGame::block_surfaces = block_surfaces;
@@ -10,6 +10,9 @@ OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, 
     OfflineGame::width = width;
     OfflineGame::height = height;
     OfflineGame::heart = heart;
+    OfflineGame::win_sound = win_sound;
+    OfflineGame::explosion_sound = explosion_sound;
+    num_bombs = 0;
     newLevel();
     updates = 0;
     for (int i = 1; i <= num_players; i++)
@@ -20,6 +23,7 @@ OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, 
     }
     start_time = SDL_GetTicks();
     maze_update_time = start_time;
+    win_screen = false;
 }
 
 OfflineGame::~OfflineGame()
@@ -154,6 +158,7 @@ void OfflineGame::score_render(SDL_Renderer *renderer, SDL_Surface *surface)
 }
 void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
 {
+
     if (winner == 0)
     {
         maze.render(renderer, surface, block_surfaces);
@@ -161,6 +166,10 @@ void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
         {
             // if (players[i].isAlive())
             players[i].render(renderer, surface, player_surfaces);
+        }
+        if (bombs.size() < num_bombs)
+        {
+            Mix_PlayChannel(-1, explosion_sound, 0);
         }
         for (int i = 0; i < bombs.size(); i++)
         {
@@ -171,14 +180,43 @@ void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
             explosions[i].render(renderer, surface, explosion_surfaces);
         }
         score_render(renderer, surface);
+        num_bombs = bombs.size();
     }
     else if (!maze.closed)
     {
         maze.render(renderer, surface, block_surfaces);
     }
+    else if (!win_screen)
+    {
+        Mix_HaltMusic();
+        Mix_PlayChannel(-1, win_sound, 0);
+        maze.render(renderer, surface, block_surfaces);
+        win_screen = true;
+    }
     else
     {
-        //maze.render(renderer, surface, block_surfaces);
+        vector<int> rgba = {0, 0, 0, 255};
+        SDL_Color curr_color = {255, 0, 0};
+        string curr_text = "Game Over !";
+        TTF_Font *curr_font = TTF_OpenFont("../assets/fonts/m5x7.ttf", 200);
+        SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
+        surface = TTF_RenderText_Solid(curr_font, curr_text.c_str(), curr_color);
+        SDL_Rect curr_rect = {(width - surface->w) / 2, (height - surface->h) / 6, surface->w, surface->h};
+        SDL_RenderDrawRect(renderer, &curr_rect);
+        SDL_Texture *display_texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_RenderFillRect(renderer, &curr_rect);
+        if (!display_texture)
+        {
+            // cout << "Failed to create texture" << endl;
+        }
+        else
+        {
+            SDL_RenderCopy(renderer, display_texture, nullptr, &curr_rect);
+        }
+        SDL_DestroyTexture(display_texture);
+
+        int vertical_offset = (height * 65) / 144;
+        int horizontal_offset = (width - players.size() * ((width * 7) / 128) - (players.size() - 1) * (2 * width) / 128) / 2;
         for (int i = 0; i < players.size(); i++)
         {
             if (players[i].getId() == winner)
@@ -194,7 +232,7 @@ void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
                 cout << "Failed to create surface" << endl;
             }
             SDL_Texture *curr_text = SDL_CreateTextureFromSurface(renderer, surface);
-            SDL_Rect rect = {100 * (i + 1), 200, 70, 70};
+            SDL_Rect rect = {horizontal_offset + i * (width)*9 / 128, vertical_offset, (width * 7) / 128, (height * 7) / 72};
             if (!curr_text)
             {
                 cout << "Failed to create texture" << endl;

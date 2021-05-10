@@ -13,7 +13,7 @@ Menu::Menu(int w, int h)
     pressed = false;
     offline_selected = false;
     online_selected = false;
-    digit_map = {{SDLK_0, '0'}, {SDLK_1, '1'}, {SDLK_2, '2'}, {SDLK_3, '3'}, {SDLK_4, '4'}, {SDLK_5, '5'}, {SDLK_6, '6'}, {SDLK_7, '7'}, {SDLK_8, '8'}, {SDLK_9, '9'}, {SDLK_PERIOD, '.'}};
+    digit_map = {{SDLK_a, 'a'}, {SDLK_m, 'm'}, {SDLK_n, 'n'}, {SDLK_i, 'i'}, {SDLK_s, 's'}, {SDLK_h, 'h'}, {SDLK_0, '0'}, {SDLK_1, '1'}, {SDLK_2, '2'}, {SDLK_3, '3'}, {SDLK_4, '4'}, {SDLK_5, '5'}, {SDLK_6, '6'}, {SDLK_7, '7'}, {SDLK_8, '8'}, {SDLK_9, '9'}, {SDLK_PERIOD, '.'}};
 }
 void Menu::initialise_fonts()
 {
@@ -442,6 +442,14 @@ void Menu::event_online_menu(SDL_Event e)
                         //provide an IP and start!
                         online_selected = true;
                         IP_address = online_menu_buttons[1].text;
+                        if (online_menu_buttons[1].text == "aman")
+                        {
+                            IP_address = "122.161.203.46";
+                        }
+                        else if (online_menu_buttons[1].text == "ishaan")
+                        {
+                            IP_address = "127.0.0.1";
+                        }
                     }
                     else if (online_menu_counter == 4)
                     {

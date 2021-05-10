@@ -22,7 +22,10 @@ vector<SDL_Surface *> block_surfaces;
 vector<SDL_Surface *> bomb_surfaces;
 vector<SDL_Surface *> explosion_surfaces;
 SDL_Surface *heart;
-Mix_Music *gMusic = NULL;
+Mix_Music *menu_music = NULL;
+Mix_Music *game_music = NULL;
+Mix_Chunk *explosion_sound = NULL;
+Mix_Chunk *win_sound = NULL;
 int player_id = -1;
 void loadTextures()
 {
@@ -116,21 +119,31 @@ bool loadMedia()
     //Loading success flag
     bool success = true;
 
-    // Load music
-    gMusic = Mix_LoadMUS("../assets/sounds/background_music.wav");
-    if (gMusic == NULL)
+    menu_music = Mix_LoadMUS("../assets/sounds/menu.wav");
+    if (menu_music == NULL)
     {
         printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
         success = false;
     }
-
-    // Load sound effects
-    // Coin::collect_coin = Mix_LoadWAV("sounds/coin.wav");
-    // if (Coin::collect_coin == NULL)
-    // {
-    //     printf("Failed to load coin sound effect! SDL_mixer Error: %s\n", Mix_GetError());
-    //     success = false;
-    // }
+    // Load music
+    game_music = Mix_LoadMUS("../assets/sounds/background_music.wav");
+    if (game_music == NULL)
+    {
+        printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+        success = false;
+    }
+    win_sound = Mix_LoadWAV("../assets/sounds/win.wav");
+    if (win_sound == NULL)
+    {
+        printf("Failed to load win sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+        success = false;
+    }
+    explosion_sound = Mix_LoadWAV("../assets/sounds/explosion.wav");
+    if (explosion_sound == NULL)
+    {
+        printf("Failed to load explosion sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+        success = false;
+    }
     return success;
 }
 
@@ -163,8 +176,10 @@ void close()
     // Mix_FreeChunk(Coin::collect_coin);
     // Coin::collect_coin = NULL;
     // Free the music
-    Mix_FreeMusic(gMusic);
-    gMusic = NULL;
+    Mix_FreeMusic(menu_music);
+    Mix_FreeMusic(game_music);
+    menu_music = NULL;
+    game_music = NULL;
 
     //Destroy window
     //SDL_DestroyRenderer(renderer);
@@ -203,11 +218,6 @@ int main()
         return 1;
     }
 
-    if (Mix_PlayingMusic() == 0)
-    {
-        //Play the music
-        Mix_PlayMusic(gMusic, -1);
-    }
     SDL_Event e;
     SDL_Surface *surface = nullptr;
     Uint32 startTicks = SDL_GetTicks();
@@ -219,6 +229,11 @@ int main()
     //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     bool quit = false;
     int players;
+    if (Mix_PlayingMusic() == 0)
+    {
+        //Play the music
+        Mix_PlayMusic(menu_music, -1);
+    }
     while (!quit)
     {
         Uint32 curTicks = SDL_GetTicks();
@@ -258,8 +273,13 @@ int main()
     {
         //cout << "Enter number of players: ";
         //cin >> players;
-        OfflineGame game(players, 7, WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart);
+        OfflineGame game(players, 7, WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart, win_sound, explosion_sound);
         int start_time = SDL_GetTicks();
+        // if (Mix_PlayingMusic() == 0)
+        // {
+        //Play the music
+        Mix_PlayMusic(game_music, -1);
+        // }
         while (!quit)
         {
             Uint32 curTicks = SDL_GetTicks();
@@ -278,6 +298,23 @@ int main()
                 {
                     quit = true;
                 }
+                if (e.type == SDL_KEYDOWN)
+                {
+                    if (e.key.keysym.sym == SDLK_m)
+                    {
+                        if (Mix_PausedMusic() == 1)
+                        {
+                            //Resume the music
+                            Mix_ResumeMusic();
+                        }
+                        //If the music is playing
+                        else
+                        {
+                            //Pause the music
+                            Mix_PauseMusic();
+                        }
+                    }
+                }
 
                 game.control(e, curTicks);
             }
@@ -287,7 +324,8 @@ int main()
     else if (online)
     {
         Client client(menu.IP_address.c_str());
-        Renderer renderIt = Renderer(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart);
+        Renderer renderIt = Renderer(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart, win_sound, explosion_sound);
+        Mix_PlayMusic(game_music, -1);
         while (!quit)
         {
             Uint32 curTicks = SDL_GetTicks();
@@ -315,6 +353,23 @@ int main()
                 {
                     quit = true;
                     break;
+                }
+                if (e.type == SDL_KEYDOWN)
+                {
+                    if (e.key.keysym.sym == SDLK_m)
+                    {
+                        if (Mix_PausedMusic() == 1)
+                        {
+                            //Resume the music
+                            Mix_ResumeMusic();
+                        }
+                        //If the music is playing
+                        else
+                        {
+                            //Pause the music
+                            Mix_PauseMusic();
+                        }
+                    }
                 }
                 //send packet to server regarding the key press
                 vector<int> sending_info = get_send_info(e);

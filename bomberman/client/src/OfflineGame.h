@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <vector>
 #include "Player.h"
 using namespace std;
@@ -9,7 +11,7 @@ using namespace std;
 class OfflineGame
 {
 public:
-    OfflineGame(int, int, int, int, vector<vector<SDL_Surface *>>, vector<SDL_Surface *>, vector<SDL_Surface *>, vector<SDL_Surface *>, SDL_Surface *);
+    OfflineGame(int, int, int, int, vector<vector<SDL_Surface *>>, vector<SDL_Surface *>, vector<SDL_Surface *>, vector<SDL_Surface *>, SDL_Surface *, Mix_Chunk *, Mix_Chunk *);
     ~OfflineGame();
     void newLevel();
     void render(SDL_Renderer *, SDL_Surface *);
@@ -35,4 +37,8 @@ public:
     int updates;
     int winner = 0;
     void score_render(SDL_Renderer *, SDL_Surface *);
+    Mix_Chunk *win_sound;
+    Mix_Chunk *explosion_sound;
+    bool win_screen;
+    int num_bombs;
 };

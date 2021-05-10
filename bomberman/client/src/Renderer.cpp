@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-Renderer::Renderer(int w, int h, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces, SDL_Surface *heart)
+Renderer::Renderer(int w, int h, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces, SDL_Surface *heart, Mix_Chunk *win_sound, Mix_Chunk *explosion_sound)
 {
     Renderer::player_surfaces = player_surfaces;
     Renderer::block_surfaces = block_surfaces;
@@ -11,6 +11,9 @@ Renderer::Renderer(int w, int h, vector<vector<SDL_Surface *>> player_surfaces, 
     WINDOW_HEIGHT = h;
     //cout << "HELLO" << endl;
     winner_screen = false;
+    Renderer::win_sound = win_sound;
+    Renderer::explosion_sound = explosion_sound;
+    num_bombs = 0;
 }
 
 void Renderer::update(vector<int> obj)
@@ -22,13 +25,13 @@ void Renderer::update(vector<int> obj)
     {
     case 0:
         if (map.getSize() < 4)
-            map = Map(obj[3], 1, WINDOW_WIDTH, WINDOW_HEIGHT, obj[2]);
+            map = Map(obj[3], 0, WINDOW_WIDTH, WINDOW_HEIGHT, obj[2]);
         break;
     case 1:
         players.clear();
         bombs.clear();
         explosions.clear();
-        for (int i = 1; i < obj.size(); i += 6)
+        for (int i = 1; i < obj.size(); i += 5)
         {
             int x = obj[i + 1];
             int y = obj[i + 2];
@@ -83,7 +86,52 @@ void Renderer::update(vector<int> obj)
         break;
     }
 }
-
+void Renderer::score_render(SDL_Renderer *renderer, SDL_Surface *surface)
+{
+    int vertical_offset = (WINDOW_HEIGHT - WINDOW_HEIGHT * (10 * lives.size() - 3) / 72) / 2;
+    for (int i = 0; i < lives.size(); i++)
+    {
+        surface = (player_surfaces[i][0]);
+        if (!surface)
+        {
+            cout << "Failed to create surface" << endl;
+        }
+        SDL_Texture *curr_text = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_Rect rect = {(WINDOW_WIDTH * 103) / 128, WINDOW_HEIGHT * (i)*5 / 36 + vertical_offset, (WINDOW_WIDTH * 7) / 128, (WINDOW_HEIGHT * 7) / 72};
+        if (!curr_text)
+        {
+            cout << "Failed to create texture" << endl;
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderFillRect(renderer, &rect);
+        }
+        else
+        {
+            SDL_RenderCopy(renderer, curr_text, nullptr, &rect);
+        }
+        SDL_DestroyTexture(curr_text);
+        for (int j = 0; j < lives[i]; j++)
+        {
+            surface = heart;
+            if (!surface)
+            {
+                cout << "Failed to create surface" << endl;
+            }
+            SDL_Texture *curr_text = SDL_CreateTextureFromSurface(renderer, surface);
+            SDL_Rect rect = {(WINDOW_WIDTH * 7) / 8 + (j * WINDOW_WIDTH * 9) / 256, WINDOW_HEIGHT * 5 * (i) / 36 + (vertical_offset * 51) / 48, WINDOW_WIDTH / 32, WINDOW_HEIGHT / 18};
+            if (!curr_text)
+            {
+                cout << "Failed to create texture" << endl;
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                SDL_RenderFillRect(renderer, &rect);
+            }
+            else
+            {
+                SDL_RenderCopy(renderer, curr_text, nullptr, &rect);
+            }
+            SDL_DestroyTexture(curr_text);
+        }
+    }
+}
 void Renderer::render_all(SDL_Renderer *renderer, SDL_Surface *surface)
 {
     if (winner == 0)
@@ -93,16 +141,20 @@ void Renderer::render_all(SDL_Renderer *renderer, SDL_Surface *surface)
         {
             render_player(renderer, surface, players[i].first.first, players[i].first.second, players[i].second);
         }
-
+        if (bombs.size() < num_bombs)
+        {
+            Mix_PlayChannel(-1, explosion_sound, 0);
+        }
         for (int i = 0; i < bombs.size(); i++)
         {
             render_bomb(renderer, surface, bombs[i]);
         }
-
         for (int i = 0; i < explosions.size(); i++)
         {
             render_explosion(renderer, surface, explosions[i]);
         }
+        score_render(renderer, surface);
+        num_bombs = bombs.size();
     }
     else if (!map.closed)
     {
@@ -111,13 +163,36 @@ void Renderer::render_all(SDL_Renderer *renderer, SDL_Surface *surface)
     }
     else if (!winner_screen)
     {
+        Mix_HaltMusic();
         map.update(SDL_GetTicks());
         map.render(renderer, surface, block_surfaces);
         SDL_Delay(1000);
+        Mix_PlayChannel(-1, win_sound, 0);
         winner_screen = true;
     }
     else
     {
+        vector<int> rgba = {0, 0, 0, 255};
+        SDL_Color curr_color = {255, 0, 0};
+        string curr_text = "Game Over !";
+        TTF_Font *curr_font = TTF_OpenFont("../assets/fonts/m5x7.ttf", 200);
+        SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
+        surface = TTF_RenderText_Solid(curr_font, curr_text.c_str(), curr_color);
+        SDL_Rect curr_rect = {(WINDOW_WIDTH - surface->w) / 2, (WINDOW_HEIGHT - surface->h) / 6, surface->w, surface->h};
+        SDL_RenderDrawRect(renderer, &curr_rect);
+        SDL_Texture *display_texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_RenderFillRect(renderer, &curr_rect);
+        if (!display_texture)
+        {
+            // cout << "Failed to create texture" << endl;
+        }
+        else
+        {
+            SDL_RenderCopy(renderer, display_texture, nullptr, &curr_rect);
+        }
+        SDL_DestroyTexture(display_texture);
+        int vertical_offset = (WINDOW_HEIGHT * 65) / 144;
+        int horizontal_offset = (WINDOW_WIDTH - number_of_players * ((WINDOW_WIDTH * 7) / 128) - (number_of_players - 1) * (2 * WINDOW_WIDTH) / 128) / 2;
         for (int i = 0; i < number_of_players; i++)
         {
             if (i + 1 == winner)
@@ -133,7 +208,7 @@ void Renderer::render_all(SDL_Renderer *renderer, SDL_Surface *surface)
                 cout << "Failed to create surface" << endl;
             }
             SDL_Texture *curr_text = SDL_CreateTextureFromSurface(renderer, surface);
-            SDL_Rect rect = {100 * (i + 1), 200, 70, 70};
+            SDL_Rect rect = {horizontal_offset + i * (WINDOW_WIDTH)*9 / 128, vertical_offset, (WINDOW_WIDTH * 7) / 128, (WINDOW_HEIGHT * 7) / 72};
             if (!curr_text)
             {
                 cout << "Failed to create texture" << endl;
