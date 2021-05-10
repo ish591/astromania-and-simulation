@@ -1002,6 +1002,7 @@ void Player::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<vector<
 {
     if (!isAlive())
         player_state = 4;
+
     surface = (player_surfaces[player_id - 1][player_state - 2]);
     if (!surface)
     {
@@ -1034,7 +1035,7 @@ string Player::render()
     int gap = SDL_GetTicks() - last_life_loss_time;
     if (gap > 2000 || (gap / 100) % 5 < 4)
     {
-        return (to_string(player_id) + " " + to_string(rect.x) + " " + to_string(rect.y) + " " + to_string(rect.w) + " " + to_string(rect.h) + " " + to_string(player_state) + " ");
+        return (to_string(player_id) + " " + to_string(rect.x) + " " + to_string(rect.y) + " " + to_string(rect.w) + " " + to_string(rect.h) + " " + to_string(player_state) + " "); // + to_string(lives) + " ");
     }
     return "";
 }

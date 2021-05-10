@@ -26,4 +26,8 @@ private:
     void render_bomb(SDL_Renderer *, SDL_Surface *, SDL_Rect);
     void render_explosion(SDL_Renderer *, SDL_Surface *, SDL_Rect);
     int WINDOW_HEIGHT, WINDOW_WIDTH;
+    int winner = 0;
+    int rem_lives = -1;
+    int number_of_players = 0;
+    bool winner_screen;
 };

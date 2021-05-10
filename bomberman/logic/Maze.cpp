@@ -20,6 +20,7 @@ Maze::Maze(int N, bool discrete_walls, int width, int height, int seed)
             maze_matrix[i][j] = maze[i][j].get_block_type();
         }
     }
+    closed = false;
 }
 
 // void Maze::generate(int N)
@@ -85,7 +86,7 @@ Maze::Maze(int N, bool discrete_walls, int width, int height, int seed)
 //         continue;
 //     }
 
-//     int r = rand() % ct;
+//     int r =  % ct;
 //     int l = x[r];
 //     a[i][j][l] = 1;
 
@@ -154,6 +155,7 @@ void Maze::generate(int N, int seed)
     maze.clear();
     maze = vector<vector<Box>>();
     srand(seed);
+    randomiser = PRG(seed);
     for (int i = 0; i < M; i++)
     {
         vector<Box> temp;
@@ -181,7 +183,7 @@ void Maze::generate(int N, int seed)
             if (i % 2 == 0 && j % 2 == 0)
                 maze[i][j].update(2, -1);
             else
-                maze[i][j].update(rand() % 2, -1);
+                maze[i][j].update(randomiser.generate() % 2, -1);
         }
     }
     maze[1][1].update(0, -1);
@@ -304,6 +306,8 @@ void Maze::update(int cur_time)
         }
         last_close_time = cur_time;
     }
+    if (close_direction == 2 * M - 5)
+        closed = true;
 }
 void Maze::close(int cur_time, int r)
 {

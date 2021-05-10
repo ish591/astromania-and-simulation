@@ -30,4 +30,6 @@ public:
     int render_state_send_time = 0;
     int updates;
     Network network;
+    int winner = 0;
+    int winner_lives;
 };

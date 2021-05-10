@@ -32,6 +32,7 @@ public:
     void update_power_ups(int);
     void kill(int);
     bool isAlive();
+    int lives;
     SDL_Keycode UP, DOWN, RIGHT, LEFT, DROP_BOMB;
 
 protected:
@@ -53,7 +54,6 @@ protected:
     int move_size;
     int bomb_count;
     int total_released;
-    int lives;
     int last_life_loss_time;
     int color_r, color_g, color_b;
     vector<pair<int, int>> power_ups;

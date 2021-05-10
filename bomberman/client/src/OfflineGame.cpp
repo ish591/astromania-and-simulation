@@ -59,6 +59,7 @@ void OfflineGame::update(int current_time)
         maze_update_time = current_time;
     }
     int alive_count = 0;
+    int temp_winner = 0;
     maze.update(current_time);
     vector<vector<int>> player_info;
     for (int i = 0; i < players.size(); i++)
@@ -67,11 +68,16 @@ void OfflineGame::update(int current_time)
         {
             player_info.push_back({players[i].getId(), players[i].get_x(), players[i].get_y(), players[i].get_x_offset(), players[i].get_y_offset(), players[i].get_size()});
             alive_count++;
+            temp_winner = i + 1;
         }
     }
 
     if (alive_count <= 1 && maze.close_radius != 100)
+    {
         maze.close(current_time, 100);
+        if (winner == 0)
+            winner = temp_winner;
+    }
 
     for (int i = 0; i < explosions.size(); i++)
     {
@@ -102,18 +108,58 @@ void OfflineGame::update(int current_time)
 
 void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
 {
-    maze.render(renderer, surface, block_surfaces);
-    for (int i = 0; i < players.size(); i++)
+    if (winner == 0)
     {
-        // if (players[i].isAlive())
-        players[i].render(renderer, surface, player_surfaces);
+        maze.render(renderer, surface, block_surfaces);
+        for (int i = 0; i < players.size(); i++)
+        {
+            // if (players[i].isAlive())
+            players[i].render(renderer, surface, player_surfaces);
+        }
+        for (int i = 0; i < bombs.size(); i++)
+        {
+            bombs[i].render(renderer, surface, bomb_surfaces);
+        }
+        for (int i = 0; i < explosions.size(); i++)
+        {
+            explosions[i].render(renderer, surface, explosion_surfaces);
+        }
     }
-    for (int i = 0; i < bombs.size(); i++)
+    else if (!maze.closed)
     {
-        bombs[i].render(renderer, surface, bomb_surfaces);
+        maze.render(renderer, surface, block_surfaces);
     }
-    for (int i = 0; i < explosions.size(); i++)
+    else
     {
-        explosions[i].render(renderer, surface, explosion_surfaces);
+        //maze.render(renderer, surface, block_surfaces);
+        for (int i = 0; i < players.size(); i++)
+        {
+            if (players[i].getId() == winner)
+            {
+                surface = (player_surfaces[players[i].getId() - 1][0]);
+            }
+            else
+            {
+                surface = (player_surfaces[players[i].getId() - 1][2]);
+            }
+            if (!surface)
+            {
+                cout << "Failed to create surface" << endl;
+            }
+            SDL_Texture *curr_text = SDL_CreateTextureFromSurface(renderer, surface);
+            SDL_Rect rect = {100 * (i + 1), 200, 70, 70};
+            if (!curr_text)
+            {
+                cout << "Failed to create texture" << endl;
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                SDL_RenderFillRect(renderer, &rect);
+            }
+            else
+            {
+                SDL_RenderCopy(renderer, curr_text, nullptr, &rect);
+            }
+
+            SDL_DestroyTexture(curr_text);
+        }
     }
 }

@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "Box.h"
-
+#include "PRG.h"
 using namespace std;
 
 class Maze
@@ -27,10 +27,12 @@ public:
     bool discrete_walls;
     int left_offset, top_offset;
     void close(int, int);
-    int close_radius;
     string getBoxUpdates();
+    int close_radius;
+    bool closed;
 
 private:
+    PRG randomiser = PRG(0);
     vector<vector<int>> maze_matrix;
     void generate(int, int);
     int N;

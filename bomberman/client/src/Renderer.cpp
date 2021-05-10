@@ -9,10 +9,12 @@ Renderer::Renderer(int w, int h, vector<vector<SDL_Surface *>> player_surfaces, 
     WINDOW_WIDTH = w;
     WINDOW_HEIGHT = h;
     cout << "HELLO" << endl;
+    winner_screen = false;
 }
 
 void Renderer::update(vector<int> obj)
 {
+
     if (obj.empty())
         return;
     switch (obj[0])
@@ -61,26 +63,80 @@ void Renderer::update(vector<int> obj)
         }
 
         break;
+    case 3:
+        map.close(SDL_GetTicks(), 100);
+        if (winner == 0)
+        {
+            rem_lives = obj[3];
+            number_of_players = obj[1];
+            winner = obj[2];
+        }
+        break;
     }
 }
 
 void Renderer::render_all(SDL_Renderer *renderer, SDL_Surface *surface)
 {
-
-    map.render(renderer, surface, block_surfaces);
-    for (int i = 0; i < players.size(); i++)
+    if (winner == 0)
     {
-        render_player(renderer, surface, players[i].first.first, players[i].first.second, players[i].second);
+        map.render(renderer, surface, block_surfaces);
+        for (int i = 0; i < players.size(); i++)
+        {
+            render_player(renderer, surface, players[i].first.first, players[i].first.second, players[i].second);
+        }
+
+        for (int i = 0; i < bombs.size(); i++)
+        {
+            render_bomb(renderer, surface, bombs[i]);
+        }
+
+        for (int i = 0; i < explosions.size(); i++)
+        {
+            render_explosion(renderer, surface, explosions[i]);
+        }
     }
-
-    for (int i = 0; i < bombs.size(); i++)
+    else if (!map.closed)
     {
-        render_bomb(renderer, surface, bombs[i]);
+        map.update(SDL_GetTicks());
+        map.render(renderer, surface, block_surfaces);
     }
-
-    for (int i = 0; i < explosions.size(); i++)
+    else if (!winner_screen)
     {
-        render_explosion(renderer, surface, explosions[i]);
+        map.update(SDL_GetTicks());
+        map.render(renderer, surface, block_surfaces);
+        SDL_Delay(1000);
+        winner_screen = true;
+    }
+    else
+    {
+        for (int i = 0; i < number_of_players; i++)
+        {
+            if (i + 1 == winner)
+            {
+                surface = (player_surfaces[i][0]);
+            }
+            else
+            {
+                surface = (player_surfaces[i][2]);
+            }
+            if (!surface)
+            {
+                cout << "Failed to create surface" << endl;
+            }
+            SDL_Texture *curr_text = SDL_CreateTextureFromSurface(renderer, surface);
+            SDL_Rect rect = {100 * (i + 1), 200, 70, 70};
+            if (!curr_text)
+            {
+                cout << "Failed to create texture" << endl;
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                SDL_RenderFillRect(renderer, &rect);
+            }
+            else
+            {
+                SDL_RenderCopy(renderer, curr_text, nullptr, &rect);
+            }
+            SDL_DestroyTexture(curr_text);
+        }
     }
 }
 

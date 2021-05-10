@@ -24,10 +24,10 @@ void Menu::initialise_main_menu()
 {
     SDL_Rect rect1 = {(window_width - 100) / 2, 100, 100, 30};
     SDL_Rect rect2 = {(window_width - 100) / 2, 200, 100, 30};
-    vector<int> rgba = {255, 255, 255, 255}; //default rectangle color
+    vector<int> rgba = {0, 0, 0, 255}; //default rectangle color
     string text1 = "Play";
     string text2 = "Help";
-    SDL_Color font_color = {0, 0, 200};
+    SDL_Color font_color = {255, 255, 255};
     menu_buttons button1 = menu_buttons(rect1, font_color, text1, fonts[0], rgba);
     menu_buttons button2 = menu_buttons(rect2, font_color, text2, fonts[0], rgba);
     main_menu_buttons.push_back(button1);
@@ -37,10 +37,10 @@ void Menu::initialise_help_menu()
 {
     SDL_Rect rect1 = {(window_width - 1000) / 2, 100, 1000, 100};
     SDL_Rect rect2 = {(window_width - 100) / 2, 400, 100, 30};
-    vector<int> rgba = {255, 255, 255, 255}; //default rectangle color
+    vector<int> rgba = {0, 0, 0, 255}; //default rectangle color
     string text1 = "Instructions : Use arrow keys to navigate, press enter to throw bombs.";
     string text2 = "Back";
-    SDL_Color font_color = {0, 0, 200};
+    SDL_Color font_color = {255, 255, 255};
     menu_buttons button1 = menu_buttons(rect1, font_color, text1, fonts[1], rgba);
     menu_buttons button2 = menu_buttons(rect2, font_color, text2, fonts[0], rgba);
     help_menu_buttons.push_back(button1);
@@ -51,11 +51,11 @@ void Menu::initialise_play_menu()
     SDL_Rect rect1 = {(window_width - 100) / 2, 100, 100, 30};
     SDL_Rect rect2 = {(window_width - 100) / 2, 200, 100, 30};
     SDL_Rect rect3 = {(window_width - 100) / 2, 300, 100, 30};
-    vector<int> rgba = {255, 255, 255, 255}; //default rectangle color
+    vector<int> rgba = {0, 0, 0, 255}; //default rectangle color
     string text1 = "Offline mode";
     string text2 = "Online mode";
     string text3 = "Back";
-    SDL_Color font_color = {0, 0, 200};
+    SDL_Color font_color = {255, 255, 255};
     menu_buttons button1 = menu_buttons(rect1, font_color, text1, fonts[0], rgba);
     menu_buttons button2 = menu_buttons(rect2, font_color, text2, fonts[0], rgba);
     menu_buttons button3 = menu_buttons(rect3, font_color, text3, fonts[0], rgba);
@@ -70,12 +70,12 @@ void Menu::initialise_offline_menu()
     SDL_Rect rect2 = {(window_width - 100) / 2, 200, 100, 30};
     SDL_Rect rect3 = {(window_width - 100) / 2, 300, 100, 30};
     SDL_Rect rect4 = {(window_width - 100) / 2, 400, 100, 30};
-    vector<int> rgba = {255, 255, 255, 255}; //default rectangle color
+    vector<int> rgba = {0, 0, 0, 255}; //default rectangle color
     string text1 = "2 Players";
     string text2 = "3 Players";
     string text3 = "4 Players";
     string text4 = "Back";
-    SDL_Color font_color = {0, 0, 200};
+    SDL_Color font_color = {255, 255, 255};
     menu_buttons button1 = menu_buttons(rect1, font_color, text1, fonts[0], rgba);
     menu_buttons button2 = menu_buttons(rect2, font_color, text2, fonts[0], rgba);
     menu_buttons button3 = menu_buttons(rect3, font_color, text3, fonts[0], rgba);
@@ -88,17 +88,17 @@ void Menu::initialise_offline_menu()
 void Menu::initialise_online_menu()
 {
     SDL_Rect rect1 = {(window_width - 400) / 2, 100, 400, 60};
-    SDL_Rect rect2 = {(window_width - 400) / 2, 200, 400, 60};
+    SDL_Rect rect2 = {(window_width - 400) / 2, 200, 400, 60}; //assign width and height of this dynamically
     SDL_Rect rect3 = {(window_width - 400) / 2, 300, 400, 60};
     SDL_Rect rect4 = {(window_width - 400) / 2, 400, 400, 60};
-    vector<int> rgba = {255, 255, 255, 255}; //default rectangle color
-    vector<int> ipbox = {100, 255, 255, 255};
+    vector<int> rgba = {0, 0, 0, 255};        //default rectangle color
+    vector<int> ipbox = {0, 0, 0, 255};       //ipbox will be variable
     vector<int> instruction = {0, 0, 0, 255}; //for enter ip instruction
     string text1 = "Enter IP address in the box below :";
     string text2 = "Enter here";
     string text3 = "Start";
     string text4 = "Back";
-    SDL_Color font_color = {0, 0, 200};
+    SDL_Color font_color = {255, 255, 255};
     SDL_Color prompt_color = {200, 0, 0};
     menu_buttons button1 = menu_buttons(rect1, prompt_color, text1, fonts[0], instruction);
     menu_buttons button2 = menu_buttons(rect2, font_color, text2, fonts[0], ipbox);
@@ -154,21 +154,27 @@ void Menu::display(SDL_Renderer *renderer, SDL_Surface *surface)
         SDL_Rect curr_rect = display_current[i].rect;
         SDL_Color curr_color = display_current[i].text_color;
         string curr_text = display_current[i].text;
-        TTF_Font *curr_font = display_current[i].font;
-        SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
-        SDL_RenderDrawRect(renderer, &curr_rect);
-        surface = TTF_RenderText_Solid(curr_font, curr_text.c_str(), curr_color);
-        SDL_Texture *display_texture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_RenderFillRect(renderer, &curr_rect);
-        if (!display_texture)
+        if (curr_text.size() != 0)
         {
-            // cout << "Failed to create texture" << endl;
+            TTF_Font *curr_font = display_current[i].font;
+            SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
+            surface = TTF_RenderText_Solid(curr_font, curr_text.c_str(), curr_color);
+            curr_rect.w = surface->w;
+            curr_rect.h = surface->h;
+            curr_rect.x = (window_width - curr_rect.w) / 2;
+            SDL_RenderDrawRect(renderer, &curr_rect);
+            SDL_Texture *display_texture = SDL_CreateTextureFromSurface(renderer, surface);
+            SDL_RenderFillRect(renderer, &curr_rect);
+            if (!display_texture)
+            {
+                // cout << "Failed to create texture" << endl;
+            }
+            else
+            {
+                SDL_RenderCopy(renderer, display_texture, nullptr, &curr_rect);
+            }
+            SDL_DestroyTexture(display_texture);
         }
-        else
-        {
-            SDL_RenderCopy(renderer, display_texture, nullptr, &curr_rect);
-        }
-        SDL_DestroyTexture(display_texture);
     }
     SDL_RenderPresent(renderer);
 }
@@ -314,7 +320,15 @@ void Menu::event_help_menu(SDL_Event e)
             {
                 pressed = true;
                 SDL_Keycode key_press = e.key.keysym.sym;
-                if (key_press == SDLK_RETURN)
+                if (key_press == SDLK_DOWN)
+                {
+                    help_menu_counter = (help_menu_counter) % 2 + 1;
+                }
+                else if (key_press == SDLK_UP)
+                {
+                    help_menu_counter = (help_menu_counter - 1) + 2 * (help_menu_counter == 1);
+                }
+                else if (key_press == SDLK_RETURN)
                 {
                     option = 0;
                     help_menu_counter = 0;
@@ -480,8 +494,98 @@ void Menu::event_online_menu(SDL_Event e)
     }
     }
 }
-bool Menu::ended() { return offline_selected || online_selected; }
-// void Menu::display_online_menu(SDL_Renderer *renderer, SDL_Surface *surface)
+// void Menu::event_closing_menu(SDL_Event e)
 // {
-//     //recieve IP address as input, back button
+//     //display winner with its score
+//     //the winning one will be alive, rest three will be dead
+//     //Back to Menu
+//     //End Game
+//     switch (e.type)
+//     {
+//     case (SDL_KEYDOWN):
+//     {
+//         if (online_menu_counter == 0)
+//         {
+//             pressed = true;
+//             online_menu_counter = 2;
+//             //text box is highlighted (box number 2)
+//         }
+//         else
+//         {
+//             if (!pressed)
+//             {
+//                 pressed = true;
+//                 SDL_Keycode key_press = e.key.keysym.sym;
+//                 if (key_press == SDLK_DOWN)
+//                 {
+//                     online_menu_counter = (online_menu_counter + 1) - 3 * (online_menu_counter == 4);
+//                     //since we are effectively toggling in last three boxes (2,3,4)
+//                 }
+//                 else if (key_press == SDLK_UP)
+//                 {
+//                     online_menu_counter = (online_menu_counter - 1) + 3 * (online_menu_counter == 2);
+//                 }
+//                 else if (key_press == SDLK_RETURN)
+//                 {
+//                     if (online_menu_counter == 3)
+//                     {
+//                         //provide an IP and start!
+//                         online_selected = true;
+//                         IP_address = online_menu_buttons[1].text;
+//                     }
+//                     else if (online_menu_counter == 4)
+//                     {
+//                         option = 2;
+//                         online_menu_counter = 0;
+//                         play_menu_counter = 0;
+//                     }
+//                 }
+//                 else
+//                 {
+//                     //handle all key presses if online_menu_counter is 2
+//                     if (online_menu_counter == 2)
+//                     {
+//                         string temp = online_menu_buttons[1].text;
+//                         if (temp.length() <= 20)
+//                         { //max allowed
+//                             //not allowing space bars
+//                             //only allowing numbers and decimal
+//                             if (digit_map.find(key_press) != digit_map.end())
+//                             {
+//                                 if (temp == "Enter here")
+//                                 {
+//                                     temp = "";
+//                                 }
+//                                 temp += digit_map[key_press];
+//                             }
+//                         }
+//                         if (key_press == SDLK_BACKSPACE && temp.length() != 0)
+//                         {
+//                             if (temp == "Enter here")
+//                             {
+//                                 temp = "";
+//                             }
+//                             else
+//                             {
+//                                 temp.erase(temp.length() - 1);
+//                             }
+//                         }
+//                         online_menu_buttons[1].text = temp;
+//                     }
+//                 }
+//             }
+//         }
+//         break;
+//     }
+//     case (SDL_KEYUP):
+//     {
+//         pressed = false;
+//         break;
+//     }
+//     }
 // }
+bool Menu::ended() { return offline_selected || online_selected; }
+// // void Menu::display_online_menu(SDL_Renderer *renderer, SDL_Surface *surface)
+// // {
+// //     //recieve IP address as input, back button
+// // }

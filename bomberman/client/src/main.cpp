@@ -238,6 +238,7 @@ int main()
             {
                 player_id = v[1];
             }
+
             renderIt.update(v);
             renderIt.render_all(renderer, surface);
 

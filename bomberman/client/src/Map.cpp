@@ -146,6 +146,7 @@ void Map::generate(int N, int seed)
     map.clear();
     map = vector<vector<Block>>();
     srand(seed);
+    randomiser = PRG(seed);
     for (int i = 0; i < M; i++)
     {
         vector<Block> temp;
@@ -173,7 +174,7 @@ void Map::generate(int N, int seed)
             if (i % 2 == 0 && j % 2 == 0)
                 map[i][j].update(2);
             else
-                map[i][j].update(rand() % 2);
+                map[i][j].update(randomiser.generate() % 2);
         }
     }
     map[1][1].update(0);
@@ -233,4 +234,53 @@ void Map::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<SDL_Surfac
 int Map::getBlockSize()
 {
     return block_size;
+}
+
+void Map::update(int cur_time)
+{
+    int delay = 20;
+
+    for (int i = last_close_time; i < cur_time; i += delay)
+    {
+        if (close_direction / 4 < close_radius && close_direction < 2 * M - 5)
+        {
+            if (close_direction % 4 == 0)
+            {
+                map[last_close.first][++last_close.second].update(2);
+                if (last_close.first + last_close.second == M - 1)
+                    close_direction++;
+            }
+            if (close_direction % 4 == 1)
+            {
+                map[++last_close.first][last_close.second].update(2);
+                if (last_close.first == last_close.second)
+                    close_direction++;
+            }
+            if (close_direction % 4 == 2)
+            {
+                map[last_close.first][--last_close.second].update(2);
+                if (last_close.first + last_close.second == M - 1)
+                    close_direction++;
+            }
+            if (close_direction % 4 == 3)
+            {
+                map[--last_close.first][last_close.second].update(2);
+                if (last_close.first - last_close.second == 1)
+                {
+                    close_direction++;
+                    close_radius--;
+                }
+            }
+        }
+    }
+    last_close_time = cur_time;
+    if (close_direction == 2 * M - 5)
+    {
+        closed = true;
+    }
+}
+void Map::close(int cur_time, int r)
+{
+    last_close_time = cur_time;
+    close_radius = r;
 }

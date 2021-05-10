@@ -5,6 +5,7 @@
 #include <stack>
 #include <vector>
 #include "Block.h"
+#include "PRG.h"
 //this is the interface file basically
 using namespace std;
 
@@ -26,8 +27,10 @@ public:
     int left_offset, top_offset;
     void close(int, int);
     int close_radius;
+    bool closed;
 
 private:
+    PRG randomiser = PRG(0);
     void generate(int, int);
     int N;
     int M;

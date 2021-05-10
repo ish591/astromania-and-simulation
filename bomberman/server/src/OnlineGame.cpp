@@ -23,6 +23,8 @@ OnlineGame::OnlineGame(int num_players, int maze_size, int width, int height)
     start_time = SDL_GetTicks();
     maze_update_time = start_time;
     maze_update_send_time = 0;
+    winner = 0;
+    winner_lives = 0;
 }
 
 OnlineGame::~OnlineGame()
@@ -94,37 +96,49 @@ void OnlineGame::update(int current_time)
     //     maze.close(current_time, maze.close_radius + 1);
     //     maze_update_time = current_time;
     // }
-    if (current_time > maze_update_send_time + 200)
-    {
-        string maze_updates = maze.getBoxUpdates();
-        for (int i = 0; i < 2; i++)
-        {
-            // cout << maze_updates << endl;
-            if (maze_updates.length() > 4)
-            {
-                // cout << maze_updates << endl;
-                network.sendState(maze_updates);
-                SDL_Delay(10);
-            }
-        }
-        maze_update_send_time = current_time;
-    }
 
     int alive_count = 0;
     maze.update(current_time);
     vector<vector<int>> player_info;
+    int temp_winner = 0;
     for (int i = 0; i < players.size(); i++)
     {
         if (players[i].isAlive())
         {
             player_info.push_back({players[i].getId(), players[i].get_x(), players[i].get_y(), players[i].get_x_offset(), players[i].get_y_offset(), players[i].get_size()});
             alive_count++;
+            temp_winner = i + 1;
         }
     }
 
-    if (alive_count <= 1 && maze.close_radius != 100)
+    if (alive_count == 1 && maze.close_radius != 100)
+    {
+        if (winner == 0)
+        {
+            winner = temp_winner;
+            winner_lives = players[winner - 1].lives;
+        }
         maze.close(current_time, 100);
-
+    }
+    if (current_time > maze_update_send_time + 200)
+    {
+        string maze_updates = maze.getBoxUpdates();
+        for (int i = 0; i < 2; i++)
+        {
+            // cout << maze_updates << endl;
+            if (maze.close_radius == 100)
+            {
+                network.sendState("3 " + to_string(players.size()) + " " + to_string(winner) + " " + to_string(winner_lives));
+            }
+            else if (maze_updates.length() > 4)
+            {
+                // cout << maze_updates << endl;
+                network.sendState(maze_updates);
+            }
+            SDL_Delay(10);
+        }
+        maze_update_send_time = current_time;
+    }
     for (int i = 0; i < explosions.size(); i++)
     {
         vector<int> final_ids = explosions[i].update(current_time, explosions, maze, player_info);

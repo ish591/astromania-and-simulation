@@ -32,4 +32,5 @@ public:
     SDL_Window *win;
     SDL_Event e;
     int updates;
+    int winner = 0;
 };
