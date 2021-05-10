@@ -1,14 +1,15 @@
 #include "Renderer.h"
 
-Renderer::Renderer(int w, int h, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces)
+Renderer::Renderer(int w, int h, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces, SDL_Surface *heart)
 {
     Renderer::player_surfaces = player_surfaces;
     Renderer::block_surfaces = block_surfaces;
     Renderer::bomb_surfaces = bomb_surfaces;
     Renderer::explosion_surfaces = explosion_surfaces;
+    Renderer::heart = heart;
     WINDOW_WIDTH = w;
     WINDOW_HEIGHT = h;
-    cout << "HELLO" << endl;
+    //cout << "HELLO" << endl;
     winner_screen = false;
 }
 
@@ -27,7 +28,7 @@ void Renderer::update(vector<int> obj)
         players.clear();
         bombs.clear();
         explosions.clear();
-        for (int i = 1; i < obj.size(); i += 5)
+        for (int i = 1; i < obj.size(); i += 6)
         {
             int x = obj[i + 1];
             int y = obj[i + 2];
@@ -38,7 +39,15 @@ void Renderer::update(vector<int> obj)
                 if (obj[i] <= 4)
                 {
                     players.push_back({{obj[i], obj[i + 5]}, SDL_Rect({x, y, w, h})});
-                    i++;
+                    if (lives.size() < obj[i])
+                    {
+                        lives.push_back(obj[i + 6]);
+                    }
+                    else
+                    {
+                        lives[obj[i] - 1] = obj[i + 6];
+                    }
+                    i += 2;
                 }
                 else if (obj[i] == 5)
                 {

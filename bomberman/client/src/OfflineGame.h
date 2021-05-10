@@ -9,7 +9,7 @@ using namespace std;
 class OfflineGame
 {
 public:
-    OfflineGame(int, int, int, int, vector<vector<SDL_Surface *>>, vector<SDL_Surface *>, vector<SDL_Surface *>, vector<SDL_Surface *>);
+    OfflineGame(int, int, int, int, vector<vector<SDL_Surface *>>, vector<SDL_Surface *>, vector<SDL_Surface *>, vector<SDL_Surface *>, SDL_Surface *);
     ~OfflineGame();
     void newLevel();
     void render(SDL_Renderer *, SDL_Surface *);
@@ -24,6 +24,7 @@ public:
     vector<SDL_Surface *> block_surfaces;
     vector<SDL_Surface *> bomb_surfaces;
     vector<SDL_Surface *> explosion_surfaces;
+    SDL_Surface *heart;
     int maze_size = 7;
     int level;
     int start_time, maze_update_time;
@@ -33,4 +34,5 @@ public:
     SDL_Event e;
     int updates;
     int winner = 0;
+    void score_render(SDL_Renderer *, SDL_Surface *);
 };

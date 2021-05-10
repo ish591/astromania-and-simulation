@@ -1,6 +1,6 @@
 #include "OfflineGame.h"
 
-OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces)
+OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces, SDL_Surface *heart)
 {
     OfflineGame::player_surfaces = player_surfaces;
     OfflineGame::block_surfaces = block_surfaces;
@@ -9,6 +9,7 @@ OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, 
     OfflineGame::maze_size = maze_size;
     OfflineGame::width = width;
     OfflineGame::height = height;
+    OfflineGame::heart = heart;
     newLevel();
     updates = 0;
     for (int i = 1; i <= num_players; i++)
@@ -105,7 +106,52 @@ void OfflineGame::update(int current_time)
         }
     }
 }
-
+void OfflineGame::score_render(SDL_Renderer *renderer, SDL_Surface *surface)
+{
+    int vertical_offset = (height - height * (10 * players.size() - 3) / 72) / 2;
+    for (int i = 0; i < players.size(); i++)
+    {
+        surface = (player_surfaces[i][0]);
+        if (!surface)
+        {
+            cout << "Failed to create surface" << endl;
+        }
+        SDL_Texture *curr_text = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_Rect rect = {(width * 103) / 128, height * (i)*5 / 36 + vertical_offset, (width * 7) / 128, (height * 7) / 72};
+        if (!curr_text)
+        {
+            cout << "Failed to create texture" << endl;
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderFillRect(renderer, &rect);
+        }
+        else
+        {
+            SDL_RenderCopy(renderer, curr_text, nullptr, &rect);
+        }
+        SDL_DestroyTexture(curr_text);
+        for (int j = 0; j < players[i].lives; j++)
+        {
+            surface = heart;
+            if (!surface)
+            {
+                cout << "Failed to create surface" << endl;
+            }
+            SDL_Texture *curr_text = SDL_CreateTextureFromSurface(renderer, surface);
+            SDL_Rect rect = {(width * 7) / 8 + (j * width * 9) / 256, height * 5 * (i) / 36 + (vertical_offset * 51) / 48, width / 32, height / 18};
+            if (!curr_text)
+            {
+                cout << "Failed to create texture" << endl;
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                SDL_RenderFillRect(renderer, &rect);
+            }
+            else
+            {
+                SDL_RenderCopy(renderer, curr_text, nullptr, &rect);
+            }
+            SDL_DestroyTexture(curr_text);
+        }
+    }
+}
 void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
 {
     if (winner == 0)
@@ -124,6 +170,7 @@ void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
         {
             explosions[i].render(renderer, surface, explosion_surfaces);
         }
+        score_render(renderer, surface);
     }
     else if (!maze.closed)
     {

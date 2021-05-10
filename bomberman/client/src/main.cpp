@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <iostream>
 #include <vector>
 #include <cstring>
@@ -20,13 +21,15 @@ vector<vector<SDL_Surface *>> player_surfaces;
 vector<SDL_Surface *> block_surfaces;
 vector<SDL_Surface *> bomb_surfaces;
 vector<SDL_Surface *> explosion_surfaces;
-
+SDL_Surface *heart;
+Mix_Music *gMusic = NULL;
 int player_id = -1;
 void loadTextures()
 {
     string assets_dir = "../assets/";
     string pref_players = assets_dir + "images/characters/";
     string colors[] = {"red", "green", "blue", "pink", "yellow", "purple"};
+    heart = IMG_Load((assets_dir + "images/heart.png").c_str());
     for (int i = 0; i < 6; i++)
     {
         vector<SDL_Surface *> curr;
@@ -108,6 +111,29 @@ vector<int> get_send_info(SDL_Event event)
     return vector<int>{up_down, direction};
 }
 
+bool loadMedia()
+{
+    //Loading success flag
+    bool success = true;
+
+    // Load music
+    gMusic = Mix_LoadMUS("../assets/sounds/background_music.wav");
+    if (gMusic == NULL)
+    {
+        printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+        success = false;
+    }
+
+    // Load sound effects
+    // Coin::collect_coin = Mix_LoadWAV("sounds/coin.wav");
+    // if (Coin::collect_coin == NULL)
+    // {
+    //     printf("Failed to load coin sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+    //     success = false;
+    // }
+    return success;
+}
+
 int Init()
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -120,12 +146,47 @@ int Init()
         cout << " Image failed to be initialised" << SDL_GetError() << endl;
         return 1;
     }
+    bool res = loadMedia();
     TTF_Init();
     return 1;
 }
 
+//The sound effects that will be used
+// Mix_Chunk *collect_coin = NULL;
+//Mix_Chunk *Coin::collect_coin = NULL;
+void close()
+{
+    // //Free loaded images
+    // gPromptTexture.free();
+
+    //Free the sound effects
+    // Mix_FreeChunk(Coin::collect_coin);
+    // Coin::collect_coin = NULL;
+    // Free the music
+    Mix_FreeMusic(gMusic);
+    gMusic = NULL;
+
+    //Destroy window
+    //SDL_DestroyRenderer(renderer);
+    //SDL_DestroyWindow(win);
+    //win = NULL;
+    //renderer = NULL;
+
+    //Quit SDL subsystems
+    Mix_Quit();
+    // IMG_Quit();
+    SDL_Quit();
+}
 int main()
 {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) != 0)
+    {
+        cout << "Error: " << SDL_GetError() << endl;
+    }
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    {
+        printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+    }
     Init();
     bool offline = false;
     bool online = false;
@@ -140,6 +201,12 @@ int main()
         cout << "Error" << endl;
         SDL_Quit();
         return 1;
+    }
+
+    if (Mix_PlayingMusic() == 0)
+    {
+        //Play the music
+        Mix_PlayMusic(gMusic, -1);
     }
     SDL_Event e;
     SDL_Surface *surface = nullptr;
@@ -191,7 +258,7 @@ int main()
     {
         //cout << "Enter number of players: ";
         //cin >> players;
-        OfflineGame game(players, 7, WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces);
+        OfflineGame game(players, 7, WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart);
         int start_time = SDL_GetTicks();
         while (!quit)
         {
@@ -220,7 +287,7 @@ int main()
     else if (online)
     {
         Client client(menu.IP_address.c_str());
-        Renderer renderIt = Renderer(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces);
+        Renderer renderIt = Renderer(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart);
         while (!quit)
         {
             Uint32 curTicks = SDL_GetTicks();

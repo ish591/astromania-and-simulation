@@ -983,7 +983,7 @@ void Player::kill(int cur_time)
 {
 
     // cout << cur_time << endl;
-    if (last_life_loss_time + 1500 < cur_time)
+    if (last_life_loss_time + 4000 < cur_time)
     {
         lives--;
         // cout << lives << endl;
@@ -1035,7 +1035,7 @@ string Player::render()
     int gap = SDL_GetTicks() - last_life_loss_time;
     if (gap > 2000 || (gap / 100) % 5 < 4)
     {
-        return (to_string(player_id) + " " + to_string(rect.x) + " " + to_string(rect.y) + " " + to_string(rect.w) + " " + to_string(rect.h) + " " + to_string(player_state) + " "); // + to_string(lives) + " ");
+        return (to_string(player_id) + " " + to_string(rect.x) + " " + to_string(rect.y) + " " + to_string(rect.w) + " " + to_string(rect.h) + " " + to_string(player_state) + " " + to_string(lives) + " ");
     }
     return "";
 }
