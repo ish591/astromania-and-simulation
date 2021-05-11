@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-Renderer::Renderer(int w, int h, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces, SDL_Surface *heart, Mix_Chunk *win_sound, Mix_Chunk *explosion_sound)
+Renderer::Renderer(int w, int h, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces, SDL_Surface *heart, Mix_Chunk *win_sound, Mix_Chunk *explosion_sound, TTF_Font *curr_font)
 {
     Renderer::player_surfaces = player_surfaces;
     Renderer::block_surfaces = block_surfaces;
@@ -13,6 +13,7 @@ Renderer::Renderer(int w, int h, vector<vector<SDL_Surface *>> player_surfaces, 
     winner_screen = false;
     Renderer::win_sound = win_sound;
     Renderer::explosion_sound = explosion_sound;
+    Renderer::game_font = curr_font;
     num_bombs = 0;
 }
 
@@ -175,9 +176,8 @@ void Renderer::render_all(SDL_Renderer *renderer, SDL_Surface *surface)
         vector<int> rgba = {0, 0, 0, 255};
         SDL_Color curr_color = {255, 0, 0};
         string curr_text = "Game Over !";
-        TTF_Font *curr_font = TTF_OpenFont("../assets/fonts/m5x7.ttf", 200);
         SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
-        surface = TTF_RenderText_Solid(curr_font, curr_text.c_str(), curr_color);
+        surface = TTF_RenderText_Solid(game_font, curr_text.c_str(), curr_color);
         SDL_Rect curr_rect = {(WINDOW_WIDTH - surface->w) / 2, (WINDOW_HEIGHT - surface->h) / 6, surface->w, surface->h};
         SDL_RenderDrawRect(renderer, &curr_rect);
         SDL_Texture *display_texture = SDL_CreateTextureFromSurface(renderer, surface);

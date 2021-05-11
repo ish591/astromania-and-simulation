@@ -26,6 +26,7 @@ Mix_Music *menu_music = NULL;
 Mix_Music *game_music = NULL;
 Mix_Chunk *explosion_sound = NULL;
 Mix_Chunk *win_sound = NULL;
+TTF_Font *curr_font;
 int player_id = -1;
 void loadTextures()
 {
@@ -146,7 +147,6 @@ bool loadMedia()
     }
     return success;
 }
-
 int Init()
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -161,6 +161,7 @@ int Init()
     }
     bool res = loadMedia();
     TTF_Init();
+    curr_font = TTF_OpenFont("../assets/fonts/m5x7.ttf", 200);
     return 1;
 }
 
@@ -273,7 +274,7 @@ int main()
     {
         //cout << "Enter number of players: ";
         //cin >> players;
-        OfflineGame game(players, 7, WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart, win_sound, explosion_sound);
+        OfflineGame game(players, 7, WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart, win_sound, explosion_sound, curr_font);
         int start_time = SDL_GetTicks();
         // if (Mix_PlayingMusic() == 0)
         // {
@@ -324,7 +325,7 @@ int main()
     else if (online)
     {
         Client client(menu.IP_address.c_str());
-        Renderer renderIt = Renderer(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart, win_sound, explosion_sound);
+        Renderer renderIt = Renderer(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart, win_sound, explosion_sound, curr_font);
         Mix_PlayMusic(game_music, -1);
         while (!quit)
         {

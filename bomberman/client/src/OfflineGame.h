@@ -11,7 +11,7 @@ using namespace std;
 class OfflineGame
 {
 public:
-    OfflineGame(int, int, int, int, vector<vector<SDL_Surface *>>, vector<SDL_Surface *>, vector<SDL_Surface *>, vector<SDL_Surface *>, SDL_Surface *, Mix_Chunk *, Mix_Chunk *);
+    OfflineGame(int, int, int, int, vector<vector<SDL_Surface *>>, vector<SDL_Surface *>, vector<SDL_Surface *>, vector<SDL_Surface *>, SDL_Surface *, Mix_Chunk *, Mix_Chunk *, TTF_Font *);
     ~OfflineGame();
     void newLevel();
     void render(SDL_Renderer *, SDL_Surface *);
@@ -39,6 +39,7 @@ public:
     void score_render(SDL_Renderer *, SDL_Surface *);
     Mix_Chunk *win_sound;
     Mix_Chunk *explosion_sound;
+    TTF_Font *game_font;
     bool win_screen;
     int num_bombs;
 };

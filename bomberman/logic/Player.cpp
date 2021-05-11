@@ -224,7 +224,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             {
                                 if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
-                                    if (power_ups[0].first && bombs[b].get_id() == player_id)
+                                    if (power_ups[0].first)
                                     {
                                         bombs[b].set_direction(1);
                                         bombs[b].set_moving();
@@ -281,7 +281,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         {
                             if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
-                                if (power_ups[0].first && bombs[b].get_id() == player_id)
+                                if (power_ups[0].first)
                                 {
                                     bombs[b].set_direction(1);
                                     bombs[b].set_moving();
@@ -338,7 +338,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 {
                     if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
-                        if (power_ups[0].first && bombs[b].get_id() == player_id)
+                        if (power_ups[0].first)
                         {
                             bombs[b].set_direction(1);
                             bombs[b].set_moving();
@@ -414,7 +414,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             {
                                 if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
-                                    if (power_ups[0].first && bombs[b].get_id() == player_id)
+                                    if (power_ups[0].first)
                                     {
                                         bombs[b].set_direction(3);
                                         bombs[b].set_moving();
@@ -468,7 +468,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         {
                             if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
-                                if (power_ups[0].first && bombs[b].get_id() == player_id)
+                                if (power_ups[0].first)
                                 {
                                     bombs[b].set_direction(3);
                                     bombs[b].set_moving();
@@ -523,7 +523,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 {
                     if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
-                        if (power_ups[0].first && bombs[b].get_id() == player_id)
+                        if (power_ups[0].first)
                         {
                             bombs[b].set_direction(3);
                             bombs[b].set_moving();
@@ -601,7 +601,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             {
                                 if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
-                                    if (power_ups[0].first && bombs[b].get_id() == player_id)
+                                    if (power_ups[0].first)
                                     {
                                         bombs[b].set_direction(2);
                                         bombs[b].set_moving();
@@ -655,7 +655,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         {
                             if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
-                                if (power_ups[0].first && bombs[b].get_id() == player_id)
+                                if (power_ups[0].first)
                                 {
                                     bombs[b].set_direction(2);
                                     bombs[b].set_moving();
@@ -710,7 +710,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 {
                     if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
-                        if (power_ups[0].first && bombs[b].get_id() == player_id)
+                        if (power_ups[0].first)
                         {
                             bombs[b].set_direction(2);
                             bombs[b].set_moving();
@@ -783,7 +783,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                             {
                                 if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                                 {
-                                    if (power_ups[0].first && bombs[b].get_id() == player_id)
+                                    if (power_ups[0].first)
                                     {
                                         bombs[b].set_direction(4);
                                         bombs[b].set_moving();
@@ -837,7 +837,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                         {
                             if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                             {
-                                if (power_ups[0].first && bombs[b].get_id() == player_id)
+                                if (power_ups[0].first)
                                 {
                                     bombs[b].set_direction(4);
                                     bombs[b].set_moving();
@@ -892,7 +892,7 @@ void Player::updateLocation(Maze &maze, vector<Player> &players, vector<Bomb> &b
                 {
                     if (bombs[b].get_x() == next_x & bombs[b].get_y() == next_y)
                     {
-                        if (power_ups[0].first && bombs[b].get_id() == player_id)
+                        if (power_ups[0].first)
                         {
                             bombs[b].set_direction(4);
                             bombs[b].set_moving();

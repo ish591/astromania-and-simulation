@@ -10,7 +10,7 @@ using namespace std;
 class Renderer
 {
 public:
-    Renderer(int, int, vector<vector<SDL_Surface *>>, vector<SDL_Surface *>, vector<SDL_Surface *>, vector<SDL_Surface *>, SDL_Surface *, Mix_Chunk *, Mix_Chunk *);
+    Renderer(int, int, vector<vector<SDL_Surface *>>, vector<SDL_Surface *>, vector<SDL_Surface *>, vector<SDL_Surface *>, SDL_Surface *, Mix_Chunk *, Mix_Chunk *, TTF_Font *);
     void render_all(SDL_Renderer *, SDL_Surface *);
     void update(vector<int>);
     Map map = Map(1, 1, 100, 100, 0);
@@ -36,5 +36,6 @@ private:
     vector<int> lives;
     Mix_Chunk *win_sound;
     Mix_Chunk *explosion_sound;
+    TTF_Font *game_font;
     int num_bombs;
 };

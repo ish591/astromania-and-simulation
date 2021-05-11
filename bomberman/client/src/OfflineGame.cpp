@@ -1,6 +1,6 @@
 #include "OfflineGame.h"
 
-OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces, SDL_Surface *heart, Mix_Chunk *win_sound, Mix_Chunk *explosion_sound)
+OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces, SDL_Surface *heart, Mix_Chunk *win_sound, Mix_Chunk *explosion_sound, TTF_Font *curr_font)
 {
     OfflineGame::player_surfaces = player_surfaces;
     OfflineGame::block_surfaces = block_surfaces;
@@ -12,6 +12,7 @@ OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, 
     OfflineGame::heart = heart;
     OfflineGame::win_sound = win_sound;
     OfflineGame::explosion_sound = explosion_sound;
+    OfflineGame::game_font = curr_font;
     num_bombs = 0;
     newLevel();
     updates = 0;
@@ -198,9 +199,8 @@ void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
         vector<int> rgba = {0, 0, 0, 255};
         SDL_Color curr_color = {255, 0, 0};
         string curr_text = "Game Over !";
-        TTF_Font *curr_font = TTF_OpenFont("../assets/fonts/m5x7.ttf", 200);
         SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
-        surface = TTF_RenderText_Solid(curr_font, curr_text.c_str(), curr_color);
+        surface = TTF_RenderText_Solid(game_font, curr_text.c_str(), curr_color);
         SDL_Rect curr_rect = {(width - surface->w) / 2, (height - surface->h) / 6, surface->w, surface->h};
         SDL_RenderDrawRect(renderer, &curr_rect);
         SDL_Texture *display_texture = SDL_CreateTextureFromSurface(renderer, surface);
