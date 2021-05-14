@@ -11,7 +11,7 @@ Bomb::Bomb(Maze &maze, int r, int x1, int y1, int x_off, int y_off, int start_ti
     time_explode = 3000;
     speed = 3;
     radius = r;
-    bomb_size = block_size - 20;
+    bomb_size = block_size - 10;
     x_offset = x_off;
     y_offset = y_off;
     left_offset = maze.left_offset;
