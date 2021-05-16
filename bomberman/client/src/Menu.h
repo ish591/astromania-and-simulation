@@ -45,6 +45,7 @@ public:
     bool offline_selected = false;
     bool online_selected = false;
     int joined_players = 0; //the sole information needed for buffer menu
+    int total_players = 0;
     string IP_address;
     vector<TTF_Font *> fonts;
 };

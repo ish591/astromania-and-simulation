@@ -517,7 +517,7 @@ void Menu::event_buffer_menu(SDL_Event e)
     {
     case (SDL_KEYDOWN):
     {
-        if (!player_is_ready)
+        if (!player_is_ready && e.key.keysym.sym == SDLK_RETURN)
         {
             pressed = true;
             player_is_ready = true;
@@ -580,8 +580,8 @@ void Menu::display_buffer_menu(SDL_Renderer *renderer, SDL_Surface *surface)
     SDL_DestroyTexture(display_texture);
 
     int vertical_offset = (window_height * 65) / 144;
-    int horizontal_offset = (window_width - joined_players * ((window_width * 7) / 128) - (joined_players - 1) * (2 * window_width) / 128) / 2;
-    for (int i = 0; i < joined_players; i++)
+    int horizontal_offset = (window_width - total_players * ((window_width * 7) / 128) - (total_players - 1) * (2 * window_width) / 128) / 2;
+    for (int i = 0; i < total_players; i++)
     {
         surface = (player_surfaces[i][0]);
         if (!surface)
@@ -612,6 +612,24 @@ void Menu::display_buffer_menu(SDL_Renderer *renderer, SDL_Surface *surface)
     SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
     surface = TTF_RenderText_Solid(fonts[2], curr_text.c_str(), curr_color);
     curr_rect = {(window_width - surface->w) / 2, window_height * 90 / 144, surface->w, surface->h};
+    SDL_RenderDrawRect(renderer, &curr_rect);
+    display_texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_RenderFillRect(renderer, &curr_rect);
+    if (!display_texture)
+    {
+        // cout << "Failed to create texture" << endl;
+    }
+    else
+    {
+        SDL_RenderCopy(renderer, display_texture, nullptr, &curr_rect);
+    }
+    SDL_DestroyTexture(display_texture);
+    rgba = {0, 0, 0, 255};
+    curr_color = {255, 0, 0};
+    curr_text = "Number of players ready = " + to_string(joined_players) + "/" + to_string(total_players);
+    SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
+    surface = TTF_RenderText_Solid(fonts[2], curr_text.c_str(), curr_color);
+    curr_rect = {(window_width - surface->w) / 2, window_height * 110 / 144, surface->w, surface->h};
     SDL_RenderDrawRect(renderer, &curr_rect);
     display_texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_RenderFillRect(renderer, &curr_rect);

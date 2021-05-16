@@ -16,6 +16,7 @@ int main()
     while (!quit)
     {
         vector<vector<int>> actions = network_init.recv();
+        //send info about total players and players joined
         //cout << joined_so_far << endl;
         for (int i = 0; i < actions.size(); i++)
         {
@@ -24,27 +25,35 @@ int main()
             {
                 total_players++; //added players
                 //cout << "ok1" << endl;
+                string send_joining_info = "4 " + to_string(total_players) + " " + to_string(joined_so_far);
+                network_init.sendState(send_joining_info);
             }
             else if (actions[i][1] == 6)
             {
                 joined_so_far++; //player is ready
                 //cout << "ok2" << endl;
+                string send_joining_info = "4 " + to_string(total_players) + " " + to_string(joined_so_far);
+                network_init.sendState(send_joining_info);
             }
             else if (actions[i][1] == 7)
             {
                 //a player has left
                 total_players--;
                 joined_so_far--;
+                string send_joining_info = "4 " + to_string(total_players) + " " + to_string(joined_so_far);
+                network_init.sendState(send_joining_info);
             }
             else if (actions[i][1] == 8)
             {
                 joined_so_far--; //player has unreadied
+                string send_joining_info = "4 " + to_string(total_players) + " " + to_string(joined_so_far);
+                network_init.sendState(send_joining_info);
             }
-        }
-        if (total_players == joined_so_far && total_players > 0)
-        {
-            //cout << total_players << endl;
-            quit = true;
+            if (total_players == joined_so_far && total_players > 0)
+            {
+                SDL_Delay(50);
+                quit = true;
+            }
         }
     }
 

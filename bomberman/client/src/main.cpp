@@ -204,6 +204,7 @@ int main()
         printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
     }
     Init();
+    loadTextures();
     bool offline = false;
     bool online = false;
     bool game_started = false;
@@ -271,7 +272,6 @@ int main()
     }
     quit = false;
     SDL_FreeSurface(surface);
-    loadTextures();
     if (offline)
     {
         //cout << "Enter number of players: ";
@@ -414,6 +414,12 @@ int main()
                         break;
                         //this is player initialisation. Send only when starting
                     }
+                    else if (v.size() && v[0] == 4)
+                    {
+                        //cout << "ok" << endl;
+                        menu.total_players = v[1];
+                        menu.joined_players = v[2];
+                    }
                     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
                     while (SDL_PollEvent(&e))
@@ -443,7 +449,7 @@ int main()
                         //but haven't left.
                         //type 8.
                         client.send(8, 0, 0);
-                        not_ready_yet = false;
+                        not_ready_yet = true;
                     }
                     menu.display(renderer, surface);
                 }
