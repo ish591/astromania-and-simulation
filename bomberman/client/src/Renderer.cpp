@@ -25,9 +25,12 @@ void Renderer::update(vector<int> obj)
     switch (obj[0])
     {
     case 0:
+    {
+        //cout << "aca" << endl;
         if (map.getSize() < 4)
             map = Map(obj[3], 0, WINDOW_WIDTH, WINDOW_HEIGHT, obj[2]);
         break;
+    }
     case 1:
         players.clear();
         bombs.clear();

@@ -1,6 +1,6 @@
 #include "OnlineGame.h"
 
-OnlineGame::OnlineGame(int num_players, int maze_size, int width, int height)
+OnlineGame::OnlineGame(int num_players, int maze_size, int width, int height, Network &network_init)
 {
     if (SDL_Init(SDL_INIT_TIMER) != 0)
     {
@@ -10,6 +10,7 @@ OnlineGame::OnlineGame(int num_players, int maze_size, int width, int height)
     OnlineGame::maze_size = maze_size;
     OnlineGame::width = width;
     OnlineGame::height = height;
+    OnlineGame::network = network_init;
     network.seed = (time(0) % 100000);
     network.maze_size = maze_size;
     newLevel();
@@ -19,6 +20,17 @@ OnlineGame::OnlineGame(int num_players, int maze_size, int width, int height)
         Player player(i, maze);
         player.updateDimensions(maze, width, height);
         players.push_back(player);
+        string send_initial = "0 " + to_string(i) + " " + to_string(network.seed) + " " + to_string(maze_size) + "\n";
+        strcpy(network.tmp, send_initial.c_str());
+        //cout << socketvector.size() << endl;
+        int size = 0;
+        //we want to send initialize info ONLY TO THE CONCERNED SOCKET
+        int len = strlen(network.tmp) + 1;
+        while (size < len)
+        {
+            size += SDLNet_TCP_Send(network.socketvector[i - 1].socket, network.tmp, strlen(network.tmp) + 1);
+        }
+        //cout << send_initial << endl;
     }
     start_time = SDL_GetTicks();
     maze_update_time = start_time;
@@ -35,15 +47,15 @@ OnlineGame::~OnlineGame()
 bool OnlineGame::run()
 {
     Uint32 curTicks = SDL_GetTicks();
-    vector<vector<int>> actions = network.recv();
-    control(actions, curTicks);
+    //cout << "addcbsueucbc" << endl;
     render(curTicks);
-
     int val = (curTicks - start_time) / 5;
     for (; updates < val; updates++)
     {
         update(curTicks - (val - updates + 1) * 5);
     }
+    vector<vector<int>> actions = network.recv();
+    control(actions, curTicks);
     SDL_Delay(1);
     return false;
 }
@@ -173,6 +185,7 @@ void OnlineGame::render(int current_time)
     if (current_time > render_state_send_time + 30)
     {
         string s = "1 ";
+        //cout << players.size() << endl;
         for (int i = 0; i < players.size(); i++)
         {
             // if (players[i].isAlive())
@@ -186,7 +199,9 @@ void OnlineGame::render(int current_time)
         {
             s += explosions[i].render();
         }
+        //cout << s << endl;
         network.sendState(s);
+        //cout << s << endl;
         render_state_send_time = current_time;
     }
 }

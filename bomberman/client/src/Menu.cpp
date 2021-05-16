@@ -1,5 +1,5 @@
 #include "Menu.h"
-Menu::Menu(int w, int h)
+Menu::Menu(int w, int h, vector<vector<SDL_Surface *>> player_surfaces)
 {
     option = 0;
     window_width = w;
@@ -10,15 +10,18 @@ Menu::Menu(int w, int h)
     initialise_play_menu();
     initialise_offline_menu();
     initialise_online_menu();
+    Menu::player_surfaces = player_surfaces;
     pressed = false;
     offline_selected = false;
     online_selected = false;
+    player_is_ready = false;
     digit_map = {{SDLK_a, 'a'}, {SDLK_m, 'm'}, {SDLK_n, 'n'}, {SDLK_i, 'i'}, {SDLK_s, 's'}, {SDLK_h, 'h'}, {SDLK_0, '0'}, {SDLK_1, '1'}, {SDLK_2, '2'}, {SDLK_3, '3'}, {SDLK_4, '4'}, {SDLK_5, '5'}, {SDLK_6, '6'}, {SDLK_7, '7'}, {SDLK_8, '8'}, {SDLK_9, '9'}, {SDLK_PERIOD, '.'}};
 }
 void Menu::initialise_fonts()
 {
     fonts.push_back(TTF_OpenFont("../assets/fonts/m5x7.ttf", 24));
     fonts.push_back(TTF_OpenFont("../assets/fonts/OpenSans-Regular.ttf", 24));
+    fonts.push_back(TTF_OpenFont("../assets/fonts/m5x7.ttf", 30));
 }
 void Menu::initialise_main_menu()
 {
@@ -109,6 +112,10 @@ void Menu::initialise_online_menu()
     online_menu_buttons.push_back(button3);
     online_menu_buttons.push_back(button4);
 }
+void Menu::setOption(int option)
+{
+    Menu::option = option;
+}
 void Menu::display(SDL_Renderer *renderer, SDL_Surface *surface)
 {
     vector<menu_buttons> display_current;
@@ -135,9 +142,11 @@ void Menu::display(SDL_Renderer *renderer, SDL_Surface *surface)
         display_current = online_menu_buttons;
         counter_current = online_menu_counter;
         break;
-    default:
-        display_current = main_menu_buttons;
-        counter_current = main_menu_counter;
+    case 5:
+        display_buffer_menu(renderer, surface);
+        // default:
+        //     display_current = main_menu_buttons;
+        //     counter_current = main_menu_counter;
         break;
     }
     for (int i = 0; i < display_current.size(); i++)
@@ -199,8 +208,8 @@ void Menu::HandleEvents(SDL_Event e)
     case 4:
         event_online_menu(e);
         break;
-    default:
-        event_main_menu(e);
+    case 5:
+        event_buffer_menu(e);
         break;
     }
 }
@@ -502,98 +511,117 @@ void Menu::event_online_menu(SDL_Event e)
     }
     }
 }
-// void Menu::event_closing_menu(SDL_Event e)
-// {
-//     //display winner with its score
-//     //the winning one will be alive, rest three will be dead
-//     //Back to Menu
-//     //End Game
-//     switch (e.type)
-//     {
-//     case (SDL_KEYDOWN):
-//     {
-//         if (online_menu_counter == 0)
-//         {
-//             pressed = true;
-//             online_menu_counter = 2;
-//             //text box is highlighted (box number 2)
-//         }
-//         else
-//         {
-//             if (!pressed)
-//             {
-//                 pressed = true;
-//                 SDL_Keycode key_press = e.key.keysym.sym;
-//                 if (key_press == SDLK_DOWN)
-//                 {
-//                     online_menu_counter = (online_menu_counter + 1) - 3 * (online_menu_counter == 4);
-//                     //since we are effectively toggling in last three boxes (2,3,4)
-//                 }
-//                 else if (key_press == SDLK_UP)
-//                 {
-//                     online_menu_counter = (online_menu_counter - 1) + 3 * (online_menu_counter == 2);
-//                 }
-//                 else if (key_press == SDLK_RETURN)
-//                 {
-//                     if (online_menu_counter == 3)
-//                     {
-//                         //provide an IP and start!
-//                         online_selected = true;
-//                         IP_address = online_menu_buttons[1].text;
-//                     }
-//                     else if (online_menu_counter == 4)
-//                     {
-//                         option = 2;
-//                         online_menu_counter = 0;
-//                         play_menu_counter = 0;
-//                     }
-//                 }
-//                 else
-//                 {
-//                     //handle all key presses if online_menu_counter is 2
-//                     if (online_menu_counter == 2)
-//                     {
-//                         string temp = online_menu_buttons[1].text;
-//                         if (temp.length() <= 20)
-//                         { //max allowed
-//                             //not allowing space bars
-//                             //only allowing numbers and decimal
-//                             if (digit_map.find(key_press) != digit_map.end())
-//                             {
-//                                 if (temp == "Enter here")
-//                                 {
-//                                     temp = "";
-//                                 }
-//                                 temp += digit_map[key_press];
-//                             }
-//                         }
-//                         if (key_press == SDLK_BACKSPACE && temp.length() != 0)
-//                         {
-//                             if (temp == "Enter here")
-//                             {
-//                                 temp = "";
-//                             }
-//                             else
-//                             {
-//                                 temp.erase(temp.length() - 1);
-//                             }
-//                         }
-//                         online_menu_buttons[1].text = temp;
-//                     }
-//                 }
-//             }
-//         }
-//         break;
-//     }
-//     case (SDL_KEYUP):
-//     {
-//         pressed = false;
-//         break;
-//     }
-//     }
-// }
+void Menu::event_buffer_menu(SDL_Event e)
+{
+    switch (e.type)
+    {
+    case (SDL_KEYDOWN):
+    {
+        if (!player_is_ready)
+        {
+            pressed = true;
+            player_is_ready = true;
+            //button 1 is highlighted
+        }
+        else
+        {
+            if (!pressed)
+            {
+                pressed = true;
+                SDL_Keycode key_press = e.key.keysym.sym;
+                if (key_press == SDLK_RETURN)
+                {
+                    player_is_ready = !player_is_ready;
+                }
+            }
+        }
+        break;
+    }
+    case (SDL_KEYUP):
+    {
+        pressed = false;
+        break;
+    }
+    }
+}
 bool Menu::ended() { return offline_selected || online_selected; }
-// // void Menu::display_online_menu(SDL_Renderer *renderer, SDL_Surface *surface)
-// // {
-// //     //recieve IP address as input, back button
-// // }
+bool Menu::player_ready()
+{
+    return player_is_ready;
+}
+void Menu::display_buffer_menu(SDL_Renderer *renderer, SDL_Surface *surface)
+{
+    SDL_RenderClear(renderer);
+    vector<int> rgba = {0, 0, 0, 255};
+    SDL_Color curr_color = {255, 0, 0};
+    string curr_text;
+    if (player_is_ready)
+    {
+        curr_text = "Waiting for other Players ...";
+    }
+    else
+    {
+        curr_text = "Click on Ready button when ready !";
+    }
+    SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
+    surface = TTF_RenderText_Solid(fonts[0], curr_text.c_str(), curr_color);
+    SDL_Rect curr_rect = {(window_width - surface->w) / 2, (window_height - surface->h) / 6, surface->w, surface->h};
+    SDL_RenderDrawRect(renderer, &curr_rect);
+    SDL_Texture *display_texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_RenderFillRect(renderer, &curr_rect);
+    if (!display_texture)
+    {
+        // cout << "Failed to create texture" << endl;
+    }
+    else
+    {
+        SDL_RenderCopy(renderer, display_texture, nullptr, &curr_rect);
+    }
+    SDL_DestroyTexture(display_texture);
+
+    int vertical_offset = (window_height * 65) / 144;
+    int horizontal_offset = (window_width - joined_players * ((window_width * 7) / 128) - (joined_players - 1) * (2 * window_width) / 128) / 2;
+    for (int i = 0; i < joined_players; i++)
+    {
+        surface = (player_surfaces[i][0]);
+        if (!surface)
+        {
+            cout << "Failed to create surface" << endl;
+        }
+        SDL_Texture *curr_text = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_Rect rect = {horizontal_offset + i * (window_width)*9 / 128, vertical_offset, (window_width * 7) / 128, (window_height * 7) / 72};
+        if (!curr_text)
+        {
+            cout << "Failed to create texture" << endl;
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderFillRect(renderer, &rect);
+        }
+        else
+        {
+            SDL_RenderCopy(renderer, curr_text, nullptr, &rect);
+        }
+        SDL_DestroyTexture(curr_text);
+    }
+    rgba = {0, 0, 0, 255};
+    if (player_is_ready)
+    {
+        rgba = {0, 100, 100, 255};
+    }
+    curr_color = {255, 255, 255};
+    curr_text = "Ready";
+    SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
+    surface = TTF_RenderText_Solid(fonts[2], curr_text.c_str(), curr_color);
+    curr_rect = {(window_width - surface->w) / 2, window_height * 90 / 144, surface->w, surface->h};
+    SDL_RenderDrawRect(renderer, &curr_rect);
+    display_texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_RenderFillRect(renderer, &curr_rect);
+    if (!display_texture)
+    {
+        // cout << "Failed to create texture" << endl;
+    }
+    else
+    {
+        SDL_RenderCopy(renderer, display_texture, nullptr, &curr_rect);
+    }
+    SDL_DestroyTexture(display_texture);
+}

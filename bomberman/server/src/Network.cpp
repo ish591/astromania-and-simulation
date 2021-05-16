@@ -26,12 +26,13 @@ vector<vector<int>> Network::recv()
     {
         SDLNet_TCP_AddSocket(sockets, tmpsocket);
         socketvector.push_back(data(tmpsocket, SDL_GetTicks(), cur_id));
-        playernum++;
-        cur_id++;
-        sprintf(tmp, "0 %d %d %d \n", cur_id, seed, maze_size);
+        //playernum++;
+        //cur_id++;
+        //sprintf(tmp, "0 %d %d %d \n", cur_id, seed, maze_size);
         cout << "New connection!" << endl;
-        cout << cur_id << " " << seed << endl;
-        SDLNet_TCP_Send(tmpsocket, tmp, strlen(tmp) + 1);
+        //cout << cur_id << " " << seed << endl;
+        //SDLNet_TCP_Send(tmpsocket, tmp, strlen(tmp) + 1);
+        //currently don't send the player any initial info
     }
 
     vector<vector<int>> player_states;
@@ -41,7 +42,7 @@ vector<vector<int>> Network::recv()
         {
             if (SDLNet_SocketReady(socketvector[i].socket))
             {
-                vector<int> v(4);
+                vector<int> v(4, 0);
                 socketvector[i].timeout = SDL_GetTicks();
                 int offset = 0;
                 do
@@ -52,7 +53,7 @@ vector<vector<int>> Network::recv()
                 } while (tmp[strlen(tmp) - 1] != '\n');
                 sscanf(tmp, "%d %d %d %d", &v[0], &v[1], &v[2], &v[3]);
                 player_states.push_back(v);
-                // cout << "Received: " << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << endl;
+                //cout << "Received: " << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << endl;
             }
         }
     }
@@ -95,14 +96,16 @@ void Network::sendState(string passed)
     passed += "\n";
     // cout << passed << endl;
     strcpy(tmp, passed.c_str());
+    //cout << socketvector.size() << endl;
     for (int k = 0; k < socketvector.size(); k++)
     {
         int size = 0;
-        // cout << "Sending to " << k << passed << endl;
+        //cout << "Sending to " << k << passed << endl;
         int len = strlen(tmp) + 1;
         while (size < len)
         {
             size += SDLNet_TCP_Send(socketvector[k].socket, tmp, strlen(tmp) + 1);
         }
     }
+    //cout << "Sending to " << 0 << passed << endl;
 }

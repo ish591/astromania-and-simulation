@@ -23,7 +23,7 @@ void Client::send(int id, int up_down, int direction)
     // <id> <Up or Down> <direction 0-4> <newline>
     // cout << "SEND:" << id << up_down << direction << endl;
     sprintf(tmp, "1 %d %d %d \n", id, up_down, direction);
-    // cout << printf("%s", tmp) << endl;
+    //cout << printf("%s", tmp) << endl;
     int size = 0;
     int len = strlen(tmp) + 1;
     while (size < len)
@@ -69,7 +69,8 @@ vector<int> Client::recv()
             v.push_back(stoi(curr));
         }
         //sscanf(tmp, "%d %d %d %d %d %d", &v[0], &v[1], &v[2], &v[3], &v[4], &v[5]);
-        // cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << " " << v[4] << " " << v[5] << endl;
+        //cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << " " << v[4] << " " << v[5] << endl;
+        //01 1 336 56 32 32 2 3
         return v;
     }
     return vector<int>({});

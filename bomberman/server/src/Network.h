@@ -24,12 +24,12 @@ public:
     void sendState(string);
     vector<vector<int>> recv();
     int seed, maze_size;
+    vector<data> socketvector;
+    char tmp[8000];
 
 private:
     SDLNet_SocketSet sockets;
-    vector<data> socketvector;
     TCPsocket server;
-    char tmp[8000];
     int playernum;
     int cur_id;
     IPaddress ip;

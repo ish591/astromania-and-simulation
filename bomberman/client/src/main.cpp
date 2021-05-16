@@ -206,9 +206,11 @@ int main()
     Init();
     bool offline = false;
     bool online = false;
+    bool game_started = false;
+    bool not_ready_yet = true;
     //cout << "offline?";
     //cin >> offline;
-    Menu menu = Menu(WINDOW_WIDTH, WINDOW_HEIGHT);
+    Menu menu = Menu(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces);
     SDL_Window *win = SDL_CreateWindow("TEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, 0); //-1 denotes its the first renderer
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -326,7 +328,8 @@ int main()
     {
         Client client(menu.IP_address.c_str());
         Renderer renderIt = Renderer(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart, win_sound, explosion_sound, curr_font);
-        Mix_PlayMusic(game_music, -1);
+        //this denotes that a player has joined
+        client.send(5, 0, 0);
         while (!quit)
         {
             Uint32 curTicks = SDL_GetTicks();
@@ -339,57 +342,114 @@ int main()
             }
 
             SDL_RenderClear(renderer);
-            vector<int> v = client.recv();
-            if (v.size() && v[0] == 0)
+            if (game_started)
             {
-                player_id = v[1];
-            }
 
-            renderIt.update(v);
-            renderIt.render_all(renderer, surface);
+                vector<int> v = client.recv();
+                //cout << v.size() << endl;
+                renderIt.update(v);
+                renderIt.render_all(renderer, surface);
 
-            while (SDL_PollEvent(&e))
-            {
-                if (e.type == SDL_QUIT)
+                while (SDL_PollEvent(&e))
                 {
-                    quit = true;
-                    break;
-                }
-                if (e.type == SDL_KEYDOWN)
-                {
-                    if (e.key.keysym.sym == SDLK_m)
+                    if (e.type == SDL_QUIT)
                     {
-                        if (Mix_PausedMusic() == 1)
+                        client.send(7, 0, 0);
+                        quit = true;
+                        break;
+                    }
+                    if (e.type == SDL_KEYDOWN)
+                    {
+                        if (e.key.keysym.sym == SDLK_m)
                         {
-                            //Resume the music
-                            Mix_ResumeMusic();
-                        }
-                        //If the music is playing
-                        else
-                        {
-                            //Pause the music
-                            Mix_PauseMusic();
+                            if (Mix_PausedMusic() == 1)
+                            {
+                                //Resume the music
+                                Mix_ResumeMusic();
+                            }
+                            //If the music is playing
+                            else
+                            {
+                                //Pause the music
+                                Mix_PauseMusic();
+                            }
                         }
                     }
-                }
-                //send packet to server regarding the key press
-                vector<int> sending_info = get_send_info(e);
+                    //send packet to server regarding the key press
+                    vector<int> sending_info = get_send_info(e);
 
-                if (sending_info[0] != -1 && sending_info[1] != -1)
+                    if (sending_info[0] != -1 && sending_info[1] != -1)
+                    {
+                        event_queue.push({player_id, sending_info[0], sending_info[1]});
+                    }
+                }
+                if (curTicks > last_event_send_time + 50 && !(event_queue.empty()))
                 {
-                    event_queue.push({player_id, sending_info[0], sending_info[1]});
+                    //cout << player_id << endl;
+                    //cout << "here" << endl;
+                    last_event_send_time = curTicks;
+                    client.send(event_queue.front()[0], event_queue.front()[1], event_queue.front()[2]);
+                    event_queue.pop();
+                }
+                SDL_RenderPresent(renderer);
+            }
+            else
+            {
+                //HANDLE RECIEVING PACKETS FROM SERVER AT THIS TIME FOR DISPLAY OF NUMBER OF PLAYERS
+                SDL_RenderClear(renderer);
+                menu.setOption(5);
+                bool quit1 = false;
+                while (!quit1)
+                {
+                    vector<int> v = client.recv();
+                    if (v.size() && v[0] == 0)
+                    {
+                        //cout << "F" << endl;
+                        player_id = v[1];
+                        game_started = true;
+                        Mix_PlayMusic(game_music, -1);
+                        quit1 = true;
+                        renderIt.update(v);
+                        //renderIt.render_all(renderer, surface);
+                        break;
+                        //this is player initialisation. Send only when starting
+                    }
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+                    while (SDL_PollEvent(&e))
+                    {
+                        if (e.type == SDL_QUIT)
+                        {
+                            quit1 = true;
+                            break;
+                        }
+                        else
+                        {
+                            menu.HandleEvents(e);
+                            //add a ready button !!!!
+                        }
+                    }
+                    if (menu.player_ready() && not_ready_yet)
+                    {
+
+                        //send a packet to server that I am ready
+                        client.send(6, 0, 0);
+                        not_ready_yet = false;
+                        //only send a packet the first time
+                    }
+                    if (!menu.player_ready() && !not_ready_yet)
+                    {
+                        //if pressed ready button again, but was ready earlier. Send a packet that you are not ready.
+                        //but haven't left.
+                        //type 8.
+                        client.send(8, 0, 0);
+                        not_ready_yet = false;
+                    }
+                    menu.display(renderer, surface);
                 }
             }
-            if (curTicks > last_event_send_time + 50 && !(event_queue.empty()))
-            {
-                last_event_send_time = curTicks;
-                client.send(event_queue.front()[0], event_queue.front()[1], event_queue.front()[2]);
-                event_queue.pop();
-            }
-            SDL_RenderPresent(renderer);
         }
     }
-
     // SDL_DestroyWindow(win);
     IMG_Quit();
     SDL_Quit();

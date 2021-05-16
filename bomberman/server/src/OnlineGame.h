@@ -12,7 +12,7 @@ using namespace std;
 class OnlineGame
 {
 public:
-    OnlineGame(int, int, int, int);
+    OnlineGame(int, int, int, int, Network &);
     ~OnlineGame();
     bool run();
     void newLevel();
