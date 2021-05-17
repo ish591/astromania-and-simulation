@@ -14,7 +14,7 @@ class Bot : public Player
 public:
     Bot(int);
     void setDestination(Maze, int, int, vector<Coin>);
-    void render(SDL_Renderer *);
+    void render(SDL_Renderer *, SDL_Surface *, SDL_Surface *);
     void updateLocation(Maze);
     vector<vector<int>> bfs(Maze, int, int);
     vector<vector<int>> createMatrix(Maze, vector<Coin>);

@@ -40,7 +40,7 @@ void Coin::collect()
     if (!collected)
     {
         collected = true;
-        cout << "COLLECTED" << endl;
+        //cout << "COLLECTED" << endl;
         Mix_PlayChannel(-1, Coin::collect_coin, 0);
     }
 }

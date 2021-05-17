@@ -57,17 +57,17 @@ vector<vector<int>> Bot::createMatrix(Maze maze, vector<Coin> coins)
 vector<int> Bot::findOptimalPermutation(Maze maze, vector<Coin> coins)
 {
     vector<vector<int>> mat = createMatrix(maze, coins);
-    for (int i = 0; i < coins.size() + 2; i++)
-    {
+    // for (int i = 0; i < coins.size() + 2; i++)
+    // {
 
-        for (int j = 0; j < coins.size() + 2; j++)
-            cout << mat[i][j] << " ";
-        cout << endl;
-    }
-    for (int i = 0; i < coins.size(); i++)
-    {
-        cout << coins[i].getCoordinates().first << " " << coins[i].getCoordinates().second << endl;
-    }
+    //     for (int j = 0; j < coins.size() + 2; j++)
+    //         cout << mat[i][j] << " ";
+    //     cout << endl;
+    // }
+    // for (int i = 0; i < coins.size(); i++)
+    // {
+    //     //cout << coins[i].getCoordinates().first << " " << coins[i].getCoordinates().second << endl;
+    // }
     //this finds the optimal permutation according to indices
     vector<int> indices;
     for (int i = 1; i <= coins.size(); i++)
@@ -85,7 +85,7 @@ vector<int> Bot::findOptimalPermutation(Maze maze, vector<Coin> coins)
     cur_d += mat[indices[coins.size() - 1]][coins.size() + 1];
     minimal_distance = cur_d;
     optimal_answer = indices;
-    cout << minimal_distance << endl;
+    //cout << minimal_distance << endl;
     while (next_permutation(indices.begin(), indices.end()))
     {
         // for (int i = 0; i < coins.size(); i++)
@@ -106,7 +106,7 @@ vector<int> Bot::findOptimalPermutation(Maze maze, vector<Coin> coins)
         }
         // cout << cur_d << " " << minimal_distance << endl;
     }
-    cout << minimal_distance << endl;
+    //cout << minimal_distance << endl;
     return optimal_answer;
 }
 vector<vector<int>> Bot::bfs(Maze m, int x, int y)
@@ -326,9 +326,24 @@ void Bot::updateLocation(Maze maze)
     }
 }
 
-void Bot::render(SDL_Renderer *renderer)
+void Bot::render(SDL_Renderer *renderer, SDL_Surface *surface, SDL_Surface *player_surface)
 {
     SDL_Rect rect = {x * block_size + x_offset + left_offset - (player_size / 2), y * block_size + y_offset + top_offset - (player_size / 2), player_size, player_size};
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_RenderFillRect(renderer, &rect);
+    surface = (player_surface);
+    if (!surface)
+    {
+        cout << "Failed to create surface" << endl;
+    }
+    SDL_Texture *curr_texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (!curr_texture)
+    {
+        cout << "Failed to create texture" << endl;
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
+    else
+    {
+        SDL_RenderCopy(renderer, curr_texture, nullptr, &rect);
+    }
+    SDL_DestroyTexture(curr_texture);
 }

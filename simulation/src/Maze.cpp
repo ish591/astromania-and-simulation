@@ -161,13 +161,13 @@ void Maze::print()
     }
 }
 
-void Maze::render(SDL_Renderer *renderer)
+void Maze::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<SDL_Surface *> &block_surface)
 {
     for (int i = 0; i < M; i++)
     {
         for (int j = 0; j < M; j++)
         {
-            maze[i][j].render(renderer, j * (block_size) + left_offset, i * (block_size) + top_offset, block_size - discrete_walls, block_size - discrete_walls);
+            maze[i][j].render(renderer, surface, j * (block_size) + left_offset, i * (block_size) + top_offset, block_size - discrete_walls, block_size - discrete_walls, block_surface);
         }
     }
 }

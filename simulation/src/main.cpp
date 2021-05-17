@@ -14,12 +14,11 @@ SDL_Window *win = NULL;
 
 //The window renderer
 SDL_Renderer *renderer = NULL;
-
+vector<SDL_Surface *> block_surface;
+SDL_Surface *player_surface;
+SDL_Surface *surface = NULL;
 // //Scene texture
 // LTexture gPromptTexture;
-
-//The music that will be played
-Mix_Music *gMusic = NULL;
 
 //The sound effects that will be used
 // Mix_Chunk *collect_coin = NULL;
@@ -31,15 +30,8 @@ bool loadMedia()
     bool success = true;
 
     // Load music
-    gMusic = Mix_LoadMUS("sounds/beat.wav");
-    if (gMusic == NULL)
-    {
-        printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
-        success = false;
-    }
-
     // Load sound effects
-    Coin::collect_coin = Mix_LoadWAV("sounds/coin.wav");
+    Coin::collect_coin = Mix_LoadWAV("assets/sounds/coin.wav");
     if (Coin::collect_coin == NULL)
     {
         printf("Failed to load coin sound effect! SDL_mixer Error: %s\n", Mix_GetError());
@@ -48,17 +40,25 @@ bool loadMedia()
     return success;
 }
 
+void loadTextures()
+{
+    string assets_dir = "assets/images/";
+    string pref_player = assets_dir + "droid.png";
+    string pref_block = assets_dir + "block.png";
+    string pref_block2 = assets_dir + "empty_block.png";
+    block_surface.push_back(IMG_Load(pref_block2.c_str()));
+    block_surface.push_back(IMG_Load(pref_block.c_str()));
+    player_surface = IMG_Load(pref_player.c_str());
+}
+
 void close()
 {
     // //Free loaded images
     // gPromptTexture.free();
 
-    //Free the sound effects
-    // Mix_FreeChunk(Coin::collect_coin);
-    // Coin::collect_coin = NULL;
-    // Free the music
-    Mix_FreeMusic(gMusic);
-    gMusic = NULL;
+    // Free the sound effects
+    Mix_FreeChunk(Coin::collect_coin);
+    Coin::collect_coin = NULL;
 
     //Destroy window
     SDL_DestroyRenderer(renderer);
@@ -77,9 +77,11 @@ int main()
     int n, fl;
     cout << "Enter maze dimension: ";
     cin >> n;
+    bool paused = true;
     // cout << "Enter 0 for continuous walls, 1 for discrete:";
     // cin >> fl;
-    Maze maze(n, 1280, 720, fl);
+    loadTextures();
+    Maze maze(n, 1280, 720, false);
     bool success = true;
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) != 0)
     {
@@ -136,8 +138,11 @@ int main()
             int val = (curTicks - startTicks) / slow_factor;
             for (; updates < val; updates++)
             {
-                bot.updateLocation(maze);
-                bot.checkCoinCollection(coins);
+                if (!paused)
+                {
+                    bot.updateLocation(maze);
+                    bot.checkCoinCollection(coins);
+                }
             }
 
             while (SDL_PollEvent(&e))
@@ -166,14 +171,21 @@ int main()
                         // Mix_PlayChannel(-1, Coin::collect_coin, 0);
                     }
                 }
+                else if (e.type == SDL_KEYUP)
+                {
+                    if (e.key.keysym.sym == SDLK_SPACE)
+                    {
+                        paused = !paused;
+                    }
+                }
             }
 
-            maze.render(renderer);
+            maze.render(renderer, surface, block_surface);
             for (int i = 0; i < coins.size(); i++)
             {
                 coins[i].render(renderer);
             }
-            bot.render(renderer);
+            bot.render(renderer, surface, player_surface);
 
             SDL_RenderPresent(renderer);
         }

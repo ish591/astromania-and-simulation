@@ -15,7 +15,7 @@ public:
     void update(vector<pair<int, int>>);
     int getSize();
     void print();
-    void render(SDL_Renderer *);
+    void render(SDL_Renderer *, SDL_Surface *, vector<SDL_Surface *> &);
     int getBlockSize();
     vector<vector<Box>> getMaze();
     bool discrete_walls;

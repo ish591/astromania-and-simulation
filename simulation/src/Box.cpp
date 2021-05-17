@@ -16,7 +16,7 @@ int Box::get_block_type()
     return type;
 }
 
-void Box::render(SDL_Renderer *renderer, int x, int y, int w, int h)
+void Box::render(SDL_Renderer *renderer, SDL_Surface *surface, int x, int y, int w, int h, vector<SDL_Surface *> &block_surface)
 {
     SDL_Rect rect;
     rect = {x, y, w, h};
@@ -27,6 +27,7 @@ void Box::render(SDL_Renderer *renderer, int x, int y, int w, int h)
         g = 0;
         b = 0;
         a = 255;
+        surface = (block_surface[0]);
     }
     else
     {
@@ -34,7 +35,22 @@ void Box::render(SDL_Renderer *renderer, int x, int y, int w, int h)
         g = 0;
         b = 255;
         a = 255;
+        surface = (block_surface[1]);
     }
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
-    SDL_RenderFillRect(renderer, &rect);
+    if (!surface)
+    {
+        cout << "Failed to create surface" << endl;
+    }
+    SDL_Texture *curr_texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (!curr_texture)
+    {
+        cout << "Failed to create texture" << endl;
+        SDL_SetRenderDrawColor(renderer, r, g, b, a);
+        SDL_RenderFillRect(renderer, &rect);
+    }
+    else
+    {
+        SDL_RenderCopy(renderer, curr_texture, nullptr, &rect);
+    }
+    SDL_DestroyTexture(curr_texture);
 }
