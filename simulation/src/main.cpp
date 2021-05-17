@@ -16,6 +16,7 @@ SDL_Window *win = NULL;
 SDL_Renderer *renderer = NULL;
 vector<SDL_Surface *> block_surface;
 SDL_Surface *player_surface;
+SDL_Surface *coin_surface;
 SDL_Surface *surface = NULL;
 // //Scene texture
 // LTexture gPromptTexture;
@@ -49,6 +50,7 @@ void loadTextures()
     block_surface.push_back(IMG_Load(pref_block2.c_str()));
     block_surface.push_back(IMG_Load(pref_block.c_str()));
     player_surface = IMG_Load(pref_player.c_str());
+    coin_surface = IMG_Load((assets_dir + "gold.png").c_str());
 }
 
 void close()
@@ -114,7 +116,7 @@ int main()
         vector<Coin> coins;
         for (int i = 0; i < 6; i++)
         {
-            coins.push_back(Coin(n, maze.getBlockSize(), maze.left_offset, maze.top_offset));
+            coins.push_back(Coin(n, maze.getBlockSize(), maze.left_offset, maze.top_offset, coin_surface));
             coins[i].setLocation(coins);
         }
 
@@ -183,7 +185,7 @@ int main()
             maze.render(renderer, surface, block_surface);
             for (int i = 0; i < coins.size(); i++)
             {
-                coins[i].render(renderer);
+                coins[i].render(renderer, surface);
             }
             bot.render(renderer, surface, player_surface);
 

@@ -1,6 +1,6 @@
 #include "Coin.h"
 
-Coin::Coin(int N, int block_size, int left_offset, int top_offset)
+Coin::Coin(int N, int block_size, int left_offset, int top_offset, SDL_Surface *coin_surface)
 {
     srand(time(0));
     Coin::left_offset = left_offset;
@@ -10,7 +10,8 @@ Coin::Coin(int N, int block_size, int left_offset, int top_offset)
     collected = false;
     x = -1;
     y = -1;
-    coin_size = max(2, block_size / 2);
+    coin_size = max(2, block_size - 5);
+    Coin::coin_surface = coin_surface;
 }
 
 void Coin::setLocation(vector<Coin> coins)
@@ -45,14 +46,39 @@ void Coin::collect()
     }
 }
 
-void Coin::render(SDL_Renderer *renderer)
+void Coin::render(SDL_Renderer *renderer, SDL_Surface *surface)
 {
     SDL_Rect rect;
     rect = {left_offset + x * block_size + (block_size - coin_size) / 2, top_offset + y * block_size + (block_size - coin_size) / 2, coin_size, coin_size};
-    int r, g, b, a;
-    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-    if (!collected)
-        SDL_RenderFillRect(renderer, &rect);
+
+    surface = (coin_surface);
+    if (!surface)
+    {
+        // cout << "Failed to create surface" << endl;
+    }
+    SDL_Texture *curr_texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (!curr_texture)
+    {
+        // cout << "Failed to create texture" << endl;
+        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+        if (!collected)
+        {
+            SDL_RenderFillRect(renderer, &rect);
+        }
+        else
+        {
+            SDL_RenderDrawRect(renderer, &rect);
+        }
+    }
     else
-        SDL_RenderDrawRect(renderer, &rect);
+    {
+        if (!collected)
+            SDL_RenderCopy(renderer, curr_texture, nullptr, &rect);
+        else
+        {
+            SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+            SDL_RenderDrawRect(renderer, &rect);
+        }
+    }
+    SDL_DestroyTexture(curr_texture);
 }

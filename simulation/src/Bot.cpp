@@ -332,12 +332,12 @@ void Bot::render(SDL_Renderer *renderer, SDL_Surface *surface, SDL_Surface *play
     surface = (player_surface);
     if (!surface)
     {
-        cout << "Failed to create surface" << endl;
+        // cout << "Failed to create surface" << endl;
     }
     SDL_Texture *curr_texture = SDL_CreateTextureFromSurface(renderer, surface);
     if (!curr_texture)
     {
-        cout << "Failed to create texture" << endl;
+        // cout << "Failed to create texture" << endl;
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
         SDL_RenderFillRect(renderer, &rect);
     }

@@ -39,12 +39,12 @@ void Box::render(SDL_Renderer *renderer, SDL_Surface *surface, int x, int y, int
     }
     if (!surface)
     {
-        cout << "Failed to create surface" << endl;
+        // cout << "Failed to create surface" << endl;
     }
     SDL_Texture *curr_texture = SDL_CreateTextureFromSurface(renderer, surface);
     if (!curr_texture)
     {
-        cout << "Failed to create texture" << endl;
+        // cout << "Failed to create texture" << endl;
         SDL_SetRenderDrawColor(renderer, r, g, b, a);
         SDL_RenderFillRect(renderer, &rect);
     }

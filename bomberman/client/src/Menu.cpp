@@ -1,5 +1,5 @@
 #include "Menu.h"
-Menu::Menu(int w, int h, vector<vector<SDL_Surface *>> player_surfaces)
+Menu::Menu(int w, int h, vector<vector<SDL_Surface *>> player_surfaces, SDL_Surface *main_screen)
 {
     option = 0;
     window_width = w;
@@ -11,6 +11,7 @@ Menu::Menu(int w, int h, vector<vector<SDL_Surface *>> player_surfaces)
     initialise_offline_menu();
     initialise_online_menu();
     Menu::player_surfaces = player_surfaces;
+    Menu::main_screen = main_screen;
     pressed = false;
     offline_selected = false;
     online_selected = false;
@@ -25,8 +26,9 @@ void Menu::initialise_fonts()
 }
 void Menu::initialise_main_menu()
 {
-    SDL_Rect rect1 = {(window_width - 100) / 2, 100, 100, 30};
-    SDL_Rect rect2 = {(window_width - 100) / 2, 200, 100, 30};
+
+    SDL_Rect rect1 = {(window_width * 415) / 1280, window_height * 8 / 10, (window_width * 200) / 1280, (window_height * 50 / 720)};
+    SDL_Rect rect2 = {(window_width * 415) / 1280 + (window_width * 250) / 1280, window_height * 8 / 10, (window_width * 200) / 1280, (window_height * 50 / 720)};
     vector<int> rgba = {0, 0, 0, 255}; //default rectangle color
     string text1 = "Play";
     string text2 = "Help";
@@ -149,6 +151,20 @@ void Menu::display(SDL_Renderer *renderer, SDL_Surface *surface)
         //     counter_current = main_menu_counter;
         break;
     }
+    SDL_Rect curr_rect = {0, 0, window_width, window_height};
+    surface = main_screen;
+    SDL_RenderDrawRect(renderer, &curr_rect);
+    SDL_Texture *display_texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_RenderFillRect(renderer, &curr_rect);
+    if (!display_texture)
+    {
+        // cout << "Failed to create texture" << endl;
+    }
+    else
+    {
+        SDL_RenderCopy(renderer, display_texture, nullptr, &curr_rect);
+    }
+    SDL_DestroyTexture(display_texture);
     for (int i = 0; i < display_current.size(); i++)
     {
         vector<int> rgba;

@@ -12,8 +12,8 @@
 class Coin
 {
 public:
-    Coin(int, int, int, int);
-    void render(SDL_Renderer *);
+    Coin(int, int, int, int, SDL_Surface *);
+    void render(SDL_Renderer *, SDL_Surface *);
     pair<int, int> getCoordinates();
     void setLocation(vector<Coin>);
     void collect();
@@ -26,4 +26,5 @@ private:
     int coin_size = 10;
     int block_size;
     bool collected;
+    SDL_Surface *coin_surface;
 };

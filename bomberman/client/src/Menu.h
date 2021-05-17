@@ -19,9 +19,10 @@ private:
     map<SDL_Keycode, char> digit_map;
     bool player_is_ready = false;
     vector<vector<SDL_Surface *>> player_surfaces;
+    SDL_Surface *main_screen;
 
 public:
-    Menu(int, int, vector<vector<SDL_Surface *>>);
+    Menu(int, int, vector<vector<SDL_Surface *>>, SDL_Surface *);
     void initialise_fonts();
     void initialise_main_menu();
     void initialise_help_menu();

@@ -21,6 +21,7 @@ vector<vector<SDL_Surface *>> player_surfaces;
 vector<SDL_Surface *> block_surfaces;
 vector<SDL_Surface *> bomb_surfaces;
 vector<SDL_Surface *> explosion_surfaces;
+SDL_Surface *main_screen;
 SDL_Surface *heart;
 Mix_Music *menu_music = NULL;
 Mix_Music *game_music = NULL;
@@ -73,6 +74,9 @@ void loadTextures()
     explosion_surfaces.push_back(IMG_Load(image_explosion.c_str()));
     image_explosion = assets_dir + "images/explosion_vertical.png";
     explosion_surfaces.push_back(IMG_Load(image_explosion.c_str()));
+
+    string main_surf = assets_dir + "images/main_screen.png";
+    main_screen = IMG_Load(main_surf.c_str());
 }
 
 vector<int> get_send_info(SDL_Event event)
@@ -96,7 +100,7 @@ vector<int> get_send_info(SDL_Event event)
 
             direction = 3;
 
-        else if (key_press == SDLK_RETURN)
+        else if (key_press == SDLK_SPACE)
             direction = 4;
     }
     else if (event.type == SDL_KEYUP)
@@ -211,7 +215,7 @@ int main()
     bool not_ready_yet = true;
     //cout << "offline?";
     //cin >> offline;
-    Menu menu = Menu(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces);
+    Menu menu = Menu(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, main_screen);
     SDL_Window *win = SDL_CreateWindow("TEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, 0); //-1 denotes its the first renderer
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
