@@ -6,8 +6,10 @@ Player::Player(int id, Maze &maze)
     player_state = 2;
     if (id == 1)
     {
-        x = 1;
-        y = 1;
+        // x = 1;
+        // y = 1;
+        x = maze.getSize() - 2;
+        y = x;
         color_r = 255;
         color_g = 255;
         color_b = 0;
@@ -67,7 +69,7 @@ Player::Player(int id, Maze &maze)
     bomb_count = 0;
     total_released = 0;
     power_up_duration = 8000;
-    lives = 3;
+    lives = 1;
     last_life_loss_time = -5000;
     power_ups.push_back({0, -1}); //slidable bomb
     power_ups.push_back({1, -1}); //speed increased
@@ -1002,7 +1004,6 @@ void Player::render(SDL_Renderer *renderer, SDL_Surface *surface, vector<vector<
 {
     if (!isAlive())
         player_state = 4;
-
     surface = (player_surfaces[player_id - 1][player_state - 2]);
     if (!surface)
     {

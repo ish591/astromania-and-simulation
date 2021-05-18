@@ -30,6 +30,7 @@ OnlineGame::OnlineGame(int num_players, int maze_size, int width, int height, Ne
         {
             size += SDLNet_TCP_Send(network.socketvector[i - 1].socket, network.tmp, strlen(network.tmp) + 1);
         }
+        maze_update_time = SDL_GetTicks() + 40000;
         //cout << send_initial << endl;
     }
     start_time = SDL_GetTicks();
@@ -103,11 +104,11 @@ void OnlineGame::control(vector<vector<int>> actions, int current_time)
 
 void OnlineGame::update(int current_time)
 {
-    // if (current_time > maze_update_time + 20000)
-    // {
-    //     maze.close(current_time, maze.close_radius + 1);
-    //     maze_update_time = current_time;
-    // }
+    if (current_time > maze_update_time + 20000)
+    {
+        maze.close(current_time, maze.close_radius + 1);
+        maze_update_time = current_time;
+    }
 
     int alive_count = 0;
     maze.update(current_time);
@@ -123,14 +124,16 @@ void OnlineGame::update(int current_time)
         }
     }
 
-    if (alive_count == 1 && maze.close_radius != 100)
+    if (alive_count <= 1 && maze.close_radius <= 50)
     {
         if (winner == 0)
         {
             winner = temp_winner;
             winner_lives = players[winner - 1].lives;
+            if (winner == 0)
+                winner = -1;
         }
-        maze.close(current_time, 100);
+        maze.close(current_time + 4000, 100);
     }
     if (current_time > maze_update_send_time + 200)
     {
@@ -138,9 +141,12 @@ void OnlineGame::update(int current_time)
         for (int i = 0; i < 2; i++)
         {
             // cout << maze_updates << endl;
-            if (maze.close_radius == 100)
+            if (maze.close_radius >= 50)
             {
-                network.sendState("3 " + to_string(players.size()) + " " + to_string(winner) + " " + to_string(winner_lives));
+                if (winner == -1)
+                    network.sendState("3 " + to_string(players.size()) + " " + to_string(winner) + " " + to_string(-1));
+                else
+                    network.sendState("3 " + to_string(players.size()) + " " + to_string(winner) + " " + to_string(winner_lives));
             }
             else if (maze_updates.length() > 4)
             {
@@ -182,7 +188,7 @@ void OnlineGame::render(int current_time)
 {
     // maze.render(renderer, surface, block_surfaces);
 
-    if (current_time > render_state_send_time + 30)
+    if (current_time > render_state_send_time + 30 && (winner == 0 || SDL_GetTicks() < maze.last_close_time))
     {
         string s = "1 ";
         //cout << players.size() << endl;

@@ -21,13 +21,19 @@ vector<vector<SDL_Surface *>> player_surfaces;
 vector<SDL_Surface *> block_surfaces;
 vector<SDL_Surface *> bomb_surfaces;
 vector<SDL_Surface *> explosion_surfaces;
+vector<SDL_Surface *> mute_unmute;
+vector<SDL_Surface *> control_buttons;
 SDL_Surface *main_screen;
+SDL_Surface *background;
 SDL_Surface *heart;
+SDL_Surface *back_button;
 Mix_Music *menu_music = NULL;
 Mix_Music *game_music = NULL;
 Mix_Chunk *explosion_sound = NULL;
 Mix_Chunk *win_sound = NULL;
 TTF_Font *curr_font;
+int mute_hover = 0;
+int mute_state;
 int player_id = -1;
 void loadTextures()
 {
@@ -77,6 +83,29 @@ void loadTextures()
 
     string main_surf = assets_dir + "images/main_screen.png";
     main_screen = IMG_Load(main_surf.c_str());
+
+    string backg = assets_dir + "images/background.png";
+    background = IMG_Load(backg.c_str());
+
+    string mute = assets_dir + "images/music_off.png";
+    SDL_Surface *temp = IMG_Load(mute.c_str());
+    mute_unmute.push_back(temp);
+
+    string unmute = assets_dir + "images/music_on.png";
+    temp = IMG_Load(unmute.c_str());
+    mute_unmute.push_back(temp);
+
+    string backb = assets_dir + "images/back_button.png";
+    back_button = IMG_Load(backb.c_str());
+
+    string prefOff = assets_dir + "images/instructions/offline_";
+    for (int i = 0; i < 4; i++)
+    {
+        SDL_Surface *temp = IMG_Load((prefOff + to_string(i + 1) + ".png").c_str());
+        control_buttons.push_back(temp);
+    }
+    temp = IMG_Load((assets_dir + "images/instructions/online.png").c_str());
+    control_buttons.push_back(temp);
 }
 
 vector<int> get_send_info(SDL_Event event)
@@ -215,7 +244,7 @@ int main()
     bool not_ready_yet = true;
     //cout << "offline?";
     //cin >> offline;
-    Menu menu = Menu(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, main_screen);
+    Menu menu = Menu(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, main_screen, background, mute_unmute, back_button, control_buttons, block_surfaces);
     SDL_Window *win = SDL_CreateWindow("TEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, 0); //-1 denotes its the first renderer
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -280,12 +309,16 @@ int main()
     {
         //cout << "Enter number of players: ";
         //cin >> players;
-        OfflineGame game(players, 7, WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart, win_sound, explosion_sound, curr_font);
+        OfflineGame game(players, 7, WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart, win_sound, explosion_sound, curr_font, menu.mute_state, mute_unmute);
         int start_time = SDL_GetTicks();
         // if (Mix_PlayingMusic() == 0)
         // {
         //Play the music
         Mix_PlayMusic(game_music, -1);
+        if (menu.mute_state == 1)
+        {
+            Mix_PauseMusic();
+        }
         // }
         while (!quit)
         {
@@ -305,23 +338,6 @@ int main()
                 {
                     quit = true;
                 }
-                if (e.type == SDL_KEYDOWN)
-                {
-                    if (e.key.keysym.sym == SDLK_m)
-                    {
-                        if (Mix_PausedMusic() == 1)
-                        {
-                            //Resume the music
-                            Mix_ResumeMusic();
-                        }
-                        //If the music is playing
-                        else
-                        {
-                            //Pause the music
-                            Mix_PauseMusic();
-                        }
-                    }
-                }
 
                 game.control(e, curTicks);
             }
@@ -330,6 +346,8 @@ int main()
     }
     else if (online)
     {
+        SDL_Rect mute_rect = {WINDOW_WIDTH - (WINDOW_WIDTH * 100) / 1280, (WINDOW_HEIGHT * 8) / 10, (WINDOW_WIDTH * 70) / 1280, (WINDOW_HEIGHT * 50) / 720};
+        int mute_state = menu.mute_state;
         Client client(menu.IP_address.c_str());
         Renderer renderIt = Renderer(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, block_surfaces, bomb_surfaces, explosion_surfaces, heart, win_sound, explosion_sound, curr_font);
         //this denotes that a player has joined
@@ -348,7 +366,6 @@ int main()
             SDL_RenderClear(renderer);
             if (game_started)
             {
-
                 vector<int> v = client.recv();
                 //cout << v.size() << endl;
                 renderIt.update(v);
@@ -356,6 +373,64 @@ int main()
 
                 while (SDL_PollEvent(&e))
                 {
+                    switch (e.type)
+                    {
+                    case (SDL_MOUSEBUTTONDOWN):
+                    {
+                        if (e.button.button == SDL_BUTTON_LEFT)
+                        {
+                            if (mute_hover == 1)
+                            {
+                                if (Mix_PausedMusic() == 1)
+                                {
+                                    //Resume the music
+                                    Mix_ResumeMusic();
+                                    mute_state = 0;
+                                }
+                                //If the music is playing
+                                else
+                                {
+                                    //Pause the music
+                                    Mix_PauseMusic();
+                                    mute_state = 1;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case (SDL_MOUSEMOTION):
+                    {
+                        int x1, y1;
+                        SDL_GetMouseState(&x1, &y1);
+                        mute_hover = 0;
+                        if (x1 > mute_rect.x && x1 < (mute_rect.x + mute_rect.w) &&
+                            y1 > mute_rect.y && y1 < (mute_rect.y + mute_rect.h))
+                        {
+                            mute_hover = 1;
+                        }
+                        break;
+                    }
+                    case (SDL_KEYDOWN):
+                    {
+                        SDL_Keycode key_press = e.key.keysym.sym;
+                        if (key_press == SDLK_m)
+                        {
+                            if (Mix_PausedMusic() == 1)
+                            {
+                                //Resume the music
+                                Mix_ResumeMusic();
+                                mute_state = 0;
+                            }
+                            //If the music is playing
+                            else
+                            {
+                                //Pause the music
+                                Mix_PauseMusic();
+                                mute_state = 1;
+                            }
+                        }
+                    }
+                    }
                     if (e.type == SDL_QUIT)
                     {
                         client.send(7, 0, 0);
@@ -395,6 +470,37 @@ int main()
                     client.send(event_queue.front()[0], event_queue.front()[1], event_queue.front()[2]);
                     event_queue.pop();
                 }
+                if (mute_state == 0)
+                {
+                    surface = mute_unmute[1];
+                }
+                else
+                {
+                    surface = mute_unmute[0];
+                }
+                SDL_Texture *display_texture = SDL_CreateTextureFromSurface(renderer, surface);
+                if (!display_texture)
+                {
+                    //cout << "Failed to create texture" << endl;
+                    SDL_RenderFillRect(renderer, &mute_rect);
+                }
+                else
+                {
+                    SDL_RenderCopy(renderer, display_texture, nullptr, &mute_rect);
+                }
+                SDL_DestroyTexture(display_texture);
+                //SDL_Rect curr_rect = {width - (width * 100) / 1280, (height * 8) / 10, (width * 70) / 1280, (height * 50) / 720};
+                if (mute_hover == 1)
+                {
+                    SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
+                    SDL_RenderDrawRect(renderer, &mute_rect);
+                }
+                else
+                {
+                    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                    SDL_RenderDrawRect(renderer, &mute_rect);
+                }
+                SDL_DestroyTexture(display_texture);
                 SDL_RenderPresent(renderer);
             }
             else
@@ -408,10 +514,11 @@ int main()
                     vector<int> v = client.recv();
                     if (v.size() && v[0] == 0)
                     {
-                        //cout << "F" << endl;
                         player_id = v[1];
                         game_started = true;
                         Mix_PlayMusic(game_music, -1);
+                        if (mute_state == 1)
+                            Mix_PauseMusic();
                         quit1 = true;
                         renderIt.update(v);
                         //renderIt.render_all(renderer, surface);
@@ -455,6 +562,7 @@ int main()
                         client.send(8, 0, 0);
                         not_ready_yet = true;
                     }
+
                     menu.display(renderer, surface);
                 }
             }

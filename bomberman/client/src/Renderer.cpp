@@ -77,7 +77,6 @@ void Renderer::update(vector<int> obj)
             if (x >= 0 && y >= 0 && x < map.getSize() && y < map.getSize() && t >= 0 && t <= 6)
                 map.update(x, y, t);
         }
-
         break;
     case 3:
         map.close(SDL_GetTicks(), 100);
@@ -178,7 +177,7 @@ void Renderer::render_all(SDL_Renderer *renderer, SDL_Surface *surface)
     {
         vector<int> rgba = {0, 0, 0, 255};
         SDL_Color curr_color = {255, 0, 0};
-        string curr_text = "Game Over !";
+        string curr_text = "Game Over!";
         SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
         surface = TTF_RenderText_Solid(game_font, curr_text.c_str(), curr_color);
         SDL_Rect curr_rect = {(WINDOW_WIDTH - surface->w) / 2, (WINDOW_HEIGHT - surface->h) / 6, surface->w, surface->h};

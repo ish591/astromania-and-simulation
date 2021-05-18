@@ -269,7 +269,7 @@ void Maze::update(int cur_time)
     // cout << last_close.first << " " << last_close.second << " " << close_radius << " " << close_direction << endl;
     // cout << last_close_time << " " << cur_time << " ";
     int delay;
-    if (close_radius == 100)
+    if (close_radius >= 50)
         delay = 10;
     else
         delay = 1000;

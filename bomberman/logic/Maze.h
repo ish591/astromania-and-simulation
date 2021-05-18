@@ -30,6 +30,7 @@ public:
     string getBoxUpdates();
     int close_radius;
     bool closed;
+    int last_close_time;
 
 private:
     PRG randomiser = PRG(0);
@@ -42,6 +43,5 @@ private:
     vector<Box> power_ups;
     pair<int, int> last_close;
     int close_direction;
-    int last_close_time;
     //each powee up box has a type,coordinate, and ending time
 };

@@ -1,6 +1,6 @@
 #include "OfflineGame.h"
 
-OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces, SDL_Surface *heart, Mix_Chunk *win_sound, Mix_Chunk *explosion_sound, TTF_Font *curr_font)
+OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, vector<vector<SDL_Surface *>> player_surfaces, vector<SDL_Surface *> block_surfaces, vector<SDL_Surface *> bomb_surfaces, vector<SDL_Surface *> explosion_surfaces, SDL_Surface *heart, Mix_Chunk *win_sound, Mix_Chunk *explosion_sound, TTF_Font *curr_font, int mute_state, vector<SDL_Surface *> &mute_unmute)
 {
     OfflineGame::player_surfaces = player_surfaces;
     OfflineGame::block_surfaces = block_surfaces;
@@ -13,6 +13,8 @@ OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, 
     OfflineGame::win_sound = win_sound;
     OfflineGame::explosion_sound = explosion_sound;
     OfflineGame::game_font = curr_font;
+    OfflineGame::mute_unmute = mute_unmute;
+    mute_rect = {width - (width * 100) / 1280, (height * 8) / 10, (width * 70) / 1280, (height * 50) / 720};
     num_bombs = 0;
     newLevel();
     updates = 0;
@@ -23,8 +25,10 @@ OfflineGame::OfflineGame(int num_players, int maze_size, int width, int height, 
         players.push_back(player);
     }
     start_time = SDL_GetTicks();
-    maze_update_time = start_time;
+    maze_update_time = start_time + 40000;
     win_screen = false;
+    mute_hover = 0;
+    OfflineGame::mute_state = mute_state;
 }
 
 OfflineGame::~OfflineGame()
@@ -39,6 +43,64 @@ void OfflineGame::newLevel()
 
 void OfflineGame::control(SDL_Event e, int current_time)
 {
+    switch (e.type)
+    {
+    case (SDL_MOUSEBUTTONDOWN):
+    {
+        if (e.button.button == SDL_BUTTON_LEFT)
+        {
+            if (mute_hover == 1)
+            {
+                if (Mix_PausedMusic() == 1)
+                {
+                    //Resume the music
+                    Mix_ResumeMusic();
+                    mute_state = 0;
+                }
+                //If the music is playing
+                else
+                {
+                    //Pause the music
+                    Mix_PauseMusic();
+                    mute_state = 1;
+                }
+            }
+        }
+        break;
+    }
+    case (SDL_MOUSEMOTION):
+    {
+        int x1, y1;
+        SDL_GetMouseState(&x1, &y1);
+        mute_hover = 0;
+        if (x1 > mute_rect.x && x1 < (mute_rect.x + mute_rect.w) &&
+            y1 > mute_rect.y && y1 < (mute_rect.y + mute_rect.h))
+        {
+            mute_hover = 1;
+        }
+        break;
+    }
+    case (SDL_KEYDOWN):
+    {
+        SDL_Keycode key_press = e.key.keysym.sym;
+        if (key_press == SDLK_m)
+        {
+            if (Mix_PausedMusic() == 1)
+            {
+                //Resume the music
+                Mix_ResumeMusic();
+                mute_state = 0;
+            }
+            //If the music is playing
+            else
+            {
+                //Pause the music
+                Mix_PauseMusic();
+                mute_state = 1;
+            }
+        }
+    }
+    }
     for (int i = 0; i < players.size(); i++)
     {
         if (players[i].isAlive())
@@ -78,11 +140,15 @@ void OfflineGame::update(int current_time)
         }
     }
 
-    if (alive_count <= 1 && maze.close_radius != 100)
+    if (alive_count <= 1 && maze.close_radius <= 50)
     {
-        maze.close(current_time, 100);
+        maze.close(current_time + 3000, 100);
         if (winner == 0)
+        {
             winner = temp_winner;
+            if (winner == 0)
+                winner = -1;
+        }
     }
 
     for (int i = 0; i < explosions.size(); i++)
@@ -160,7 +226,7 @@ void OfflineGame::score_render(SDL_Renderer *renderer, SDL_Surface *surface)
 void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
 {
 
-    if (winner == 0)
+    if (winner == 0 || SDL_GetTicks() <= maze.last_close_time)
     {
         maze.render(renderer, surface, block_surfaces);
         for (int i = 0; i < players.size(); i++)
@@ -198,7 +264,7 @@ void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
     {
         vector<int> rgba = {0, 0, 0, 255};
         SDL_Color curr_color = {255, 0, 0};
-        string curr_text = "Game Over !";
+        string curr_text = "Game Over!";
         SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
         surface = TTF_RenderText_Solid(game_font, curr_text.c_str(), curr_color);
         SDL_Rect curr_rect = {(width - surface->w) / 2, (height - surface->h) / 6, surface->w, surface->h};
@@ -247,4 +313,36 @@ void OfflineGame::render(SDL_Renderer *renderer, SDL_Surface *surface)
             SDL_DestroyTexture(curr_text);
         }
     }
+    //SDL_RenderDrawRect(renderer, &curr_rect);
+    if (mute_state == 0)
+    {
+        surface = mute_unmute[1];
+    }
+    else
+    {
+        surface = mute_unmute[0];
+    }
+    SDL_Texture *display_texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (!display_texture)
+    {
+        //cout << "Failed to create texture" << endl;
+        SDL_RenderFillRect(renderer, &mute_rect);
+    }
+    else
+    {
+        SDL_RenderCopy(renderer, display_texture, nullptr, &mute_rect);
+    }
+    SDL_DestroyTexture(display_texture);
+    //SDL_Rect curr_rect = {width - (width * 100) / 1280, (height * 8) / 10, (width * 70) / 1280, (height * 50) / 720};
+    if (mute_hover == 1)
+    {
+        SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
+        SDL_RenderDrawRect(renderer, &mute_rect);
+    }
+    else
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDrawRect(renderer, &mute_rect);
+    }
+    SDL_DestroyTexture(display_texture);
 }

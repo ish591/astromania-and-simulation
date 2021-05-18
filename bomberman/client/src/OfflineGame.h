@@ -11,7 +11,7 @@ using namespace std;
 class OfflineGame
 {
 public:
-    OfflineGame(int, int, int, int, vector<vector<SDL_Surface *>>, vector<SDL_Surface *>, vector<SDL_Surface *>, vector<SDL_Surface *>, SDL_Surface *, Mix_Chunk *, Mix_Chunk *, TTF_Font *);
+    OfflineGame(int, int, int, int, vector<vector<SDL_Surface *>>, vector<SDL_Surface *>, vector<SDL_Surface *>, vector<SDL_Surface *>, SDL_Surface *, Mix_Chunk *, Mix_Chunk *, TTF_Font *, int, vector<SDL_Surface *> &);
     ~OfflineGame();
     void newLevel();
     void render(SDL_Renderer *, SDL_Surface *);
@@ -42,4 +42,8 @@ public:
     TTF_Font *game_font;
     bool win_screen;
     int num_bombs;
+    int mute_hover;
+    int mute_state;
+    SDL_Rect mute_rect{0, 0, 0, 0};
+    vector<SDL_Surface *> mute_unmute;
 };

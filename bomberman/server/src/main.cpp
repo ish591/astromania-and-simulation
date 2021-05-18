@@ -49,7 +49,7 @@ int main()
                 string send_joining_info = "4 " + to_string(total_players) + " " + to_string(joined_so_far);
                 network_init.sendState(send_joining_info);
             }
-            if (total_players == joined_so_far && total_players > 0)
+            if (total_players == joined_so_far && total_players > 1)
             {
                 SDL_Delay(50);
                 quit = true;
