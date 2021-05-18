@@ -30,11 +30,10 @@ OnlineGame::OnlineGame(int num_players, int maze_size, int width, int height, Ne
         {
             size += SDLNet_TCP_Send(network.socketvector[i - 1].socket, network.tmp, strlen(network.tmp) + 1);
         }
-        maze_update_time = SDL_GetTicks() + 40000;
         //cout << send_initial << endl;
     }
     start_time = SDL_GetTicks();
-    maze_update_time = start_time;
+    maze_update_time = start_time + 40000;
     maze_update_send_time = 0;
     winner = 0;
     winner_lives = 0;

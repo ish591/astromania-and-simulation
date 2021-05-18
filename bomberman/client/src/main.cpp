@@ -437,23 +437,6 @@ int main()
                         quit = true;
                         break;
                     }
-                    if (e.type == SDL_KEYDOWN)
-                    {
-                        if (e.key.keysym.sym == SDLK_m)
-                        {
-                            if (Mix_PausedMusic() == 1)
-                            {
-                                //Resume the music
-                                Mix_ResumeMusic();
-                            }
-                            //If the music is playing
-                            else
-                            {
-                                //Pause the music
-                                Mix_PauseMusic();
-                            }
-                        }
-                    }
                     //send packet to server regarding the key press
                     vector<int> sending_info = get_send_info(e);
 

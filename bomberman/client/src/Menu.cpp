@@ -1026,7 +1026,7 @@ void Menu::event_online_menu(SDL_Event e)
     {
         int x1, y1;
         SDL_GetMouseState(&x1, &y1);
-        online_menu_counter = 5;
+        online_menu_counter = 0;
         for (int i = 0; i < online_menu_buttons.size(); i++)
         {
             if (i != 2 && i != 3)
@@ -1042,7 +1042,7 @@ void Menu::event_online_menu(SDL_Event e)
     }
     case (SDL_KEYDOWN):
     {
-        if (online_menu_counter == 0)
+        if (online_menu_counter == 0 && e.key.keysym.sym == SDLK_RETURN)
         {
             online_menu_counter = 5;
         }
