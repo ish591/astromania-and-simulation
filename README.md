@@ -1,17 +1,34 @@
-# Maze Game and Simulator
+# Maze Game and Simulation
 
 A maze based game and maze solver simulation
 
-## Dev
+## Setup instructions
 
+To setup SDL and the appropriate libraries run:
 ```bash
-make # creates objects and executable in build directory
-make play # to test maze and player
-make clean # cleans the build
+make mac # Setup for mac: requires homebrew
+make ubuntu # Setup for ubuntu/debian 
 ```
+Libraries used:
+- SDL2
+- SDL2_net
+- SDL2_ttf
+- SDL2_image
+- SDL2_mixer
 
-## Current functionality
+Online resources used:
 
-- Generates a random maze
-- Allows a player to navigate in the maze
-- Added maze solver bot
+
+## Game: Astromania
+A game where players move through the maze, blasting rocks, collecting power-ups to gain abilities and incinerating their opponents
+
+More details can be found in [astromania/README.md](astromania/README.md)
+
+## Maze Solver Simulation
+
+A maze solver simulation implementing a Steiner-TSP solution.
+
+For details refer to [simulation/README.md](simulation/README.md)
+
+
+## References

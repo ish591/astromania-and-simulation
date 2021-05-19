@@ -8,7 +8,7 @@ Network::Network()
     SDLNet_ResolveHost(&ip, NULL, 1234);
     server = SDLNet_TCP_Open(&ip);
     sockets = SDLNet_AllocSocketSet(4);
-    cout << "Running on port 1234" << endl;
+    // cout << "Running on port 1234" << endl;
 }
 
 Network::~Network()

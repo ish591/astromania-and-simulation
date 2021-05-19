@@ -1,0 +1,5 @@
+The game is complete in all aspects:
+- Runs and compiles completely
+- Runs in online and offline mode - sockets are fully functional
+- Mouse and keyboard inputs work
+- Tested on mac and ubuntu

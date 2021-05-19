@@ -5,6 +5,7 @@
 #include <stack>
 #include <vector>
 #include <utility>
+#include <algorithm>
 
 #include "Player.h"
 #include "Coin.h"

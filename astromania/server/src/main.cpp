@@ -13,6 +13,7 @@ int main()
     int joined_so_far = 0;
     //sending ready/start signals only once
     Network network_init;
+    cout << "Running on port 1234" << endl;
     while (!quit)
     {
         vector<vector<int>> actions = network_init.recv();
@@ -58,7 +59,6 @@ int main()
     }
 
     OnlineGame game(total_players, 7, 1280, 720, network_init);
-    cout << "Running on port 1234" << endl;
     quit = false;
     while (!quit)
     {
