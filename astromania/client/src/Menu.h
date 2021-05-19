@@ -28,6 +28,8 @@ private:
     SDL_Surface *main_screen;
     SDL_Surface *background;
     SDL_Surface *back_button;
+    bool validIpnum(string);
+    bool wrong_formatted(string);
 
 public:
     int mute_state = 0;

@@ -143,6 +143,14 @@ void Player::takeAction(int down_press, SDL_Keycode key_press, Maze &maze, vecto
         }
         else if (key_press == DROP_BOMB)
         {
+            bomb_count = 0;
+            for (int i = 0; i < bombs.size(); i++)
+            {
+                if (bombs[i].get_id() == player_id)
+                {
+                    bomb_count++;
+                }
+            }
             if (bomb_count < power_ups[3].first) //then only release
             {
                 //currently setting the type as 1 only
@@ -963,16 +971,16 @@ void Player::update_bombs(Maze &maze, vector<Player> &players, vector<Bomb> &bom
         {
             new_bombs.push_back(u);
         }
-        else
-        {
-            for (int i = 0; i < players.size(); i++)
-            {
-                if (players[i].getId() == res.second)
-                {
-                    players[i].update_bomb_count(players[i].get_bomb_count() - 1);
-                }
-            }
-        }
+        // else
+        // {
+        //     for (int i = 0; i < players.size(); i++)
+        //     {
+        //         if (players[i].getId() == res.second)
+        //         {
+        //             players[i].update_bomb_count(players[i].get_bomb_count() - 1);
+        //         }
+        //     }
+        // }
     }
     bombs = new_bombs;
     //all old bombs have been updated and explosions, collissions checked.

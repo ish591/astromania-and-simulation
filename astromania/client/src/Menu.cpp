@@ -30,6 +30,54 @@ void Menu::initialise_fonts()
     fonts.push_back(TTF_OpenFont("../assets/fonts/OpenSans-Regular.ttf", 24));
     fonts.push_back(TTF_OpenFont("../assets/fonts/m5x7.ttf", 35));
 }
+bool Menu::validIpnum(string s)
+{
+    for (int i = 0; i < s.length(); i++)
+    {
+        if (!((int)s[i] >= 48 && (int)s[i] <= 57))
+        {
+            return false;
+        }
+    }
+    if (!(stoi(s) >= 0 && stoi(s) <= 255))
+    {
+        return false;
+    }
+    return true;
+}
+bool Menu::wrong_formatted(string s)
+{
+    vector<string> parts;
+    string curr = "";
+    for (int i = 0; i < s.size(); i++)
+    {
+        if (s[i] != '.')
+        {
+            curr += s[i];
+        }
+        else
+        {
+            parts.push_back(curr);
+            curr = "";
+        }
+    }
+    if (curr != "")
+    {
+        parts.push_back(curr);
+    }
+    if (parts.size() != 4)
+    {
+        return true;
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        if (!validIpnum(parts[i]))
+        {
+            return true;
+        }
+    }
+    return false;
+}
 void Menu::initialise_main_menu()
 {
     SDL_Rect rect0 = {window_width - (window_width * 100) / 1280, (window_height * 8) / 10, (window_width * 70) / 1280, (window_height * 50) / 720};
@@ -1108,19 +1156,28 @@ void Menu::event_online_menu(SDL_Event e)
                 }
                 else if (online_menu_counter == 5)
                 {
-                    online_selected = true;
                     IP_address = online_menu_buttons[3].text;
                     if (online_menu_buttons[3].text == "aman")
                     {
                         IP_address = "122.161.203.46";
+                        online_selected = true;
                     }
                     else if (online_menu_buttons[3].text == "ishaan")
                     {
                         IP_address = "182.68.33.240";
+                        online_selected = true;
                     }
                     else if (online_menu_buttons[3].text == "local")
                     {
                         IP_address = "127.0.0.1";
+                        online_selected = true;
+                    }
+                    else
+                    {
+                        if (wrong_formatted(IP_address))
+                        {
+                            online_menu_buttons[2].text = "Invalid IP address !";
+                        }
                     }
                 }
             }
@@ -1282,7 +1339,7 @@ void Menu::display_buffer_menu(SDL_Renderer *renderer, SDL_Surface *surface)
     }
     else
     {
-        curr_text = "Click on Ready button when ready !";
+        curr_text = "Click on the Ready button when ready !";
     }
     SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
     surface = TTF_RenderText_Solid(fonts[0], curr_text.c_str(), curr_color);

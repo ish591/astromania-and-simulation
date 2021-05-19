@@ -245,7 +245,7 @@ int main()
     //cout << "offline?";
     //cin >> offline;
     Menu menu = Menu(WINDOW_WIDTH, WINDOW_HEIGHT, player_surfaces, main_screen, background, mute_unmute, back_button, control_buttons, block_surfaces);
-    SDL_Window *win = SDL_CreateWindow("TEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
+    SDL_Window *win = SDL_CreateWindow("Astromania", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, 0); //-1 denotes its the first renderer
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     if (!win)
