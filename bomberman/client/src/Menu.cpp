@@ -22,7 +22,7 @@ Menu::Menu(int w, int h, vector<vector<SDL_Surface *>> player_surfaces, SDL_Surf
     offline_selected = false;
     online_selected = false;
     player_is_ready = false;
-    digit_map = {{SDLK_a, 'a'}, {SDLK_m, 'm'}, {SDLK_n, 'n'}, {SDLK_i, 'i'}, {SDLK_s, 's'}, {SDLK_h, 'h'}, {SDLK_0, '0'}, {SDLK_1, '1'}, {SDLK_2, '2'}, {SDLK_3, '3'}, {SDLK_4, '4'}, {SDLK_5, '5'}, {SDLK_6, '6'}, {SDLK_7, '7'}, {SDLK_8, '8'}, {SDLK_9, '9'}, {SDLK_PERIOD, '.'}};
+    digit_map = {{SDLK_l, 'l'}, {SDLK_o, 'o'}, {SDLK_c, 'c'}, {SDLK_a, 'a'}, {SDLK_m, 'm'}, {SDLK_n, 'n'}, {SDLK_i, 'i'}, {SDLK_s, 's'}, {SDLK_h, 'h'}, {SDLK_0, '0'}, {SDLK_1, '1'}, {SDLK_2, '2'}, {SDLK_3, '3'}, {SDLK_4, '4'}, {SDLK_5, '5'}, {SDLK_6, '6'}, {SDLK_7, '7'}, {SDLK_8, '8'}, {SDLK_9, '9'}, {SDLK_PERIOD, '.'}};
 }
 void Menu::initialise_fonts()
 {
@@ -1016,6 +1016,10 @@ void Menu::event_online_menu(SDL_Event e)
                 }
                 else if (online_menu_buttons[3].text == "ishaan")
                 {
+                    IP_address = "182.68.33.240";
+                }
+                else if (online_menu_buttons[3].text == "local")
+                {
                     IP_address = "127.0.0.1";
                 }
             }
@@ -1111,6 +1115,10 @@ void Menu::event_online_menu(SDL_Event e)
                         IP_address = "122.161.203.46";
                     }
                     else if (online_menu_buttons[3].text == "ishaan")
+                    {
+                        IP_address = "182.68.33.240";
+                    }
+                    else if (online_menu_buttons[3].text == "local")
                     {
                         IP_address = "127.0.0.1";
                     }

@@ -6,10 +6,8 @@ Player::Player(int id, Maze &maze)
     player_state = 2;
     if (id == 1)
     {
-        // x = 1;
-        // y = 1;
-        x = maze.getSize() - 2;
-        y = x;
+        x = 1;
+        y = 1;
         color_r = 255;
         color_g = 255;
         color_b = 0;
@@ -69,7 +67,7 @@ Player::Player(int id, Maze &maze)
     bomb_count = 0;
     total_released = 0;
     power_up_duration = 8000;
-    lives = 1;
+    lives = 3;
     last_life_loss_time = -5000;
     power_ups.push_back({0, -1}); //slidable bomb
     power_ups.push_back({1, -1}); //speed increased

@@ -14,6 +14,8 @@ public:
     void render_all(SDL_Renderer *, SDL_Surface *);
     void update(vector<int>);
     Map map = Map(1, 1, 100, 100, 0);
+    bool winner_screen;
+    int winner = 0;
 
 private:
     vector<pair<pair<int, int>, SDL_Rect>> players;
@@ -29,10 +31,8 @@ private:
     void render_explosion(SDL_Renderer *, SDL_Surface *, SDL_Rect);
     void score_render(SDL_Renderer *, SDL_Surface *);
     int WINDOW_HEIGHT, WINDOW_WIDTH;
-    int winner = 0;
     int rem_lives = -1;
     int number_of_players = 0;
-    bool winner_screen;
     vector<int> lives;
     Mix_Chunk *win_sound;
     Mix_Chunk *explosion_sound;

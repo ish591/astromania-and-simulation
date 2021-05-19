@@ -470,37 +470,40 @@ int main()
                     client.send(event_queue.front()[0], event_queue.front()[1], event_queue.front()[2]);
                     event_queue.pop();
                 }
-                if (mute_state == 0)
+                if (renderIt.winner == 0 || !renderIt.map.closed || !renderIt.winner_screen)
                 {
-                    surface = mute_unmute[1];
+                    if (mute_state == 0)
+                    {
+                        surface = mute_unmute[1];
+                    }
+                    else
+                    {
+                        surface = mute_unmute[0];
+                    }
+                    SDL_Texture *display_texture = SDL_CreateTextureFromSurface(renderer, surface);
+                    if (!display_texture)
+                    {
+                        //cout << "Failed to create texture" << endl;
+                        SDL_RenderFillRect(renderer, &mute_rect);
+                    }
+                    else
+                    {
+                        SDL_RenderCopy(renderer, display_texture, nullptr, &mute_rect);
+                    }
+                    SDL_DestroyTexture(display_texture);
+                    //SDL_Rect curr_rect = {width - (width * 100) / 1280, (height * 8) / 10, (width * 70) / 1280, (height * 50) / 720};
+                    if (mute_hover == 1)
+                    {
+                        SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
+                        SDL_RenderDrawRect(renderer, &mute_rect);
+                    }
+                    else
+                    {
+                        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                        SDL_RenderDrawRect(renderer, &mute_rect);
+                    }
+                    SDL_DestroyTexture(display_texture);
                 }
-                else
-                {
-                    surface = mute_unmute[0];
-                }
-                SDL_Texture *display_texture = SDL_CreateTextureFromSurface(renderer, surface);
-                if (!display_texture)
-                {
-                    //cout << "Failed to create texture" << endl;
-                    SDL_RenderFillRect(renderer, &mute_rect);
-                }
-                else
-                {
-                    SDL_RenderCopy(renderer, display_texture, nullptr, &mute_rect);
-                }
-                SDL_DestroyTexture(display_texture);
-                //SDL_Rect curr_rect = {width - (width * 100) / 1280, (height * 8) / 10, (width * 70) / 1280, (height * 50) / 720};
-                if (mute_hover == 1)
-                {
-                    SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
-                    SDL_RenderDrawRect(renderer, &mute_rect);
-                }
-                else
-                {
-                    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-                    SDL_RenderDrawRect(renderer, &mute_rect);
-                }
-                SDL_DestroyTexture(display_texture);
                 SDL_RenderPresent(renderer);
             }
             else
