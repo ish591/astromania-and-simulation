@@ -32,3 +32,22 @@ For details refer to [simulation/README.md](simulation/README.md)
 
 
 ## References
+SDL:
+- https://lazyfoo.net/tutorials/SDL/index.php
+- https://github.com/schuay/pacman
+- https://github.com/maciejspychala/sdl-game
+
+SDL_net:
+- https://www.youtube.com/watch?v=iJfC4-yNnzY
+
+Maze generation:
+- https://en.wikipedia.org/wiki/Maze-solving_algorithm
+
+Maze Solving:
+- https://en.wikipedia.org/wiki/Maze-solving_algorithm
+
+Game Logic:
+- Brain
+
+
+### Made by Aman Verma & Ishaan Singh
